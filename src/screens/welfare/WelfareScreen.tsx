@@ -1,7 +1,7 @@
 // 복지 혜택 흐름의 첫 화면: "누구의 혜택인가요?" — 청년 / 신혼·출산 / 육아 / 중장년 / 어르신 / 장애·돌봄.
 // 흐름: welfare → group → stage → item → (quiz | docs | apply)
 import { Crumb } from '@/components/layout/Crumb';
-import { ForeignNote } from '@/components/ui/Bits';
+import { ForeignNote } from '@/components/ui/Notes';
 import { Grid, Tile } from '@/components/ui/Tile';
 import { useApp } from '@/context/AppContext';
 import { GROUPS } from '@/data/benefits';

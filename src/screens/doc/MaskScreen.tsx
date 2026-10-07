@@ -4,7 +4,7 @@
 // 원본 html의 #mask 섹션 + 포인터 이벤트 핸들러 세 개를 옮긴 것.
 import { useEffect, useRef, type PointerEvent } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Hint } from '@/components/ui/Bits';
+import { Hint } from '@/components/ui/Notes';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';

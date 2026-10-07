@@ -3,7 +3,7 @@
 // 데이터는 시청·주민센터 화면(VisitScreens)과 같은 TASKS를 쓴다. 원본 html의 #counter.
 import { useState } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Bits';
+import { Hint, Note } from '@/components/ui/Notes';
 import { LangRow } from '@/components/ui/LangRow';
 import { Tr } from '@/components/ui/Tr';
 import { useApp } from '@/context/AppContext';

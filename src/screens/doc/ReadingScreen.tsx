@@ -4,7 +4,7 @@
 // 원본 html에서는 show('reading') 직후 async 함수 하나가 이 일을 전부 했다.
 import { useEffect, useRef } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Thinking } from '@/components/ui/Bits';
+import { Thinking } from '@/components/ui/Status';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { getAi } from '@/services/ai';

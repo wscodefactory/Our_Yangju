@@ -4,7 +4,8 @@
 // 상태는 AdminScreen이 들고 있고 여기선 state/setState로 받기만 한다(탭 전환 시 보존 때문).
 // 원본 html의 #admin 등록 탭 + extractRule()/publishRule().
 import { useMemo } from 'react';
-import { AiModeBadge, Hint, Note, Thinking } from '@/components/ui/Bits';
+import { Hint, Note } from '@/components/ui/Notes';
+import { AiModeBadge, Thinking } from '@/components/ui/Status';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';

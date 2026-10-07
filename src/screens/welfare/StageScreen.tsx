@@ -2,7 +2,8 @@
 // 담당자가 게시한 혜택(NEW)도 youthStages에 합쳐져 있어서 같이 보인다.
 import { Crumb } from '@/components/layout/Crumb';
 import { BenefitTile } from '@/components/ui/BenefitTile';
-import { ForeignNote, Legend } from '@/components/ui/Bits';
+import { ForeignNote } from '@/components/ui/Notes';
+import { Legend } from '@/components/ui/Status';
 import { Grid, Tile } from '@/components/ui/Tile';
 import { useApp } from '@/context/AppContext';
 import { NOW_STAGE } from '@/data/benefits';

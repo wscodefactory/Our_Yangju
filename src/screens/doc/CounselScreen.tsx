@@ -3,7 +3,7 @@
 // CardScreen(q 없음)과 TaxQScreen(질문 있음) 양쪽에서 들어온다. 원본 html의 #counsel.
 import { useRef, useState } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Bits';
+import { Hint, Note } from '@/components/ui/Notes';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';

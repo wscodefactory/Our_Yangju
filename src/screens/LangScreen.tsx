@@ -1,6 +1,6 @@
 // 첫 방문 언어 선택. localStorage에 카드 언어가 없으면 내비 스택이 이 화면 하나로 시작한다.
 // Header의 '언어' 칩, 홈의 "언어명 ✎" 버튼으로도 다시 들어올 수 있다.
-import { Note } from '@/components/ui/Bits';
+import { Note } from '@/components/ui/Notes';
 import { useApp } from '@/context/AppContext';
 import { CARD_LANGS, LANG_NAME, NATIVE } from '@/data/tax';
 

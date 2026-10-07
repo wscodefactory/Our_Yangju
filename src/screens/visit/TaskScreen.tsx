@@ -1,43 +1,17 @@
-// 시청·주민센터 민원 안내: 업무 타일 목록(VisitScreen) → 업무 상세(TaskScreen).
-// 데이터는 TASKS(data/civic) 하나고, 같은 데이터를 담당자 창구 모드도 쓴다.
-// 문구는 전부 <Tr>로 감싸서 카드 언어가 zh/vi/ne면 자동으로 번역이 끼워진다. 원본 html의 #visit, #task.
+// 시청·주민센터 민원 업무 상세(task): 어디서 / 언제까지 / 가져갈 것 + 창구에 보여줄 한국어 카드.
+// 데이터는 TASKS(data/civic)에서 id로 찾는다. VisitScreen의 타일에서 들어온다.
+// 문구는 전부 <Tr>로 감싸서 카드 언어가 zh/vi/ne면 자동으로 번역이 끼워진다. 원본 html의 #task.
 import { Crumb } from '@/components/layout/Crumb';
-import { CheckItemRow, Note } from '@/components/ui/Bits';
-import { Grid, Stack, Tile } from '@/components/ui/Tile';
+import { Note } from '@/components/ui/Notes';
+import { CheckItemRow } from '@/components/ui/Status';
+import { Stack } from '@/components/ui/Tile';
 import { Tr } from '@/components/ui/Tr';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { useGuide } from '@/context/GuideContext';
 import { TASKS } from '@/data/civic';
-import { TaskIconSvg } from '@/data/icons';
 import { SPEECH_LANG } from '@/data/tax';
 import { canSpeak, speak } from '@/utils/browser';
-
-// 빵부스러기 첫 칸. 두 화면이 같이 써서 빼둠
-const CityOffice = () => <Tr ko="시청·주민센터" en="City office" />;
-
-/** 시청·주민센터: 어떤 일인가요? — 업무 타일 그리드 */
-export function VisitScreen() {
-  const { go } = useApp();
-  return (
-    <>
-      <Crumb path={<CityOffice />} />
-      <h1><Tr ko="어떤 일인가요?" en="Which task?" /></h1>
-      <Grid>
-        {TASKS.map((task) => {
-          const Icon = TaskIconSvg[task.icon];
-          return (
-            <Tile key={task.id} onClick={() => go({ k: 'task', v: task.id })}>
-              <Icon />
-              <span className="lab" style={{ fontSize: '1.25em' }}><Tr ko={task.name[0]} en={task.name[1]} /></span>
-            </Tile>
-          );
-        })}
-      </Grid>
-      <Note><Tr ko="내용은 일반 안내이며 접수 창구·준비물은 양주시 확인 후 확정합니다." en="General guidance. Counters and documents to be confirmed with Yangju City." /></Note>
-    </>
-  );
-}
 
 /**
  * 민원 업무 상세: 어디서 / 언제까지 / 가져갈 것 + 창구에 보여줄 한국어.
@@ -53,7 +27,8 @@ export function TaskScreen({ v }: { v: string }) {
   const spoken = [task.name[1], task.where[1], task.when[1], ...task.docs.map((d) => d[1])].join('. ');
   return (
     <>
-      <Crumb path={<><CityOffice /> › <Tr ko={task.name[0]} en={task.name[1]} /></>} />
+      {/* 빵부스러기 첫 칸은 VisitScreen과 같은 문구 */}
+      <Crumb path={<><Tr ko="시청·주민센터" en="City office" /> › <Tr ko={task.name[0]} en={task.name[1]} /></>} />
       <h1><Tr ko={task.name[0]} en={task.name[1]} /></h1>
       <div className="step"><span className="no">1</span><b><Tr ko="어디서" en="Where" /></b><p><Tr ko={task.where[0]} en={task.where[1]} /></p></div>
       <div className="step"><span className="no">2</span><b><Tr ko="언제까지" en="When" /></b><p><Tr ko={task.when[0]} en={task.when[1]} /></p></div>

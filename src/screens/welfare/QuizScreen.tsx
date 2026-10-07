@@ -4,7 +4,8 @@
 import { useState } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
 import { BenefitTile } from '@/components/ui/BenefitTile';
-import { ForeignNote, ResultBox } from '@/components/ui/Bits';
+import { ResultBox } from '@/components/ui/Cards';
+import { ForeignNote } from '@/components/ui/Notes';
 import { Grid, Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';

@@ -3,7 +3,7 @@
 // 원본 html의 #admin 섹션.
 import { useState } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Bits';
+import { Hint, Note } from '@/components/ui/Notes';
 import { useApp } from '@/context/AppContext';
 import { GAP_SIGNALS } from '@/data/tax';
 import { RegisterPanel, initialRegisterState, type RegisterState } from './RegisterPanel';

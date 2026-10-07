@@ -69,3 +69,7 @@ export const CERTS: Cert[] = [
   { name: ['안심식당', 'Safe Restaurant'], by: ['지자체 지정', 'Local government'], what: ['덜어 먹기 · 위생 수칙을 지키는 식당', 'Serving utensils and hygiene rules kept'], q: '양주 안심식당' },
   { name: ['모범음식점', 'Model Restaurant'], by: ['지자체 지정', 'Local government'], what: ['위생 · 서비스 우수 업소', 'Excellent hygiene and service'], q: '양주 모범음식점' },
 ];
+
+// 출처 줄(SourceLine)에 반복해서 쓰는 Bi 쌍. 맛집·명소 섹션 화면들이 공유한다
+export const NAVER_SRC: Bi = ['네이버 지도', 'Naver Map'];
+export const CERT_SRC: Bi = ['인증 기관 공개 목록', 'Certifier lists'];

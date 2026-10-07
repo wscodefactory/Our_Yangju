@@ -3,7 +3,7 @@
 // 원본 html의 #doc 섹션(파일 input + 버튼 3개)을 그대로 옮긴 것.
 import { useRef } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Bits';
+import { Hint, Note } from '@/components/ui/Notes';
 import { LangRow } from '@/components/ui/LangRow';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';

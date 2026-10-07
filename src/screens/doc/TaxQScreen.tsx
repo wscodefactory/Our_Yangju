@@ -5,7 +5,7 @@
 // 원본 html의 #taxq 섹션 + askTax().
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
-import { AiModeBadge } from '@/components/ui/Bits';
+import { AiModeBadge } from '@/components/ui/Status';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { translate } from '@/hooks/useTranslate';

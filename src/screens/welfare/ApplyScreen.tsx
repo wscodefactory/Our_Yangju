@@ -1,34 +1,12 @@
-// 혜택 흐름의 마지막 두 화면: 준비물 체크리스트(docs)와 신청하러 가기(apply).
-// 둘 다 ItemScreen·QuizScreen 결과에서 (s, i)로 들어온다. 짧아서 한 파일에 묶었다.
+// 혜택 흐름의 마지막 화면: 신청하러 가기(apply). DocsScreen에서 (s, i)로 들어온다.
+// 온라인/방문 두 레이아웃을 b.ch.t로 가른다.
 import { Crumb } from '@/components/layout/Crumb';
-import { CheckItemRow, ForeignNote, Note } from '@/components/ui/Bits';
+import { ForeignNote, Note } from '@/components/ui/Notes';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { useGuide } from '@/context/GuideContext';
 import { UI } from '@/data/ui';
-
-/**
- * 준비물 체크리스트. 체크 상태는 저장 안 함(CheckItemRow 참고).
- * 체크박스 id는 `d{j}` — 화면에 한 목록뿐이라 인덱스만으로 충분.
- */
-export function DocsScreen({ s, i }: { s: string; i: number }) {
-  const { L, go, stageById } = useApp();
-  const b = stageById(s)?.items[i];
-  if (!b) return null;
-  return (
-    <>
-      <Crumb path={`${L(b.name)} › ${L(UI.docs)}`} />
-      <h1>{L(UI.docs)}</h1>
-      <div className="list">
-        {b.docs.map((d, j) => <CheckItemRow key={j} id={`d${j}`}>{L(d)}</CheckItemRow>)}
-      </div>
-      <Stack mt={16}>
-        <WideButton primary arrow={null} label={L(UI.allSet)} onClick={() => go({ k: 'apply', s, i })} />
-      </Stack>
-    </>
-  );
-}
 
 /**
  * 신청하러 가기. b.ch.t에 따라 온라인(복지로 등) / 방문(행정복지센터 등) 두 레이아웃.

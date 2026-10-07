@@ -40,7 +40,7 @@ src/
 ├─ data/                       정적 데이터. 문구는 전부 [ko, en] 쌍
 │  ├─ ui.ts                    공통 문구
 │  ├─ benefits.ts              청년 생애 단계별 혜택, 그룹
-│  ├─ info.ts                  양주 소개 · 행사 · 명소 · 맛집 · 인증, 외부 링크
+│  ├─ info.ts                  양주 소개 · 행사 · 명소 · 맛집 · 인증, 외부 링크, 출처 문구
 │  ├─ tax.ts                   카드 언어(ko/en/zh/vi/ne) 문구, 지방세 시나리오 20종, 예시 공고
 │  ├─ civic.ts                 행정 업무 6종, 양주에서 살기, 양주무관 추천 문장·키워드 규칙
 │  └─ icons.tsx                SVG 아이콘
@@ -55,17 +55,19 @@ src/
 │  └─ benefitsStore.ts         담당자 게시 혜택 저장소 (지금은 localStorage, 서버 붙이면 교체)
 ├─ utils/                      언어 선택 · 날짜/금액 포맷 · 샘플 고지서 그리기 · 가림 · 규칙 하이라이트
 ├─ components/
-│  ├─ layout/                  Header · Crumb · GuideButton · DemoNote · Toast
-│  ├─ ui/                      Tile · WideButton · InfoCard · ResultBox · LangRow · Tr(번역 텍스트) 등
+│  ├─ layout/                  Header · Crumb · Chrome(GuideButton · DemoNote · Toast)
+│  ├─ ui/                      Tile(Tile · Grid · Stack) · WideButton · BenefitTile · LangRow · Tr(번역 텍스트)
+│  │                           Cards(InfoCard · ResultBox) · Notes(Note · Hint · SourceLine · ForeignNote)
+│  │                           Status(Legend · Thinking · AiModeBadge · CheckItemRow)
 │  └─ guide/GuideSheet.tsx     양주무관 채팅 시트
-└─ screens/
+└─ screens/                    화면 하나 = 파일 하나
    ├─ ScreenRouter.tsx         Screen → 화면 컴포넌트
    ├─ LangScreen / HomeScreen
-   ├─ welfare/                 복지 흐름, 내 혜택, 본선 예정 단계
-   ├─ info/                    양주 소개, 행사·축제, 맛집·명소
-   ├─ doc/                     고지서 흐름 (찍기 → 가리기 → 읽기 → 확인/직접 입력 → 카드 → 질문 → 상담)
-   ├─ admin/                   혜택 등록 · 사각지대 신호 · 창구 모드
-   └─ visit/                   시청·주민센터 민원, 양주에서 살기
+   ├─ welfare/                 Welfare → Group → Stage → Item → Quiz → Docs → Apply, Mine, Soon
+   ├─ info/                    About · AboutItem · Events · Event(+EventStatusTag) · Local · Places · Eats · Cert · CertItem
+   ├─ doc/                     Doc → Mask → Reading → Confirm / Manual(useConfirm) → Card → TaxQ → Counsel
+   ├─ admin/                   AdminScreen(혜택 등록 · 사각지대 신호) · RegisterPanel · CounterScreen
+   └─ visit/                   Visit → Task, Life → LifeItem
 legacy/index.html              원본 단일 파일 시안 (claude.ai 아티팩트용)
 ```
 

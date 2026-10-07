@@ -1,9 +1,8 @@
-// 양주 소개 섹션: 목록(about)과 항목 상세(aboutItem). 데이터는 data/info.ts의 ABOUT.
-// 홈의 '양주 소개' 링크에서 들어온다.
+// 양주 소개 섹션의 목록 화면(about). 데이터는 data/info.ts의 ABOUT.
+// 홈의 '양주 소개' 링크에서 들어오고, 항목을 누르면 AboutItemScreen으로 간다.
 import { Crumb } from '@/components/layout/Crumb';
-import { InfoCard, Note, SourceLine } from '@/components/ui/Bits';
-import { Grid, Stack, Tile } from '@/components/ui/Tile';
-import { WideButton } from '@/components/ui/WideButton';
+import { SourceLine } from '@/components/ui/Notes';
+import { Grid, Tile } from '@/components/ui/Tile';
 import { useApp } from '@/context/AppContext';
 import { ABOUT } from '@/data/info';
 import { UI } from '@/data/ui';
@@ -33,29 +32,6 @@ export function AboutScreen() {
         ))}
       </Grid>
       <SourceLine items={[['양주시', 'Yangju City'], ['행정안전부', 'MOIS']]} />
-    </>
-  );
-}
-
-/**
- * 소개 상세. rows를 그대로 InfoCard에, src가 있으면 출처 메모,
- * go === 'events'인 항목(축제 소개)은 하단에 행사 화면 바로가기.
- */
-export function AboutItemScreen({ i }: { i: number }) {
-  const { L, go } = useApp();
-  const a = ABOUT[i];
-  if (!a) return null;
-  return (
-    <>
-      <Crumb path={`${L(UI.secAbout)} › ${L(a.label)}`} />
-      <h1>{L(a.label)}</h1>
-      <InfoCard rows={(a.rows || []).map((r) => [L(r[0]), L(r[1])])} />
-      {a.src && <Note>{L(a.src)}</Note>}
-      {a.go && (
-        <Stack mt={12}>
-          <WideButton primary label={L(UI.secEv)} onClick={() => go({ k: 'events' })} />
-        </Stack>
-      )}
     </>
   );
 }

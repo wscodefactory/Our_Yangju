@@ -1,36 +1,14 @@
-// "양주에서 살기" 생활 안내: 주제 타일(LifeScreen) → 주제 상세(LifeItemScreen).
-// LIFE 데이터의 항목은 둘 중 하나 — 전화번호 표(rows) 아니면 순서 팁(tips).
-// 복지처럼 다른 섹션으로 보내는 타일(go)도 섞여 있다. 원본 html의 #life, #lifeitem.
+// "양주에서 살기" 주제 상세(lifeitem). LIFE 데이터의 항목은 둘 중 하나 — 전화번호 표(rows) 아니면 순서 팁(tips).
+// 데이터는 LIFE(data/civic)에서 id로 찾는다. LifeScreen의 타일에서 들어온다. 원본 html의 #lifeitem.
 import { Crumb } from '@/components/layout/Crumb';
-import { Note } from '@/components/ui/Bits';
-import { Grid, Stack, Tile } from '@/components/ui/Tile';
+import { Note } from '@/components/ui/Notes';
+import { Stack } from '@/components/ui/Tile';
 import { Tr } from '@/components/ui/Tr';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { LIFE } from '@/data/civic';
 import { SPEECH_LANG } from '@/data/tax';
 import { canSpeak, speak } from '@/utils/browser';
-
-const Living = () => <Tr ko="양주에서 살기" en="Living in Yangju" />;
-
-/** 양주에서 살기: 무엇이 필요하세요? */
-export function LifeScreen() {
-  const { go } = useApp();
-  return (
-    <>
-      <Crumb path={<Living />} />
-      <h1><Tr ko="무엇이 필요하세요?" en="What do you need?" /></h1>
-      <Grid>
-        {LIFE.map((topic) => (
-          // go가 있으면 상세 대신 그 섹션(현재는 welfare뿐)으로 바로 보낸다
-          <Tile key={topic.id} onClick={() => go(topic.go ? { k: topic.go } : { k: 'lifeitem', v: topic.id })}>
-            <span className="lab" style={{ fontSize: '1.3em' }}><Tr ko={topic.name[0]} en={topic.name[1]} /></span>
-          </Tile>
-        ))}
-      </Grid>
-    </>
-  );
-}
 
 /**
  * 생활 주제 상세: 전화번호 목록 또는 순서 팁.
@@ -47,7 +25,8 @@ export function LifeItemScreen({ v }: { v: string }) {
   ).join('. ');
   return (
     <>
-      <Crumb path={<><Living /> › <Tr ko={topic.name[0]} en={topic.name[1]} /></>} />
+      {/* 빵부스러기 첫 칸은 LifeScreen과 같은 문구 */}
+      <Crumb path={<><Tr ko="양주에서 살기" en="Living in Yangju" /> › <Tr ko={topic.name[0]} en={topic.name[1]} /></>} />
       <h1><Tr ko={topic.name[0]} en={topic.name[1]} /></h1>
       {topic.rows ? (
         <>

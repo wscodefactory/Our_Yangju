@@ -1,7 +1,8 @@
 // 혜택 상세. 무엇/누가/언제 카드 + 네 개의 행동 버튼.
 // 여기서 quiz / docs / apply 세 갈래로 갈라지고, 별 버튼으로 내 혜택에 담는다.
 import { Crumb } from '@/components/layout/Crumb';
-import { ForeignNote, InfoCard } from '@/components/ui/Bits';
+import { InfoCard } from '@/components/ui/Cards';
+import { ForeignNote } from '@/components/ui/Notes';
 import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
