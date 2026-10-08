@@ -11,7 +11,7 @@ import * as i18n from '@/i18n';
 import type { Lang } from '@/i18n';
 import { benefitsStore } from '@/services/benefitsStore';
 import type { PublishedBenefit, Screen, Text } from '@/types';
-import { STORAGE_KEYS, storage } from '@/utils/browser';
+import { STORAGE_KEYS, stopSpeaking, storage } from '@/utils/browser';
 
 export type Overlay =
   | { k: 'lang' }
@@ -143,6 +143,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   /* ----- 시트·전체 화면 ----- */
   const [overlay, setOverlay] = useState<Overlay | null>(null);
+  // 화면이 바뀌거나 시트가 닫히면 읽어주기를 멈춘다 (뒤로가기 포함). 안 그러면 다음 화면에서도 계속 들린다
+  useEffect(() => { stopSpeaking(); }, [nav, overlay]);
   const openOverlay = useCallback((o: Overlay) => setOverlay(o), []);
   const closeOverlay = useCallback(() => setOverlay(null), []);
   useEffect(() => {

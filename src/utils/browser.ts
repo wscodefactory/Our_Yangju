@@ -72,6 +72,12 @@ export function speak(text: string, lang: Lang): boolean {
   } catch { return false; }
 }
 
+/** 재생 중인 음성을 멈춘다. 화면을 나가거나 시트를 닫을 때 AppContext 가 부른다 */
+export function stopSpeaking() {
+  if (!canSpeak) return;
+  try { speechSynthesis.cancel(); } catch { /* 무시 */ }
+}
+
 /**
  * 클립보드 복사. clipboard API 가 막힌 환경(http, 구형 웹뷰)에서는 숨은 textarea + execCommand 로 한 번 더 시도.
  * 성공 여부와 무관하게 호출부는 "복사했어요" 토스트를 띄운다 (참고용 html 과 같은 동작).
