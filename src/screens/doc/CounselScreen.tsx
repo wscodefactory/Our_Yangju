@@ -8,6 +8,7 @@ import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
+import { NOTICE_TEXT } from '@/data/tax';
 import { copyText } from '@/utils/browser';
 import { koNote } from '@/utils/format';
 
@@ -16,7 +17,7 @@ import { koNote } from '@/utils/format';
  * q: 내비 항목에 실려 온 질문. 비어 있으면 DocContext.lastQ(추가 질문 화면의 마지막 질문)로 대체.
  */
 export function CounselScreen({ q }: { q: string }) {
-  const { T } = useApp();
+  const { T, L } = useApp();
   const { data, lastQ } = useDoc();
   const boxRef = useRef<HTMLDivElement>(null);
   // 복사 결과 피드백을 버튼 라벨 자체에 띄운다. null이면 기본 라벨
@@ -52,7 +53,7 @@ export function CounselScreen({ q }: { q: string }) {
       <Stack mt={10}>
         <WideButton arrow={null} label={copyLabel ?? T('메모 복사', 'Copy note')} onClick={onCopy} />
       </Stack>
-      <Note>{T('1345 지원 언어 범위는 확인 중입니다.', 'Languages supported by 1345 are being confirmed.')}</Note>
+      <Note>{L(NOTICE_TEXT.interp)}</Note>
     </>
   );
 }

@@ -54,19 +54,10 @@ export function CardScreen() {
             <span className={`pill ${n != null && n <= 7 ? 'warn' : ''}`}>{leftText(cl, n)}</span>
           </dd>
         </dl>
+        {/* 지금 할 일: 전자납부번호를 읽었으면 프로토타입문구 §3 경로 3단계, 없으면 기존 s1~s3 */}
         <div className="todo">
           <b>{t.todo}</b>
-          <ol><li>{t.s1}</li><li>{t.s2}</li><li>{t.s3}</li></ol>
-        </div>
-        {/* 납부 행동 카드: 세정과 확정 우선순위 4개 (NOTICE_TEXT.pay 순서 그대로) */}
-        <div className="todo">
-          <b><Tr ko={NOTICE_TEXT.payTitle[0]} en={NOTICE_TEXT.payTitle[1]} /></b>
-          <ol>{NOTICE_TEXT.pay.map(([ko, en]) => <li key={en}><Tr ko={ko} en={en} /></li>)}</ol>
-        </div>
-        {/* 전자납부번호 경로: 고지서에서 읽었을 때만. 번호는 한국어 고정(lang="ko")이라 번역되지 않는다 */}
-        {d.epay_no && (
-          <div className="todo">
-            <b><Tr ko={NOTICE_TEXT.epayTitle[0]} en={NOTICE_TEXT.epayTitle[1]} /></b>
+          {d.epay_no ? (
             <ol>
               <li>
                 <Tr ko={NOTICE_TEXT.epay1[0]} en={NOTICE_TEXT.epay1[1]} />:{' '}
@@ -76,8 +67,15 @@ export function CardScreen() {
               <li><Tr ko={NOTICE_TEXT.epay2[0]} en={NOTICE_TEXT.epay2[1]} /></li>
               <li><Tr ko={NOTICE_TEXT.epay3[0]} en={NOTICE_TEXT.epay3[1]} /></li>
             </ol>
-          </div>
-        )}
+          ) : (
+            <ol><li>{t.s1}</li><li>{t.s2}</li><li>{t.s3}</li></ol>
+          )}
+        </div>
+        {/* 납부 행동 카드: 확정 우선순위 4개 (NOTICE_TEXT.pay 순서 그대로) */}
+        <div className="todo">
+          <b><Tr ko={NOTICE_TEXT.payTitle[0]} en={NOTICE_TEXT.payTitle[1]} /></b>
+          <ol>{NOTICE_TEXT.pay.map(([ko, en]) => <li key={en}><Tr ko={ko} en={en} /></li>)}</ol>
+        </div>
         {d.vacct && <p className="hint"><Tr ko={NOTICE_TEXT.vacct[0]} en={NOTICE_TEXT.vacct[1]} />: <b lang="ko">{d.vacct}</b></p>}
         {/* 가산세: 세액 판정 없이 확정 문구 일괄 제공 */}
         <p className="hint"><Tr ko={NOTICE_TEXT.penalty[0]} en={NOTICE_TEXT.penalty[1]} /></p>

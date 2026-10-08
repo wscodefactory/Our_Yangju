@@ -11,7 +11,7 @@ import { UI } from '@/data/ui';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { translate } from '@/hooks/useTranslate';
-import { CARD_TEXT, NOTICE_TEXT, TAX_SCENARIOS } from '@/data/tax';
+import { CARD_TEXT, NOTICE_TEXT, TAX_SCENARIOS, TAX_SOURCE } from '@/data/tax';
 import { getAi } from '@/services/ai';
 import { classifyPrompt, toKoreanPrompt } from '@/services/prompts';
 import type { CardLang, DocData, TaxScenario } from '@/types';
@@ -21,7 +21,7 @@ import { daysLeft, dotDate, fmtWon, koNote, leftText } from '@/utils/format';
 type Entry =
   | { id: number; kind: 'me'; text: string }
   | { id: number; kind: 'thinking' }
-  | { id: number; kind: 'answer'; text: string; counselQ?: string }
+  | { id: number; kind: 'answer'; text: string; src: string; counselQ?: string }
   | { id: number; kind: 'escalate'; text: string; note: string; counselQ: string };
 /** 유니온 각 멤버에서 id를 뺀 입력 타입 (push()가 id를 붙여준다) */
 type EntryInput = Entry extends infer E ? (E extends Entry ? Omit<E, 'id'> : never) : never;
@@ -105,7 +105,8 @@ export function TaxQScreen() {
     if (scenario && !scenario.out) {
       // 일반 답변. partial이면 "일부만 답한 것"이라 상담 연결 버튼을 같이 붙인다
       const filled = await translate(fillAnswer(scenario, cl, data, T('이 세금', 'This tax')), cl, 'plain');
-      push({ kind: 'answer', text: filled, counselQ: scenario.partial ? text : undefined });
+      // 답변마다 실제 근거를 붙인다 (프로토타입문구 §7). UI 언어로 표시
+      push({ kind: 'answer', text: filled, src: L(TAX_SOURCE[scenario.id] || TAX_SOURCE.default), counselQ: scenario.partial ? text : undefined });
       return;
     }
 
@@ -144,7 +145,7 @@ export function TaxQScreen() {
             return (
               <div key={e.id} className="qa" lang={cl}>
                 {e.text}
-                <span className="src2">{T('근거: 팀 작성 시나리오 · 세정과 검수 전', 'Source: team-written scenario · not yet reviewed by the tax office')}</span>
+                <span className="src2">{e.src}</span>
                 {e.counselQ !== undefined && (
                   <button type="button" className="go" onClick={() => go({ k: 'counsel', q: e.counselQ! })}>{t.counsel} →</button>
                 )}

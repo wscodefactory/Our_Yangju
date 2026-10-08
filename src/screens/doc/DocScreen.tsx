@@ -9,6 +9,7 @@ import { Stack } from '@/components/ui/Tile';
 import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
+import { NOTICE_TEXT } from '@/data/tax';
 import { getAi } from '@/services/ai';
 import { STORAGE_KEYS, storage } from '@/utils/browser';
 
@@ -18,7 +19,7 @@ import { STORAGE_KEYS, storage } from '@/utils/browser';
  * 없으면 샘플 버튼을 primary로 올려서 시연이 막히지 않게 한다.
  */
 export function DocScreen() {
-  const { T, cl, setCardLang, go, toast } = useApp();
+  const { T, L, cl, setCardLang, go, toast } = useApp();
   const { startSample, loadFile } = useDoc();
   const fileRef = useRef<HTMLInputElement>(null);
   // 키 없음 / 텍스트 전용 모델이면 false
@@ -49,8 +50,9 @@ export function DocScreen() {
       <Crumb path={T('받은 문서 찍기', 'Scan a document')} />
       <h1>{T('받은 문서를 찍어 주세요', 'Take a photo of your document')}</h1>
       <Hint>
-        {T('세금 고지서나 시청 안내문을 찍으면 양주무관이 읽고, 내 언어로 지금 할 일을 알려줘요. 사진은 저장하지 않아요.',
-          'Take a photo of a tax notice or a city letter. The Yangju Guide reads it and tells you what to do, in your language. Photos are not stored.')}
+        {T('세금 고지서나 시청 안내문을 찍으면 양주무관이 읽고, 내 언어로 지금 할 일을 알려줘요.',
+          'Take a photo of a tax notice or a city letter. The Yangju Guide reads it and tells you what to do, in your language.')}{' '}
+        {L(NOTICE_TEXT.privacyDoc)}
       </Hint>
       {/* 여기서 고른 언어가 할 일 카드 언어(cl)가 된다 */}
       <LangRow value={cl} onChange={setCardLang} ariaLabel={T('안내 언어', 'Card language')} />
