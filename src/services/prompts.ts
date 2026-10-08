@@ -2,8 +2,6 @@
 // 전부 영어로 쓴 건 모델이 지시를 더 안정적으로 따라서이고, 출력 언어는 프롬프트 안에서 따로 지정한다.
 // 사용자 입력은 slice로 길이를 자른다 — 붙여넣기 실수로 수만 자가 들어가는 것 방지.
 // 프롬프트를 고치면 응답 JSON 모양도 같이 바뀌므로 아래 GuideResult, types의 DocData/ExtractedRule과 맞춰야 한다.
-import { TAX_SCENARIOS, TRANSLATE_TARGET } from '@/data/tax';
-import type { CardLang } from '@/types';
 
 /** 고지서 사진 → 구조화 (개인정보는 절대 출력하지 않도록 지시)
  *  사진은 이미 사용자가 가린 뒤의 것이지만, 못 가린 부분이 있을 수 있어 프롬프트에서도 한 번 더 막는다.
@@ -12,22 +10,7 @@ export const READ_NOTICE_PROMPT =
   'This image is a photo of a document sent by a Korean local government (likely a local tax notice or a city letter). Some personal details are covered with black boxes; never guess them. Never output personal data: names, addresses, resident/alien registration numbers, taxpayer numbers (납세번호), vehicle plates. Read only what is printed.\n' +
   'DO read these two payment identifiers if printed — they belong to the notice, not to the person: 전자납부번호 (e-payment number, 17–19 digits, may be grouped with hyphens) and 가상계좌 (virtual account: bank name + account number).\n' +
   'Reply with only JSON:\n' +
-  '{"doc_type":"tax_notice|welfare_notice|other","tax_name":{"ko":"","en":"","zh":"","vi":"","ne":""},"amount_won":number or null,"due_date":"YYYY-MM-DD" or null,"phone_on_doc":"office phone number printed on the notice, or null","epay_no":"전자납부번호 exactly as printed, or null","vacct":"bank name and virtual account number exactly as printed, or null","amount_quote":"the amount exactly as printed","due_quote":"the due date exactly as printed","confidence":"high|low"}';
-
-/** 세금 질문 → 시나리오 분류
- *  TAX_SCENARIOS의 영어 질문(q[1])을 목록으로 넘기고 id 하나만 받는다. 답변 문구는 데이터에 있는 걸 쓰므로
- *  모델은 "어느 시나리오냐"만 고르면 된다 — 세금 안내를 모델이 지어내지 않게 하려는 구조. */
-export const classifyPrompt = (text: string) =>
-  `A resident of Yangju, Korea asks a question about the local tax notice they received. Pick the ONE scenario id that matches the question, or "none" if nothing matches. Scenarios:\n${TAX_SCENARIOS.map((q) => `${q.id}: ${q.q[1]}`).join('\n')}\nQuestions about installments, reductions or exemptions, a wrong amount, already paid, moving or selling a car, or leaving Korea must use those ids. Reply with only JSON like {"id":"card"}.\n\nQuestion: """${text.slice(0, 600)}"""`;
-
-/** 짧은 안내문 번역 (숫자·URL·전화번호 유지) — useTranslate의 'plain' 모드 */
-export const translatePrompt = (text: string, c: CardLang) =>
-  `Translate the following text into ${TRANSLATE_TARGET[c] || 'English'}. Keep numbers, dates, URLs and the phone number 1345 unchanged. Do not add anything. Output only the translation.\n\n${text}`;
-
-/** 화면 문구 번역 (외국인 주민용, 고유명사 괄호 유지) — useTranslate의 'ui' 모드
- *  나열된 번호는 119/112(긴급), 1345(외국인종합안내), 1330(관광), 1350(고용), 1577-1366(다누리). */
-export const translateUiPrompt = (text: string, c: CardLang) =>
-  `Translate into ${TRANSLATE_TARGET[c]} for a foreign resident of Yangju, Korea. Plain, friendly, short. Keep numbers, dates, times, URLs, phone numbers (119, 112, 1345, 1330, 1350, 1577-1366) and Korean proper nouns in parentheses unchanged. Output only the translation.\n\n${text}`;
+  '{"doc_type":"tax_notice|welfare_notice|other","tax_type":"auto (자동차세)|resident (주민세)|property (재산세)|income (지방소득세)|other","tax_name":{"ko":"","en":"","zh":"","vi":"","ne":""},"amount_won":number or null,"due_date":"YYYY-MM-DD" or null,"phone_on_doc":"office phone number printed on the notice, or null","epay_no":"전자납부번호 exactly as printed, or null","vacct":"bank name and virtual account number exactly as printed, or null","amount_quote":"the amount exactly as printed","due_quote":"the due date exactly as printed","confidence":"high|low"}';
 
 // 세금 질문 화면: 외국인 주민이 모국어로 적은 질문을 담당자가 읽을 한국어 메모로
 export const toKoreanPrompt = (text: string) =>

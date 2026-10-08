@@ -2,14 +2,11 @@
 // 공고문 텍스트를 붙여 넣으면 AI가 ExtractedRule(조건·지원·기간·신청처·서류)을 뽑고,
 // 각 항목의 근거 문장(quote)을 원문에 형광펜으로 표시한다. 담당자가 항목을 전부 체크해야만 게시 버튼이 열린다.
 // 상태는 AdminScreen이 들고 있고 여기선 state/setState로 받기만 한다(탭 전환 시 보존 때문).
-// 원본 html의 #admin 등록 탭 + extractRule()/publishRule().
 import { useMemo } from 'react';
-import { Hint, Note } from '@/components/ui/Notes';
-import { AiModeBadge, Thinking } from '@/components/ui/Status';
-import { Stack } from '@/components/ui/Tile';
-import { WideButton } from '@/components/ui/WideButton';
+import { Callout } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';
-import { SAMPLE_NOTICE, SAMPLE_RULE } from '@/data/tax';
+import { SAMPLE_NOTICE, SAMPLE_RULE } from '@/data/admin';
+import { STAGES } from '@/data/content';
 import { getAi } from '@/services/ai';
 import { benefitsStore } from '@/services/benefitsStore';
 import { extractRulePrompt } from '@/services/prompts';
@@ -33,12 +30,15 @@ interface Props {
   setState: (patch: Partial<RegisterState>) => void;
 }
 
+/** 단계 → 시민 복지 화면의 그룹. 모르는 stage는 청년으로 */
+const groupOf = (stage: string) => (stage === 'marry' || stage === 'birth' ? 'newly' : stage === 'care' ? 'child' : 'youth');
+
 /**
  * 공고문 붙여넣기 → 규칙 초안 → 근거 확인 → 게시.
  * 화면은 busy / rule 없음 / rule 있음 세 상태로 나뉘고 위에서부터 early return.
  */
 export function RegisterPanel({ state, setState }: Props) {
-  const { T, L, toast, publishBenefit, replaceNav, stageById } = useApp();
+  const { T, tx, toast, publishBenefit, replaceNav } = useApp();
   const ai = getAi();
   const { text, rule, checks, busy } = state;
 
@@ -53,8 +53,7 @@ export function RegisterPanel({ state, setState }: Props) {
   const extract = async () => {
     if (!text.trim()) { toast(T('공고문을 넣어 주세요', 'Paste a notice first')); return; }
     if (!ai) {
-      // AI 없을 땐 예시 공고 한 건만 미리 뽑아둔 SAMPLE_RULE로 대신한다.
-      // 깊은 복사하는 이유: 데이터 모듈의 상수를 state로 넘기면 나중에 누군가 수정했을 때 원본이 오염됨
+      // AI 없을 땐 예시 공고 한 건만 미리 뽑아둔 SAMPLE_RULE로 대신한다. 깊은 복사: 데이터 상수가 state로 새지 않게
       if (text.trim() === SAMPLE_NOTICE.trim()) setState({ rule: JSON.parse(JSON.stringify(SAMPLE_RULE)) as ExtractedRule, checks: [] });
       else toast(T('AI 연결이 없어 예시 공고만 처리할 수 있어요', 'Without AI only the sample notice works'));
       return;
@@ -62,7 +61,6 @@ export function RegisterPanel({ state, setState }: Props) {
     setState({ busy: true });
     try {
       const extracted = await ai.json<ExtractedRule>(extractRulePrompt(text));
-      // 새 규칙이면 체크도 처음부터
       setState({ rule: extracted, checks: [], busy: false });
     } catch {
       setState({ busy: false });
@@ -72,81 +70,82 @@ export function RegisterPanel({ state, setState }: Props) {
 
   const publish = () => {
     if (!rule) return;
-    // publishBenefit이 저장소에 넣고, 실제로 들어간 단계(stage)를 돌려준다 — 모르는 stage면 '독립(indep)'으로 떨어짐
-    const stage = publishBenefit(ruleToPublished(rule));
-    toast(T(`게시했어요 · 청년 › ${L(stage.label)} 단계에 나타나요`, `Published · now under Youth › ${L(stage.label)}`));
-    // 게시 직후 시민 화면의 해당 단계로 점프. 스택을 통째로 갈아끼워서 뒤로가기가 홈→복지→청년 순으로 자연스럽게 가게 한다
-    replaceNav([{ k: 'home' }, { k: 'welfare' }, { k: 'group', g: 'youth' }, { k: 'stage', s: stage.id }]);
+    const pub = ruleToPublished(rule);
+    publishBenefit(pub);
+    const stageLabel = tx(STAGES[pub.stage as keyof typeof STAGES]) || pub.stage;
+    toast(T(`게시했어요 · ${stageLabel} 단계에 나타나요`, `Published · now under ${stageLabel}`));
+    // 게시 직후 시민 화면의 해당 단계로 점프. 스택을 갈아끼워서 뒤로가기가 홈으로 가게 한다
+    replaceNav([{ k: 'home' }, { k: 'welfare', g: groupOf(pub.stage), s: pub.stage }]);
   };
 
   if (busy) {
-    return <Thinking>{T('AI가 공고문에서 조건·서류·기간을 뽑고 있어요… (20~60초)', 'AI is extracting conditions, documents and dates… (20–60 s)')}</Thinking>;
+    return <Callout kind="info" icon="info">{T('AI가 공고문에서 조건·서류·기간을 뽑고 있어요… (20~60초)', 'AI is extracting conditions, documents and dates… (20–60 s)')}</Callout>;
   }
 
   /* ----- 1단계: 공고문 입력 ----- */
   if (!rule) {
     return (
-      <>
-        <h1>{T('공고문을 올려 주세요', 'Paste the notice')}{!ai && <AiModeBadge />}</h1>
-        <Hint>
+      <section className="panel">
+        <h2><span className="grow">{T('공고문을 올려 주세요', 'Paste the notice')}</span>{!ai && <span className="demo-flag">{T('데모 모드', 'Demo mode')}</span>}</h2>
+        <p className="muted">
           {T('기존 공고문 텍스트를 그대로 붙여 넣으면 AI가 규칙 초안을 만들고, 근거 문장을 형광펜으로 보여줘요. 확인 없이는 게시되지 않아요.',
             'Paste the notice as is. AI drafts the rule and highlights the source sentence for each item. Nothing is published without your check.')}
-        </Hint>
-        <textarea className="box" aria-label={T('공고문', 'Notice')} value={text} onChange={(e) => setState({ text: e.target.value })} />
-        <Stack mt={12}>
-          <WideButton arrow={null} label={T('예시 공고 불러오기 (가상)', 'Load a sample notice (fictional)')} onClick={() => setState({ text: SAMPLE_NOTICE })} />
-          <WideButton primary label={T('규칙 초안 만들기', 'Draft the rule')} onClick={() => void extract()} />
-        </Stack>
-      </>
+        </p>
+        <div className="fld" style={{ marginTop: 12 }}>
+          <label htmlFor="notice">{T('공고문', 'Notice')}</label>
+          <textarea id="notice" rows={10} value={text} onChange={(e) => setState({ text: e.target.value })}
+            style={{ width: '100%', padding: 12, borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-strong)', background: 'var(--surface)', resize: 'vertical' }} />
+        </div>
+        <div className="stack" style={{ marginTop: 12 }}>
+          <button type="button" className="btn secondary" onClick={() => setState({ text: SAMPLE_NOTICE })}>{T('예시 공고 불러오기 (가상)', 'Load a sample notice (fictional)')}</button>
+          <button type="button" className="btn primary" onClick={() => void extract()}>{T('규칙 초안 만들기', 'Draft the rule')}</button>
+        </div>
+      </section>
     );
   }
 
   /* ----- 2단계: 근거 확인 → 게시 ----- */
   // AI가 stage id를 엉뚱하게 줄 수도 있어서 못 찾으면 id 문자열이라도 그대로 보여준다
-  const stage = stageById(rule.stage);
-  const stageLabel = stage ? L(stage.label) : rule.stage || '';
+  const stageLabel = tx(STAGES[rule.stage as keyof typeof STAGES]) || rule.stage || '';
   return (
-    <>
-      <h1>{rule.name || ''}</h1>
-      <Hint>{T('단계', 'Stage')}: {stageLabel} · {rule.summary || ''}</Hint>
-      {/* 원문. 근거 문장은 <mark>로 감싸고 항목 번호를 위첨자로 단다. 아래 체크 목록의 번호와 대응 */}
-      <div className="orig" aria-label={T('원문', 'Original')}>
-        {parts.map((p, i) => p.mark ? <mark key={i}>{p.text}<sup>{p.mark}</sup></mark> : <span key={i}>{p.text}</span>)}
-      </div>
-      <Hint style={{ marginTop: 12 }}>
-        {T('항목마다 원문과 맞는지 확인하세요', 'Check each item against the original')} ({doneCount}/{items.length})
-      </Hint>
-      <div className="xlist">
+    <div className="stack">
+      <section className="panel">
+        <h2>{rule.name || ''}</h2>
+        <div className="badges"><span className="bdg green">{stageLabel}</span>{rule.summary && <span className="bdg gray">{rule.summary}</span>}</div>
+        {/* 원문. 근거 문장은 <mark>로 감싸고 항목 번호를 위첨자로 단다. 아래 체크 목록의 번호와 대응 */}
+        <div className="codebox" aria-label={T('원문', 'Original')} style={{ whiteSpace: 'pre-wrap', fontSize: '.875rem', lineHeight: 1.6, marginTop: 12 }}>
+          <div>{parts.map((p, i) => p.mark ? <mark key={i}>{p.text}<sup>{p.mark}</sup></mark> : <span key={i}>{p.text}</span>)}</div>
+        </div>
+      </section>
+      <section className="panel">
+        <h2>{T('항목마다 원문과 맞는지 확인하세요', 'Check each item against the original')}</h2>
+        <div className="prog">
+          <span className="prog-txt">{doneCount}/{items.length}</span>
+          <span className="progress" aria-hidden="true"><i style={{ width: `${items.length ? Math.round((doneCount / items.length) * 100) : 0}%` }} /></span>
+        </div>
         {items.map((it, i) => (
-          <label key={i} className="xitem" htmlFor={`x${i}`}>
-            <input
-              type="checkbox"
-              id={`x${i}`}
-              checked={!!checks[i]}
-              onChange={(e) => {
-                const next = checks.slice();
-                next[i] = e.target.checked;
-                setState({ checks: next });
-              }}
-            />
-            <span className="n"><sup>{i + 1}</sup> {it.kind} · {it.text}</span>
-            {/* quote가 원문에 없으면(AI가 지어냈거나 표현을 바꿨거나) 빨간 경고. 그래도 체크는 할 수 있다 — 판단은 담당자 몫 */}
-            <span className={`qt ${it.found ? '' : 'miss'}`}>
-              {it.found ? `“${it.quote}”` : T('원문에서 근거를 찾지 못했어요 — 꼭 확인', 'Source not found in the original — check carefully')}
+          <label key={i} className="check" style={{ alignItems: 'flex-start' }}>
+            <input type="checkbox" checked={!!checks[i]} onChange={(e) => { const next = checks.slice(); next[i] = e.target.checked; setState({ checks: next }); }} />
+            <span>
+              <sup>{i + 1}</sup> {it.kind} · {it.text}
+              {/* quote가 원문에 없으면(AI가 지어냈거나 표현을 바꿨거나) 경고. 그래도 체크는 할 수 있다 — 판단은 담당자 몫 */}
+              <span className="muted" style={{ display: 'block', color: it.found ? undefined : 'var(--danger)' }}>
+                {it.found ? `“${it.quote}”` : T('원문에서 근거를 찾지 못했어요 — 꼭 확인', 'Source not found in the original — check carefully')}
+              </span>
             </span>
           </label>
         ))}
-      </div>
-      <Stack mt={12}>
-        <WideButton primary arrow={null} disabled={!allDone} label={T('확인 완료 → 게시', 'Checked → Publish')} onClick={publish} />
-        {/* 원문 텍스트는 남겨두고 규칙만 버린다 — 바로 다시 뽑을 수 있게 */}
-        <WideButton arrow={null} label={T('다시 하기', 'Start over')} onClick={() => setState({ rule: null, checks: [] })} />
-      </Stack>
-      <Note>
-        {benefitsStore.shared
-          ? T('게시하면 공유 저장소에 저장되어 시민 화면에 바로 나타나요.', 'Published items are saved to the shared store and appear on the citizen view.')
-          : T('이 화면에서는 이 기기에만 저장돼요.', 'In this view it is saved on this device only.')}
-      </Note>
-    </>
+        <div className="stack" style={{ marginTop: 12 }}>
+          <button type="button" className="btn primary" disabled={!allDone} onClick={publish}>{T('확인 완료, 게시', 'Checked, publish')}</button>
+          {/* 원문 텍스트는 남겨두고 규칙만 버린다 — 바로 다시 뽑을 수 있게 */}
+          <button type="button" className="btn secondary" onClick={() => setState({ rule: null, checks: [] })}>{T('다시 하기', 'Start over')}</button>
+        </div>
+        <p className="src">
+          {benefitsStore.shared
+            ? T('게시하면 공유 저장소에 저장되어 시민 화면에 바로 나타나요.', 'Published items are saved to the shared store and appear on the citizen view.')
+            : T('이 화면에서는 이 기기에만 저장돼요.', 'In this view it is saved on this device only.')}
+        </p>
+      </section>
+    </div>
   );
 }

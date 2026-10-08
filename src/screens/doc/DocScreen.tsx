@@ -1,34 +1,28 @@
-// 받은 문서 흐름의 첫 화면. 여기서 사진을 고르거나 샘플을 띄우면 DocContext에 캔버스가 올라가고,
-// 이후 mask → reading → confirm → card → taxq → counsel 순서로 이어진다.
-// 원본 html의 #doc 섹션(파일 input + 버튼 3개)을 그대로 옮긴 것.
-import { useRef } from 'react';
-import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Notes';
-import { LangRow } from '@/components/ui/LangRow';
-import { Stack } from '@/components/ui/Tile';
-import { WideButton } from '@/components/ui/WideButton';
+// 받은 고지서 읽기 — 시작 화면. 참고용 html 의 SCREENS.doc 에 사진 경로(mask → reading)를 더한 것.
+// 사진 버튼은 이미지 입력이 되는 AI 가 있을 때만 살아 있고, 없으면 키를 넣어 켜는 우회로를 준다.
+import { useRef, useState } from 'react';
+import { Title } from '@/components/layout/Chrome';
+import { Callout } from '@/components/ui/Bits';
+import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
-import { NOTICE_TEXT } from '@/data/tax';
+import { TAX_TYPES } from '@/data/content';
 import { getAi } from '@/services/ai';
 import { STORAGE_KEYS, storage } from '@/utils/browser';
+import { paidStore } from '@/utils/paid';
+import { Stepper } from './Stepper';
 
-/**
- * 받은 문서 찍기 — 진입 화면.
- * 사진 읽기는 이미지 입력을 지원하는 AI가 있을 때만 보여주고,
- * 없으면 샘플 버튼을 primary로 올려서 시연이 막히지 않게 한다.
- */
 export function DocScreen() {
-  const { T, L, cl, setCardLang, go, toast } = useApp();
-  const { startSample, loadFile } = useDoc();
+  const { lang, t, tx, fmtWon, fmtDate, go, toast } = useApp();
+  const { startSample, startManual, loadFile } = useDoc();
   const fileRef = useRef<HTMLInputElement>(null);
-  // 키 없음 / 텍스트 전용 모델이면 false
   const imgOk = !!getAi()?.supportsImages;
+  // 이 휴대폰에 저장한 납부 기록 (MY). 지우면 바로 사라진다
+  const [paid, setPaid] = useState(() => paidStore.load());
 
-  // 배포 번들에 키가 안 들어간 경우(공유 링크)의 우회로: 시연 기기에서 키를 한 번 넣으면 localStorage에만 저장된다.
-  // getAi()가 모듈 캐시를 들고 있어서 다시 읽게 하려면 새로고침이 가장 짧다.
+  // 배포 번들에 키가 없을 때의 우회로: 기기 localStorage 에만 저장. getAi() 가 모듈 캐시라 새로고침이 가장 짧다
   const enterKey = () => {
-    const k = window.prompt(T('Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)', 'Paste your Gemini API key (stored on this device only)'))?.trim();
+    const k = window.prompt(lang === 'ko' ? 'Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)' : 'Paste your Gemini API key (stored on this device only)')?.trim();
     if (!k) return;
     storage.set(STORAGE_KEYS.geminiKey, k);
     location.reload();
@@ -37,45 +31,55 @@ export function DocScreen() {
   const onFile = async (picked: File | undefined) => {
     if (!picked) return;
     try {
-      // HEIC 같은 브라우저가 못 여는 포맷이면 fileToCanvas에서 throw
-      await loadFile(picked);
+      await loadFile(picked); // HEIC 처럼 브라우저가 못 여는 포맷이면 throw
       go({ k: 'mask' });
     } catch {
-      toast(T('이 사진을 열 수 없어요', 'Cannot open this photo'));
+      toast(lang === 'ko' ? '이 사진을 열 수 없어요' : 'Cannot open this photo');
     }
   };
 
   return (
     <>
-      <Crumb path={T('받은 문서 찍기', 'Scan a document')} />
-      <h1>{T('받은 문서를 찍어 주세요', 'Take a photo of your document')}</h1>
-      <Hint>
-        {T('세금 고지서나 시청 안내문을 찍으면 양주무관이 읽고, 내 언어로 지금 할 일을 알려줘요.',
-          'Take a photo of a tax notice or a city letter. The Yangju Guide reads it and tells you what to do, in your language.')}{' '}
-        {L(NOTICE_TEXT.privacyDoc)}
-      </Hint>
-      {/* 여기서 고른 언어가 할 일 카드 언어(cl)가 된다 */}
-      <LangRow value={cl} onChange={setCardLang} ariaLabel={T('안내 언어', 'Card language')} />
-      <Stack>
-        {imgOk && (
-          <WideButton primary label={T('사진 찍기 / 올리기', 'Take or upload a photo')} onClick={() => fileRef.current?.click()} />
+      <Title>{t('docT')}</Title>
+      <Stepper step={0} />
+      <p className="lead">{t('docLead')}</p>
+      <Callout kind="green" icon="shield" style={{ marginBottom: 16 }}>{t('privacyDoc')}</Callout>
+      <div className="stack">
+        <button type="button" className="btn primary" disabled={!imgOk} aria-describedby={imgOk ? undefined : 'photo-off'} onClick={() => fileRef.current?.click()}>
+          <Ic n="camera" cls="sm" />{t('btnPhoto')}
+        </button>
+        {!imgOk && (
+          <>
+            <p className="muted" id="photo-off" style={{ margin: 0 }}>{t('photoOff')}</p>
+            <button type="button" className="btn secondary" onClick={enterKey}>
+              {lang === 'ko' ? 'AI 키 넣고 사진 읽기 켜기' : 'Enter an AI key to turn on photo reading'}
+            </button>
+          </>
         )}
-        <WideButton
-          primary={!imgOk}
-          label={T('샘플 고지서로 해보기', 'Try a sample notice')}
-          onClick={async () => { await startSample(); go({ k: 'mask' }); }}
-        />
-        <WideButton label={T('직접 입력하기', 'Enter it myself')} onClick={() => go({ k: 'manual' })} />
-      </Stack>
-      {!imgOk && (
-        <>
-          <Note>{T('AI 키가 없어 사진 읽기를 쓸 수 없어 샘플과 직접 입력만 보여요.', 'Photo reading needs an AI key, so only the sample and manual entry are shown.')}</Note>
-          <Stack>
-            <WideButton label={T('AI 키 넣고 사진 읽기 켜기', 'Enter an AI key to turn on photo reading')} onClick={enterKey} />
-          </Stack>
-        </>
+        <button type="button" className="btn secondary" onClick={() => { startSample(); go({ k: 'docConfirm' }); }}>
+          <Ic n="sample" cls="sm" />{t('btnSample')}
+        </button>
+        <button type="button" className="btn secondary" onClick={() => { startManual(); go({ k: 'docConfirm', manual: true }); }}>
+          <Ic n="pencil" cls="sm" />{t('btnManual')}
+        </button>
+      </div>
+      {paid.length > 0 && (
+        <section className="panel" style={{ marginTop: 16 }}>
+          <h2><span className="grow">{t('myRecords')}</span>
+            <button type="button" className="btn ghost sm" onClick={() => { paidStore.clear(); setPaid([]); }}>{t('deleteAll')}</button>
+          </h2>
+          <div>
+            {paid.map((r) => (
+              <div key={r.paidAt} className="check" style={{ cursor: 'default' }}>
+                <span style={{ flex: 1 }}><b>{tx(TAX_TYPES[r.type])}</b> · {fmtWon(r.amount)}</span>
+                <span className="muted">{t('paidOn')} {fmtDate(new Date(r.paidAt).toISOString().slice(0, 10), { month: 'short', day: 'numeric' })}</span>
+              </div>
+            ))}
+          </div>
+          <p className="muted" style={{ margin: '8px 0 0' }}>{t('paidNote')}</p>
+        </section>
       )}
-      {/* capture="environment" → 모바일에서 후면 카메라 바로 열림. 데스크톱은 그냥 파일 선택창 */}
+      {/* capture="environment" → 모바일은 후면 카메라, 데스크톱은 파일 선택창 */}
       <input
         ref={fileRef}
         type="file"
@@ -84,8 +88,7 @@ export function DocScreen() {
         hidden
         onChange={(e) => {
           const picked = e.target.files?.[0];
-          // 같은 파일을 다시 골라도 change가 뜨도록 value를 비워둔다
-          e.target.value = '';
+          e.target.value = ''; // 같은 파일을 다시 골라도 change 가 뜨게
           void onFile(picked);
         }}
       />

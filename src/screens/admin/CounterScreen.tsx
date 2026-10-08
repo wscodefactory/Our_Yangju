@@ -1,84 +1,71 @@
 // 담당자 창구 모드. 창구에서 공무원이 자기 기기로 띄워놓고 쓰는 화면이라
-// 왼쪽은 주민 모국어, 오른쪽은 한국어가 같은 내용으로 나란히 선다.
-// 데이터는 시청·주민센터 화면(VisitScreens)과 같은 TASKS를 쓴다. 원본 html의 #counter.
+// 위는 주민 모국어, 아래는 한국어가 같은 내용으로 나란히 선다.
+// 데이터는 시청·주민센터 화면과 같은 VISIT(다섯 언어 배열)을 쓴다. AI 번역 없음.
 import { useState } from 'react';
-import { Crumb } from '@/components/layout/Crumb';
-import { Hint, Note } from '@/components/ui/Notes';
-import { LangRow } from '@/components/ui/LangRow';
-import { Tr } from '@/components/ui/Tr';
+import { Title } from '@/components/layout/Chrome';
 import { useApp } from '@/context/AppContext';
-import { TASKS } from '@/data/civic';
-import { LANG_NAME } from '@/data/tax';
-import type { CardLang } from '@/types';
+import { LANGS, VISIT } from '@/data/content';
+import { tx, type Lang } from '@/i18n';
+
+// 한국어 주민이면 창구 모드가 필요 없으니 선택지에서 뺀다
+const RES_LANGS = LANGS.filter((l) => l.code !== 'ko');
 
 /**
- * 담당자 창구 모드: 주민 언어 화면과 담당자용 한국어 화면을 나란히.
- *
- * 여기서 고르는 언어(cl)는 로컬 state다. 앱 전체의 카드 언어(useApp().cl)를 건드리면
- * 담당자 기기의 다른 화면까지 베트남어로 바뀌어 버리므로 일부러 분리했다.
+ * 담당자 창구 모드: 주민 언어 패널과 담당자용 한국어 패널을 위아래로.
+ * 여기서 고르는 언어(cl)는 로컬 state다. 앱 전체 언어를 건드리면 담당자 기기의 다른 화면까지 바뀌므로 분리.
  * 기본값 'vi'는 양주 외국인 주민 상위 국적 중 하나라서.
  */
 export function CounterScreen() {
   const { T } = useApp();
-  const [cl, setCl] = useState<CardLang>('vi');
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const task = taskId ? TASKS.find((x) => x.id === taskId) : null;
-
-  // 주민 쪽 패널은 앱의 카드 언어와 무관하게 여기서 고른 언어로 강제 번역.
-  // Tr의 force prop이 없으면 전역 cl을 따라가 버려서 한국어 담당자 기기에선 번역이 안 뜬다.
-  const my = (ko: string, en: string) => <Tr ko={ko} en={en} force={cl} />;
+  const [cl, setCl] = useState<Lang>('vi');
+  const [taskId, setTaskId] = useState(VISIT[0].id);
+  const task = VISIT.find((x) => x.id === taskId) ?? VISIT[0];
+  // 주민 쪽 패널은 앱 언어와 무관하게 여기서 고른 언어로
+  const my = (arr: string[]) => tx(arr, cl);
 
   return (
-    <>
-      <Crumb path={T('담당자 창구 모드', 'Officer counter mode')} />
-      <h1>{T('창구 모드', 'Counter mode')}</h1>
-      <Hint>
-        {T('주민의 언어를 고르고 업무를 누르면, 주민에게 보여줄 화면(모국어)과 담당자용 화면(한국어)이 나란히 나와요.',
-          "Pick the resident's language and the task. The resident sees their language, you see Korean, side by side.")}
-      </Hint>
-      {/* 한국어 주민이면 창구 모드가 필요 없으니 선택지에서 뺀다 */}
-      <LangRow value={cl} onChange={setCl} exclude={['ko']} />
-      <div className="chips" style={{ marginBottom: 14 }}>
-        {TASKS.map((x) => (
-          <button
-            key={x.id}
-            type="button"
-            onClick={() => setTaskId(x.id)}
-            style={task?.id === x.id ? { borderColor: 'var(--accent)', background: 'var(--accent-soft)' } : undefined}
-          >
-            {x.name[0]}
-          </button>
+    <div className="stack">
+      <Title>{T('창구 모드', 'Counter mode')}</Title>
+      <p className="lead" style={{ margin: 0 }}>
+        {T('주민의 언어와 업무를 고르면, 주민에게 보여줄 문장(모국어)과 담당자용 문장(한국어)이 함께 나와요.',
+          "Pick the resident's language and the task. The resident sees their language, you see Korean.")}
+      </p>
+      <span className="field-label" style={{ margin: 0 }}>{T('주민 언어', "Resident's language")}</span>
+      <div className="chips">
+        {RES_LANGS.map((l) => (
+          <button key={l.code} type="button" className="chip" aria-pressed={cl === l.code} onClick={() => setCl(l.code as Lang)} lang={l.code}>{l.native}</button>
         ))}
       </div>
-      {task && (
-        <>
-          <div className="twin">
-            {/* 주민 쪽 — 라벨("어디서" 등)까지 전부 번역 */}
-            <div className="pane" lang={cl}>
-              <h3>{LANG_NAME[cl]}</h3>
-              <p><b>{my(task.name[0], task.name[1])}</b></p>
-              <p>{my('어디서', 'Where')}: {my(task.where[0], task.where[1])}</p>
-              <p>{my('언제까지', 'When')}: {my(task.when[0], task.when[1])}</p>
-              <p>{my('가져갈 것', 'Bring')}:</p>
-              <ul>{task.docs.map((d, i) => <li key={i}>{my(d[0], d[1])}</li>)}</ul>
-            </div>
-            {/* 담당자 쪽 — UI 언어가 영어여도 한국어 고정. 출처 메모(src)는 이쪽에만 */}
-            <div className="pane ko" lang="ko">
-              <h3>한국어 (담당자)</h3>
-              <p><b>{task.name[0]}</b></p>
-              <p>어디서: {task.where[0]}</p>
-              <p>언제까지: {task.when[0]}</p>
-              <p>가져갈 것:</p>
-              <ul>{task.docs.map((d, i) => <li key={i}>{d[0]}</li>)}</ul>
-              {task.src && <Note>{task.src}</Note>}
-            </div>
-          </div>
-          <p className="trnote">
-            {T('모국어 문구는 AI 번역 초안입니다. 시 공식 다국어 안내문이 확보되면 그 문장으로 교체합니다.',
-              "Native-language text is an AI draft; replaced by the city's official translations when available.")}
-          </p>
-        </>
-      )}
-    </>
+      <span className="field-label" style={{ margin: 0 }}>{T('업무', 'Task')}</span>
+      <div className="chips">
+        {VISIT.map((x) => (
+          <button key={x.id} type="button" className="chip" aria-pressed={task.id === x.id} onClick={() => setTaskId(x.id)}>{T(x.name[0], x.name[1])}</button>
+        ))}
+      </div>
+
+      {/* 주민 쪽 — 라벨까지 전부 그 언어 */}
+      <section className="panel say" lang={cl}>
+        <h2>{my(task.name)}</h2>
+        <p className="ko">{my(task.sayT)}</p>
+        <dl className="kv">
+          <dt>{my(['어디서', 'Where', '在哪里', 'Ở đâu', 'कहाँ'])}</dt><dd>{my(task.where)}</dd>
+          <dt>{my(['언제까지', 'When', '什么时候', 'Khi nào', 'कहिले'])}</dt><dd>{my(task.when)}</dd>
+          <dt>{my(['가져갈 것', 'Bring', '携带物品', 'Mang theo', 'ल्याउनुपर्ने'])}</dt>
+          <dd><ul style={{ margin: 0, paddingLeft: 18 }}>{task.docs.map((d, i) => <li key={i}>{my(d)}</li>)}</ul></dd>
+        </dl>
+      </section>
+
+      {/* 담당자 쪽 — UI 언어가 영어여도 한국어 고정. 출처 메모(src)는 이쪽에만 */}
+      <section className="panel" lang="ko">
+        <h2>{task.name[0]} <span className="bdg gray">한국어 · 담당자</span></h2>
+        <p className="ko" style={{ fontWeight: 700, lineHeight: 1.55 }}>{task.say}</p>
+        <dl className="kv">
+          <dt>어디서</dt><dd>{task.where[0]}</dd>
+          <dt>언제까지</dt><dd>{task.when[0]}</dd>
+          <dt>가져갈 것</dt><dd><ul style={{ margin: 0, paddingLeft: 18 }}>{task.docs.map((d, i) => <li key={i}>{d[0]}</li>)}</ul></dd>
+        </dl>
+        {task.src && <p className="src">{task.src[0]}</p>}
+      </section>
+    </div>
   );
 }

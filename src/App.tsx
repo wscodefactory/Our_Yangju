@@ -1,34 +1,27 @@
-import { GuideSheet } from '@/components/guide/GuideSheet';
-import { DemoNote, GuideButton, Toast } from '@/components/layout/Chrome';
-import { Header } from '@/components/layout/Header';
+import { AppBar, BarHost, Fab, Footer, SkipLink, Toast } from '@/components/layout/Chrome';
+import { Overlays } from '@/components/layout/Overlays';
 import { AppProvider } from '@/context/AppContext';
 import { DocProvider } from '@/context/DocContext';
 import { GuideProvider } from '@/context/GuideContext';
 import { ScreenRouter } from '@/screens/ScreenRouter';
 
 /**
- * 앱 뼈대. 라우터 라이브러리 없이 AppContext 의 내비 스택을 ScreenRouter 가 읽어서 화면을 고른다.
- * 원본이 단일 html 에서 화면 div 를 바꿔 끼우는 구조였고, 뒤로가기도 자체 스택이라 그대로 옮긴 것.
- *
- * Provider 순서:
- *  AppProvider   언어·내비·내 혜택·토스트. 모두가 쓰므로 맨 바깥
- *  DocProvider   고지서 흐름 상태(캔버스·읽기 결과). 다른 컨텍스트에 의존하지 않아 어디 둬도 되지만 묶어서 여기
- *  GuideProvider 양주무관 채팅. useApp() 으로 단계 이동과 언어를 쓰므로 AppProvider 안쪽이어야 한다
- *
- * .app 컬럼 바깥에 둔 GuideButton/GuideSheet/Toast 는 position: fixed 라 레이아웃 흐름에서 빠져 있다.
+ * 앱 뼈대 (참고용 html 의 body 구조 그대로):
+ *   본문 바로가기 → 앱 바 → <main> → 푸터(홈만) → 하단 고정 바 → FAB·시트 → 토스트
+ * Provider 순서: App(언어·내비·저장) → Doc(고지서) → Guide(AI 상담, useApp 을 쓰므로 안쪽)
  */
 export default function App() {
   return (
     <AppProvider>
       <DocProvider>
         <GuideProvider>
-          <div className="app">
-            <Header />
-            <ScreenRouter />
-            <DemoNote />
-          </div>
-          <GuideButton />
-          <GuideSheet />
+          <SkipLink />
+          <AppBar />
+          <ScreenRouter />
+          <Footer />
+          <BarHost />
+          <Fab />
+          <Overlays />
           <Toast />
         </GuideProvider>
       </DocProvider>

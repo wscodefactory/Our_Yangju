@@ -21,81 +21,54 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 - `.env`는 git에 올라가지 않는다. 키는 브라우저 번들에 들어가므로 시연용으로만 쓰고, 운영 시에는 서버 프록시를 두어야 한다.
 - **공유 링크(배포본)에서 사진 읽기가 안 보이면** 빌드 때 `.env`에 키가 없었던 것이다. `npm run build`를 키가 든 `.env`로 다시 돌리거나, 배포본의 "받은 문서 찍기" 화면에서 **AI 키 넣고 사진 읽기 켜기**로 시연 기기에 키를 한 번 넣는다(그 기기 localStorage에만 저장).
 
-## 화면 구성
+## 화면 구성 (2026-10-08 디자인시스템 개편)
 
-1. **내 언어 선택** — 한국어 · English · 中文 · Tiếng Việt · नेपाली (첫 방문 시)
-2. **용건 선택(홈)** — 시청·주민센터에 왔어요 / 받은 종이가 있어요 / 양주에서 살기, 하단에 행사·소개
-3. **행정 업무 6종 카드** — 어디서 · 언제까지 · 가져갈 것 + 창구에 보여줄 한국어 한 줄, 읽어주기
-4. **고지서 할 일 카드** — 사진(또는 샘플) → 기기에서 개인정보 가림 → 가린 이미지만 AI 전송 → 금액·기한 확인 → 내 언어 할 일 카드 → 추가 질문(지방세 시나리오 20종) → 상담 연결(1345 · 한국어 메모)
-5. **복지 혜택** — 누구 → 생애 단계 → 혜택 → 받을 수 있나요?(예/아니오 사전 확인) → 준비물 → 신청, 내 혜택 담기
-6. **담당자 화면(시연)** — 공고문 붙여넣기 → 규칙 초안 → 근거 문장 형광펜 대조 → 전부 확인 후 게시 / 사각지대 신호 / 창구 모드(주민 언어 ↔ 한국어 나란히)
-7. **양주무관** — 한 문장으로 상황을 말하면 볼 단계를 추천하고, 담당자에게 보낼 한국어 문의문 초안을 만들어 준다
+휴대폰 한 손 사용 기준의 모바일 웹앱. 앱 폭 480px 한 열, 밝은 테마 하나, 양주시 CI 헤더.
+모든 문구는 `[ko, en, zh, vi, ne]` 다섯 칸으로 내장되어 AI 키 없이 5개 언어가 즉시 바뀐다.
+
+1. **언어 선택** (첫 실행) — 이후에는 헤더 지구본 아이콘 → 시트
+2. **홈** — 서비스 소개(히어로) → 할 수 있는 일 4가지(시청·주민센터 업무 / 받은 고지서 읽기 / 지원 혜택 찾기 / 생활 정보) → 양주 둘러보기(행사·명소·소개)
+3. **시청과 주민센터 업무** — 목록 → 상세(장소·기한·준비물 체크리스트) + 하단 바 [1345 전화] [창구 직원에게 보여주기(한국어 전체 화면)]
+4. **받은 고지서 읽기** — 사진 → 기기에서 가림 → 가린 이미지만 AI 전송 → 내용 확인(세목·금액·기한·전자납부번호·가상계좌) → 결과(요약 카드 + 탭: 납부 방법 / 자주 묻는 질문 / 상담) + 하단 [위택스에서 납부하기]. 샘플 고지서·직접 입력 경로도 있음
+5. **지원 혜택 찾기** — 대상 칩 → 단계 탭 → 혜택 카드(북마크) → 상세 탭(자격 확인 / 준비물 / 신청 방법) + 하단 [저장] [문의 메모]
+6. **생활 정보** — 긴급 전화(tel: 링크), 쓰레기, 아플 때, 교통, 일터
+7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Gemini 있으면 AI, 없으면 5개 언어 키워드 규칙)
+8. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드)
 
 ## 코드 구조
 
 ```
 src/
-├─ main.tsx / App.tsx          진입점, Provider 조립 (App → Doc → Guide)
-├─ styles/global.css           원본 <style> 3블록을 그대로 합친 전역 스타일
-├─ types/index.ts              Benefit · Stage · Screen(내비게이션 스택 유니온) 등 공용 타입
-├─ data/                       정적 데이터. 문구는 전부 [ko, en] 쌍
-│  ├─ ui.ts                    공통 문구
-│  ├─ benefits.ts              청년 생애 단계별 혜택, 그룹
-│  ├─ info.ts                  양주 소개 · 행사 · 명소 · 맛집 · 인증, 외부 링크, 출처 문구
-│  ├─ tax.ts                   카드 언어(ko/en/zh/vi/ne) 문구, 지방세 시나리오 20종, 예시 공고
-│  ├─ civic.ts                 행정 업무 6종, 양주에서 살기, 양주무관 추천 문장·키워드 규칙
-│  └─ icons.tsx                SVG 아이콘
-├─ context/
-│  ├─ AppContext.tsx           UI 언어 · 카드 언어 · 큰 글씨 · 내비 스택 · 내 혜택 · 게시 혜택 · 토스트
-│  ├─ DocContext.tsx           고지서 흐름: 캔버스 · 가린 영역 · 읽은 결과
-│  └─ GuideContext.tsx         양주무관 대화 (AI → 실패 시 키워드 규칙)
-├─ hooks/useTranslate.ts       zh/vi/ne 화면 문구 번역 + 세션 캐시
-├─ services/
-│  ├─ ai.ts                    AiProvider 인터페이스 + GeminiProvider. 다른 모델로 바꾸려면 여기만
-│  ├─ prompts.ts               프롬프트 전부
-│  └─ benefitsStore.ts         담당자 게시 혜택 저장소 (지금은 localStorage, 서버 붙이면 교체)
-├─ utils/                      언어 선택 · 날짜/금액 포맷 · 샘플 고지서 그리기 · 가림 · 규칙 하이라이트
-├─ components/
-│  ├─ layout/                  Header · Crumb · Chrome(GuideButton · DemoNote · Toast)
-│  ├─ ui/                      Tile(Tile · Grid · Stack) · WideButton · BenefitTile · LangRow · Tr(번역 텍스트)
-│  │                           Cards(InfoCard · ResultBox) · Notes(Note · Hint · SourceLine · ForeignNote)
-│  │                           Status(Legend · Thinking · AiModeBadge · CheckItemRow)
-│  └─ guide/GuideSheet.tsx     양주무관 채팅 시트
-└─ screens/                    화면 하나 = 파일 하나
-   ├─ ScreenRouter.tsx         Screen → 화면 컴포넌트
-   ├─ LangScreen / HomeScreen
-   ├─ welfare/                 Welfare → Group → Stage → Item → Quiz → Docs → Apply, Mine, Soon
-   ├─ info/                    About · AboutItem · Events · Event(+EventStatusTag) · Local · Places · Eats · Cert · CertItem
-   ├─ doc/                     Doc → Mask → Reading → Confirm / Manual(useConfirm) → Card → TaxQ → Counsel
-   ├─ admin/                   AdminScreen(혜택 등록 · 사각지대 신호) · RegisterPanel · CounterScreen
-   └─ visit/                   Visit → Task, Life → LifeItem
-legacy/index.html              원본 단일 파일 시안 (claude.ai 아티팩트용)
+├─ main.tsx / App.tsx           진입점, Provider 조립 (App → Doc → Guide), 앱 바·하단 바·FAB·시트·토스트
+├─ styles/global.css            양주시 디자인시스템(Yangju DS) 토큰·컴포넌트 CSS. 참고용 html의 <style> 그대로
+├─ i18n.ts                      tx/t(5개 언어 문구), Intl 날짜·금액 서식, 로캘 폴백, 누락 번역 점검
+├─ data/content.ts              모든 문구와 콘텐츠 (UI 사전, VISIT, LIFE, BEN, EVENTS, PLACES, FAQ, INTENTS, SAMPLE …)
+├─ data/admin.ts                담당자 화면 시연 데이터
+├─ types/index.ts               DocInfo · Screen(내비게이션 스택 유니온) · 담당자 화면 타입
+├─ context/AppContext.tsx       언어 · 큰 글씨 · 저장 혜택 · 내비 스택(history 연동) · 시트 · 토스트
+├─ context/DocContext.tsx       고지서 흐름 상태 (캔버스·가림·DocInfo)
+├─ context/GuideContext.tsx     AI 상담 대화 (Gemini → INTENTS 규칙 폴백)
+├─ components/layout/Chrome.tsx AppBar · Title · BottomBar · Fab · Footer · Sheet · Toast
+├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면
+├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
+├─ screens/                     Home · Lang · Explore · Saved · visit/ · life/ · doc/ · welfare/ · admin/
+├─ services/ai.ts, prompts.ts   Gemini 호출 (고지서 읽기 · 공고 규칙 추출 · 상담 분류)
+└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · rule(담당자)
+legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
+요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)
 ```
-
-라우터 라이브러리 없이 `AppContext`의 `nav: Screen[]` 스택으로 화면을 오간다. 원본도 자체 스택이었고 시연용이라 URL이 바뀔 필요가 없어 그대로 두었다.
-
-### 원본과 달라진 점
-
-| 원본 (index.html) | React 버전 |
-|---|---|
-| `window.claude.use('sample')` | `services/ai.ts` — `.env`에 키가 있으면 Gemini(`gemini-2.5-flash`), 없으면 데모 모드 |
-| `window.claude.use('db')` 공유 저장소 | `services/benefitsStore.ts` — 이 기기 localStorage |
-| nav 항목에 끼워 넣던 임시 상태(퀴즈 답, 공고문 입력) | 각 화면의 로컬 state |
-| `EXT[화면]` / `ACT[동작]` 확장 훅으로 덧씌운 스크립트 3묶음 | 화면별 컴포넌트와 컨텍스트로 분리 |
-
-브라우저 저장 키(`hy-lang`, `hy-cl`, `hy-mine`, `hy-newb`)는 원본과 같다.
 
 ## 원칙
 
 - AI는 세액·자격을 판정하지 않는다. 인쇄된 금액·기한을 읽기만 하고, 원본 고지서 확인을 안내한다.
 - 원본 사진은 기기 밖으로 나가지 않는다. 사용자가 가린 이미지만 전송하고 문서·질문 원문은 저장하지 않는다.
 - 납부 링크는 공식 주소(위택스)만 쓴다.
-- 업무 안내는 일반 법령 기준 예시이며 양주시 창구별 접수 범위는 확인 중이다. 중국어·베트남어·네팔어 문구는 AI 초안으로 원어민 검토 전이며, 화면에도 그렇게 표시한다.
+- 업무 안내는 일반 법령 기준 예시이며 양주시 창구별 접수 범위는 확인 중이다. 중국어·베트남어·네팔어 문구는 내장 번역(팀 작성)으로 원어민·1345 통번역 인력 검수 전이다.
 
 ## 다음 개발
 
 - [ ] 흐림·불확실 값 재촬영 안내, 기한 경과·복수 금액 상담 전환, 확인 전 납부 연결 보류
 - [ ] 실제 고지서 3~5장 인식 테스트(정답률 기록)
-- [ ] 중·베·네 메뉴 문구 고정 번역(원어민 검토 반영)
+- [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [ ] 원어민 검수 반영
 - [ ] 담당자 게시 혜택 공유 저장소(서버) 연결
 - [ ] Gemini 호출 서버 프록시화

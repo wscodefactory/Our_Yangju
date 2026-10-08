@@ -1,3 +1,6 @@
+import { LANGS } from '@/data/content';
+import type { Lang } from '@/i18n';
+
 // 브라우저 API 를 감싸는 얇은 래퍼들. localStorage · 음성 읽기 · 클립보드 · Blob 변환.
 // 공통점은 "환경에 따라 없거나 예외를 던질 수 있는 것"이라 전부 try/catch 로 감싸고
 // 실패해도 앱이 멈추지 않게 조용히 넘어간다. 시연 환경(사생활 모드, 구형 웹뷰)을 염두에 둔 것.
@@ -37,45 +40,52 @@ export const STORAGE_KEYS = {
   newBenefits: 'hy-newb',
   /** 시연 기기에서 직접 넣은 Gemini 키 (빌드 env가 비었을 때만 쓰임). 기기 밖으로 안 나감 */
   geminiKey: 'hy-gemini-key',
+  /** 큰 글씨 '1' | '0' */
+  big: 'hy-big',
+  /** 저장한 혜택 id 목록 (JSON) */
+  saved: 'hy-saved',
+  /** 납부 기록 (JSON, utils/paid.ts) */
+  paid: 'hy-paid',
 } as const;
 
 /** 음성 합성 지원 여부. SSR 은 안 하지만 혹시 몰라 window 체크를 넣어둠 */
 export const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
 /**
- * 텍스트 읽어주기. 이전 발화가 있으면 끊고 새로 시작한다(카드 언어를 바꾸고 다시 누르는 경우).
- * rate 0.95 는 외국어 학습자 기준으로 약간 느리게. 네팔어는 기기에 음성이 없으면 그냥 조용히 끝난다.
+ * 텍스트 읽어주기. 기기에 그 언어 음성이 없으면 재생하지 않고 false 를 돌려준다 → 호출부가 안내 토스트(noVoice).
+ * rate 0.95 는 외국어 학습자 기준으로 약간 느리게.
  */
-export function speak(text: string, bcp47: string) {
-  if (!canSpeak || !text) return;
+export function speak(text: string, lang: Lang): boolean {
+  if (!canSpeak || !text) return false;
+  const lg = LANGS.find((l) => l.code === lang) || LANGS[0];
   try {
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find((x) => x.lang && x.lang.toLowerCase().startsWith(lg.tts));
+    if (!v && voices.length) return false;
     speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = bcp47;
-    utter.rate = 0.95;
-    speechSynthesis.speak(utter);
-  } catch { /* 음성 엔진 없음 등. 무시 */ }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lg.locale.split('-u-')[0];
+    if (v) u.voice = v;
+    u.rate = 0.95;
+    speechSynthesis.speak(u);
+    return true;
+  } catch { return false; }
 }
 
 /**
- * 클립보드 복사. text 를 안 주면 el 의 textContent 를 복사한다.
- * clipboard API 는 https 가 아니거나 사용자 제스처 밖이면 거부되는데, 그럴 땐 el 안의 글자를 전부 선택해 두고
- * 'selected' 를 돌려준다. 호출부는 "길게 눌러 복사하세요" 토스트를 띄우면 된다.
+ * 클립보드 복사. clipboard API 가 막힌 환경(http, 구형 웹뷰)에서는 숨은 textarea + execCommand 로 한 번 더 시도.
+ * 성공 여부와 무관하게 호출부는 "복사했어요" 토스트를 띄운다 (참고용 html 과 같은 동작).
  */
-export async function copyText(el: HTMLElement | null, text?: string): Promise<'copied' | 'selected'> {
-  const txt = text ?? el?.textContent ?? '';
+export async function copyText(text: string): Promise<void> {
   try {
-    await navigator.clipboard.writeText(txt);
-    return 'copied';
+    await navigator.clipboard.writeText(text);
   } catch {
-    if (el) {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      const sel = getSelection();
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-    }
-    return 'selected';
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch { /* 무시 */ }
+    ta.remove();
   }
 }
 

@@ -54,10 +54,7 @@ export async function drawSampleNotice(): Promise<{ canvas: HTMLCanvasElement; r
   ['• 위택스(www.wetax.go.kr) 전자납부번호 조회 — 계좌·카드·간편결제', '• 은행 앱에서 가상계좌 이체', '• 은행 ATM·무인공과금기 / 전화 ARS 142211', '• 외국어 통역 상담 1345  /  담당부서 031-8082-0000 (가상)']
     .forEach((line, i) => g.fillText(line, 60, 912 + i * 34));
 
-  // 가짜 QR. 10x10 격자에서 (i*7+j*3)%4<2 인 칸만 채워서 QR 비슷한 무늬를 만든다. 스캔되지 않음
-  g.strokeStyle = '#bbb'; g.strokeRect(640, 930, 212, 212);
-  g.font = F(16); g.fillStyle = '#666'; g.fillText('QR 납부 (가상)', 680, 1160);
-  for (let i = 0; i < 10; i++) for (let j = 0; j < 10; j++) if ((i * 7 + j * 3) % 4 < 2) { g.fillStyle = '#333'; g.fillRect(660 + i * 17, 950 + j * 17, 15, 15); }
+  // QR 은 그리지 않는다. 양주시 고지서의 QR 은 전자고지 신청용이라 "QR 납부" 로 오해될 수 있어서 (구현요청 26.10.08)
 
   g.fillStyle = '#999'; g.font = F(15); g.fillText('※ 이 고지서는 공모전 시연을 위해 만든 가상 문서입니다.', 48, 1150);
 

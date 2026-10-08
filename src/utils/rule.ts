@@ -1,10 +1,8 @@
-import { LV } from '@/data/benefits';
-import type { Benefit, CheckItem, ExtractedRule, PublishedBenefit } from '@/types';
+import type { CheckItem, ExtractedRule, PublishedBenefit } from '@/types';
 
 // 담당자 화면(공고 → 규칙 → 게시) 데이터 변환.
 // 공고문에서 뽑은 ExtractedRule 을 (1) 담당자가 체크할 목록으로 펼치고, (2) 원문 하이라이트 조각으로 자르고,
-// (3) 게시용 PublishedBenefit 으로, (4) 다시 시민 화면의 Benefit 으로 바꾼다.
-// 전부 순수 함수. (1)(2)(3)은 RegisterPanel 이, (4)는 AppContext 가 게시 혜택을 단계에 합칠 때 부른다.
+// (3) 게시용 PublishedBenefit 으로 바꾼다. 전부 순수 함수. RegisterPanel 이 부른다.
 
 /**
  * 추출 결과를 "조건 / 지원 / 기간 / 신청 / 서류" 순서의 확인 항목 목록으로 펼친다.
@@ -71,27 +69,5 @@ export function ruleToPublished(rule: ExtractedRule): PublishedBenefit {
     channel: rule.channel || {},
     source: 'officer',
     createdAt: Date.now(),
-  };
-}
-
-/**
- * 담당자가 게시한 혜택 → 시민 화면의 Benefit.
- * 게시 데이터는 한국어뿐이라 name 을 [ko, en] 양쪽에 같은 값으로 넣는다 (영어 UI 에서도 한국어로 보임. 번역은 TODO).
- * 시행 주체는 무조건 양주시, 가능성은 'check' 고정 — 담당자가 올린 건 아직 검증 안 된 규칙이라는 뜻.
- * quiz 는 조건의 question 을 쓰되 없으면 label 로 대체하고, 화면이 길어지지 않게 6개까지만.
- * documents 의 typeof 분기는 예전 저장 형식(문자열 배열)이 localStorage 에 남아 있을 수 있어서 둔 것.
- */
-export function publishedToBenefit(pub: PublishedBenefit): Benefit {
-  return {
-    name: [pub.name, pub.name],
-    lv: LV.Y,
-    st: 'check',
-    what: pub.summary || '',
-    who: pub.who || '',
-    when: pub.when || '',
-    docs: (pub.documents || []).map((doc) => (typeof doc === 'string' ? doc : doc.name)),
-    ch: { t: pub.channel?.type === 'online' ? 'online' : 'visit', where: pub.channel?.where || '행정복지센터' },
-    quiz: (pub.conditions || []).map((c) => c.question || c.label).filter(Boolean).slice(0, 6),
-    isNew: true,
   };
 }

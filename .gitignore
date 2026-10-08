@@ -7,3 +7,6 @@ dist
 
 # Serena (코드 인텔리전스) 작업 폴더
 .serena/
+
+# Office lock files
+~$*
