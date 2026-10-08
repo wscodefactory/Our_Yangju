@@ -541,6 +541,19 @@ const UI_BANK = {
   myRecords:["내 납부 기록","My payment records","我的缴纳记录","Lịch sử nộp của tôi","मेरो भुक्तानी रेकर्ड"],
   paidOn:["납부일","Paid on","缴纳日期","Ngày nộp","तिरेको मिति"],
   deleteAll:["삭제","Delete","删除","Xóa","मेटाउनुहोस्"],
+  // 사진 경로(가리기·읽는 중) 문구. maskLead·maskDone 은 「고지서화면_구현요청」 A표, 나머지는 AI 초안
+  maskLead:["이름·주소·납세번호 위를 손가락으로 눌러 드래그하면 검은 상자로 가려집니다. 가린 부분은 전송되지 않습니다.","Press and drag over your name, address and tax number to cover them with black boxes. Covered parts are not sent.","用手指按住并拖过姓名、地址和纳税号码，就会用黑框遮住。遮住的部分不会被发送。","Dùng ngón tay nhấn và kéo qua tên, địa chỉ và mã số thuế để che bằng ô màu đen. Phần đã che sẽ không được gửi đi.","नाम, ठेगाना र कर नम्बरमाथि औंलाले थिचेर तान्नुहोस्, कालो बाकसले छोपिन्छ। छोपिएको भाग पठाइँदैन।"],
+  maskCanvas:["고지서 사진. 드래그해서 가리기","Notice photo. Drag to cover","税单照片。拖动以遮挡","Ảnh giấy báo. Kéo để che","बिलको फोटो। छोप्न तान्नुहोस्"],
+  maskUndo:["마지막 상자 지우기","Remove last box","删除最后一个框","Xóa ô vừa che","अन्तिम बाकस हटाउनुहोस्"],
+  maskDone:["가리기 완료","Done covering","遮挡完成","Hoàn tất che","छोप्ने काम सकियो"],
+  readingMsg:["양주무관이 고지서를 읽고 있어요… (10~40초)","Reading your notice… (10-40 s)","正在读取税单…（10～40 秒）","Đang đọc giấy báo… (10-40 giây)","बिल पढ्दैछ… (10-40 सेकेन्ड)"],
+  readOff:["사진 읽기를 쓸 수 없어요. 직접 입력해 주세요.","Photo reading is unavailable. Please enter it yourself.","无法读取照片，请手动输入。","Không đọc được ảnh. Hãy nhập thủ công.","फोटो पढ्न सकिएन। आफैं लेख्नुहोस्।"],
+  readFail:["읽지 못했어요. 직접 입력해 주세요.","Could not read it. Please enter it yourself.","读取失败，请手动输入。","Không đọc được. Hãy nhập thủ công.","पढ्न सकिएन। आफैं लेख्नुहोस्।"],
+  welfareLetter:["복지 안내문이에요. 복지 혜택으로 이동해요.","This is a welfare letter. Opening Welfare.","这是福利通知，正在打开福利页面。","Đây là thông báo phúc lợi. Đang mở mục Phúc lợi.","यो कल्याण सूचना हो। सुविधा पृष्ठ खुल्दैछ।"],
+  lowConf:["AI가 확실하지 않대요. 고지서와 꼭 비교해 주세요.","The AI is not sure. Please compare carefully with your notice.","AI 不太确定，请务必与税单核对。","AI chưa chắc chắn. Hãy đối chiếu kỹ với giấy báo.","AI निश्चित छैन। बिलसँग राम्ररी मिलाउनुहोस्।"],
+  photoFail:["이 사진을 열 수 없어요","Cannot open this photo","无法打开这张照片","Không mở được ảnh này","यो फोटो खोल्न सकिएन"],
+  keyBtn:["AI 키 넣고 사진 읽기 켜기","Enter an AI key to turn on photo reading","输入 AI 密钥以开启照片读取","Nhập khóa AI để bật đọc ảnh","फोटो पढ्न AI कुञ्जी हाल्नुहोस्"],
+  keyPrompt:["Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)","Paste your Gemini API key (stored on this device only)","请粘贴 Gemini API 密钥（仅保存在本设备）","Dán khóa Gemini API (chỉ lưu trên thiết bị này)","Gemini API कुञ्जी टाँस्नुहोस् (यो उपकरणमा मात्र राखिन्छ)"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 

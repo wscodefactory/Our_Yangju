@@ -34,7 +34,7 @@ function toDocInfo(r: DocData): DocInfo {
  * 화면 전환은 전부 back() 다음 go(). 이 화면이 스택에 남으면 결과에서 뒤로가기 때 AI 를 또 부르기 때문.
  */
 export function ReadingScreen() {
-  const { lang, t, back, go, toast } = useApp();
+  const { t, back, go, toast } = useApp();
   const { finalizeMask, setDoc } = useDoc();
   // StrictMode(dev) 는 effect 가 두 번 돌아 AI 호출·back() 이 겹치므로 한 번만
   const ran = useRef(false);
@@ -42,7 +42,6 @@ export function ReadingScreen() {
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
-    const ko = lang === 'ko';
     const toManual = (msg: string) => { toast(msg); back(); go({ k: 'docConfirm', manual: true }); };
 
     (async () => {
@@ -56,7 +55,7 @@ export function ReadingScreen() {
       const ai = getAi();
       if (!ai?.supportsImages) {
         setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '' });
-        toManual(ko ? '사진 읽기를 쓸 수 없어요. 직접 입력해 주세요.' : 'Photo reading is unavailable. Please enter it.');
+        toManual(t('readOff'));
         return;
       }
       try {
@@ -64,7 +63,7 @@ export function ReadingScreen() {
         setDoc(toDocInfo(r));
         back();
         if (r.doc_type === 'welfare_notice') {
-          toast(ko ? '복지 안내문이에요. 복지 혜택으로 이동해요.' : 'This is a welfare letter. Opening Welfare.');
+          toast(t('welfareLetter'));
           go({ k: 'welfare' });
           return;
         }
@@ -72,7 +71,7 @@ export function ReadingScreen() {
       } catch {
         // 네트워크든 JSON 파싱이든 사용자 입장에선 같다 — 직접 입력으로 우회
         setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '' });
-        toManual(ko ? '읽지 못했어요. 직접 입력해 주세요.' : 'Could not read it. Please enter it.');
+        toManual(t('readFail'));
       }
     })();
     // 마운트 시 1회만
@@ -84,7 +83,7 @@ export function ReadingScreen() {
       <Title>{t('st3')}</Title>
       <Stepper step={2} />
       <div className="thinking" role="status" aria-live="polite">
-        <i aria-hidden="true" /><span>{lang === 'ko' ? '양주무관이 고지서를 읽고 있어요… (10~40초)' : 'The Yangju Guide is reading your notice… (10–40 s)'}</span>
+        <i aria-hidden="true" /><span>{t('readingMsg')}</span>
       </div>
     </>
   );

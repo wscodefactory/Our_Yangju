@@ -35,13 +35,12 @@ export const parseDate = (s: string) => { const [y, m, d] = s.split('-').map(Num
 export const fmtDate = (s: string, lang: Lang, opt: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }) =>
   new Intl.DateTimeFormat(loc(lang), opt).format(parseDate(s));
 
-/** 기간. 같은 날이면 하루만. 범위 구분자는 하이픈으로 통일(디자인시스템 §8) */
+/** 기간. 같은 날이면 하루만. 범위 구분자는 하이픈으로 통일(디자인시스템 §8).
+ *  formatRange 는 브라우저·언어에 따라 서식이 들쭉날쭉해서(중국어에서 숫자형으로 떨어지는 경우가 있었다) 날짜 둘을 그냥 잇는다 */
 export function fmtRange(a: string, b: string, lang: Lang): string {
-  const f = new Intl.DateTimeFormat(loc(lang), { year: 'numeric', month: lang === 'zh' ? 'long' : 'short', day: 'numeric' });
-  if (a === b) return f.format(parseDate(a));
-  return f.formatRange
-    ? f.formatRange(parseDate(a), parseDate(b)).replace(/\s*[–—]\s*/g, ' - ')
-    : `${f.format(parseDate(a))} - ${f.format(parseDate(b))}`;
+  const opt: Intl.DateTimeFormatOptions = { year: 'numeric', month: lang === 'zh' ? 'long' : 'short', day: 'numeric' };
+  const f = (s: string) => new Intl.DateTimeFormat(loc(lang), opt).format(parseDate(s));
+  return a === b ? f(a) : `${f(a)} - ${f(b)}`;
 }
 
 /** 한국어는 "143,000원", 다른 언어는 ₩143,000 / 143.000 ₩ 처럼 로캘 통화 서식 */

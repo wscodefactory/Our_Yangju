@@ -43,7 +43,8 @@ body{
   word-break:keep-all;overflow-wrap:anywhere;
   -webkit-font-smoothing:antialiased;
 }
-:lang(zh){font-family:"Pretendard Variable",Pretendard,"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
+/* 중국어는 글자 단위로 줄을 바꿔야 한다. body 의 keep-all 을 그대로 두면 띄어쓰기 없는 문장이 한 줄로 밀려 어색하게 꺾인다 */
+:lang(zh){font-family:"Pretendard Variable",Pretendard,"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;word-break:normal}
 :lang(ne){font-family:"Noto Sans Devanagari","Pretendard Variable",Pretendard,system-ui,sans-serif;line-height:1.75}
 [lang="ko"]{font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
 img{max-width:100%;display:block}

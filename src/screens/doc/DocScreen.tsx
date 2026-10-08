@@ -13,7 +13,7 @@ import { paidStore } from '@/utils/paid';
 import { Stepper } from './Stepper';
 
 export function DocScreen() {
-  const { lang, t, tx, fmtWon, fmtDate, go, toast } = useApp();
+  const { t, tx, fmtWon, fmtDate, go, toast } = useApp();
   const { startSample, startManual, loadFile } = useDoc();
   const fileRef = useRef<HTMLInputElement>(null);
   const imgOk = !!getAi()?.supportsImages;
@@ -22,7 +22,7 @@ export function DocScreen() {
 
   // 배포 번들에 키가 없을 때의 우회로: 기기 localStorage 에만 저장. getAi() 가 모듈 캐시라 새로고침이 가장 짧다
   const enterKey = () => {
-    const k = window.prompt(lang === 'ko' ? 'Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)' : 'Paste your Gemini API key (stored on this device only)')?.trim();
+    const k = window.prompt(t('keyPrompt'))?.trim();
     if (!k) return;
     storage.set(STORAGE_KEYS.geminiKey, k);
     location.reload();
@@ -34,7 +34,7 @@ export function DocScreen() {
       await loadFile(picked); // HEIC 처럼 브라우저가 못 여는 포맷이면 throw
       go({ k: 'mask' });
     } catch {
-      toast(lang === 'ko' ? '이 사진을 열 수 없어요' : 'Cannot open this photo');
+      toast(t('photoFail'));
     }
   };
 
@@ -52,7 +52,7 @@ export function DocScreen() {
           <>
             <p className="muted" id="photo-off" style={{ margin: 0 }}>{t('photoOff')}</p>
             <button type="button" className="btn secondary" onClick={enterKey}>
-              {lang === 'ko' ? 'AI 키 넣고 사진 읽기 켜기' : 'Enter an AI key to turn on photo reading'}
+              {t('keyBtn')}
             </button>
           </>
         )}

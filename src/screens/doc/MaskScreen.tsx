@@ -15,7 +15,7 @@ const MIN_RECT_PX = 8;
  * 드래그 중 상자(cur)는 state 가 아니라 ref — pointermove 마다 리렌더할 이유가 없고, draw() 로 캔버스에 직접 그린다.
  */
 export function MaskScreen() {
-  const { lang, t, go } = useApp();
+  const { t, go } = useApp();
   const { canvas, rects, addRect, undoRect } = useDoc();
   const viewRef = useRef<HTMLCanvasElement>(null);
   const dragStart = useRef<[number, number] | null>(null);
@@ -74,19 +74,17 @@ export function MaskScreen() {
     draw(); // 버려진 작은 상자는 여기서 지워야 함
   };
 
-  const ko = lang === 'ko';
   return (
     <>
       <Title>{t('st2')}</Title>
       <Stepper step={1} />
       <p className="lead">
-        {ko ? '이름·주소·번호 위를 손가락으로 드래그하면 검은 상자로 가려져요. 가린 사진만 AI 에게 보내요.'
-          : 'Drag over your name, address and numbers to cover them with black boxes. Only the covered photo is sent to the AI.'}
+        {t('maskLead')}
       </p>
       <div className="canvaswrap">
         <canvas
           ref={viewRef}
-          aria-label={ko ? '고지서 사진. 드래그해서 가리기' : 'Notice photo. Drag to cover'}
+          aria-label={t('maskCanvas')}
           onPointerDown={onDown}
           onPointerMove={onMove}
           onPointerUp={onUp}
@@ -94,11 +92,11 @@ export function MaskScreen() {
       </div>
       {rects.length > 0 && (
         <div className="stack" style={{ marginTop: 12 }}>
-          <button type="button" className="btn secondary" onClick={undoRect}>{ko ? '마지막 상자 지우기' : 'Remove last box'}</button>
+          <button type="button" className="btn secondary" onClick={undoRect}>{t('maskUndo')}</button>
         </div>
       )}
       <BottomBar>
-        <button type="button" className="btn primary" onClick={() => go({ k: 'reading' })}>{ko ? '다 가렸어요, 읽기' : 'Done, read it'}</button>
+        <button type="button" className="btn primary" onClick={() => go({ k: 'reading' })}>{t('maskDone')}</button>
       </BottomBar>
     </>
   );

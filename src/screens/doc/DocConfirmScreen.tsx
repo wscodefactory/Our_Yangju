@@ -13,7 +13,7 @@ import { Stepper } from './Stepper';
 const EMPTY: DocInfo = { type: 'auto', amount: 0, due: '', epay: '', vacct: '' };
 
 export function DocConfirmScreen({ manual }: { manual: boolean }) {
-  const { lang, t, tx, fmtNum, go, openOverlay } = useApp();
+  const { t, tx, fmtNum, go, openOverlay } = useApp();
   const { canvas, doc, setDoc } = useDoc();
   const d = doc ?? EMPTY;
   const [type, setType] = useState<TaxType>(d.type);
@@ -60,7 +60,7 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
           <img className="thumb" src={thumb} alt={t('noticeT')} />
           {d.confidence === 'low' && (
             <Callout kind="warn" icon="alert" sm style={{ marginTop: 8 }}>
-              {lang === 'ko' ? 'AI 가 확실하지 않대요. 고지서와 꼭 비교해 주세요.' : 'The AI is not sure. Please compare carefully with your notice.'}
+              {t('lowConf')}
             </Callout>
           )}
         </div>
