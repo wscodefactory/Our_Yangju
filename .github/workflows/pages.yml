@@ -31,7 +31,10 @@ jobs:
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
           VITE_GEMINI_MODEL: gemini-3.8-flash
+      # enablement: 저장소에 Pages 가 안 켜져 있으면 워크플로가 직접 켠다 (Settings → Pages 수동 설정 불필요)
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
