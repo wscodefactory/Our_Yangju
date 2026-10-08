@@ -1,7 +1,7 @@
 // AI 호출 창구. 원본 시안은 window.claude.use('sample')로 호스트가 주는 모델을 썼는데,
 // 독립 실행 버전이라 Gemini REST를 직접 친다. 화면 코드는 AiProvider 인터페이스만 보고,
 // getAi()가 null이면 "데모 모드"로 규칙/샘플 데이터만 쓴다 (GuideContext, useTranslate, ReadingScreen 등).
-import { blobToBase64 } from '@/utils/browser';
+import { blobToBase64, STORAGE_KEYS, storage } from '@/utils/browser';
 
 /**
  * AI 공급자 인터페이스.
@@ -106,7 +106,8 @@ let instance: AiProvider | null | undefined;
 /** 환경변수(VITE_GEMINI_API_KEY)가 있으면 Gemini, 없으면 null(데모 모드) */
 export function getAi(): AiProvider | null {
   if (instance !== undefined) return instance;
-  const key = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+  // 빌드 env → 없으면 기기에 저장한 키(DocScreen에서 입력). 공유 링크 배포본에 키가 안 들어가도 시연 기기에서 사진 읽기를 켤 수 있게
+  const key = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || storage.get(STORAGE_KEYS.geminiKey) || '';
   const model = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-2.5-flash';
   instance = key ? new GeminiProvider(key, model) : null;
   return instance;

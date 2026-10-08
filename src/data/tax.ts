@@ -1,4 +1,4 @@
-import type { CardLang, CardText, ExtractedRule, TaxScenario } from '@/types';
+import type { Bi, CardLang, CardText, ExtractedRule, TaxScenario } from '@/types';
 
 // 고지서(지방세) 흐름과 담당자 화면에서 쓰는 데이터.
 //  - 카드 언어 목록·이름·인사말
@@ -42,6 +42,33 @@ export const CARD_TEXT: Record<CardLang, CardText> = {
   ne: { docIs: 'तपाईंले पाएको कागज', amount: 'तिर्नुपर्ने रकम', due: 'तिर्ने अन्तिम मिति', todo: 'अहिले गर्नुपर्ने काम', pay: 'Wetax मा भुक्तानी', ask: 'थप प्रश्न', counsel: 'परामर्शसँग जोड्नुहोस्', left: '{n} दिन बाँकी', today: 'आज अन्तिम दिन हो', over: 'म्याद नाघिसक्यो', src: 'आधार: याङजु सहरको स्थानीय कर जानकारी · टोलीले लेखेको परिदृश्य (कर कार्यालयले जाँच गर्न बाँकी)', ver: 'रकम र मितिको अन्तिम आधार मूल बिल नै हो', s1: 'रकम र मिति बिलसँग मिल्छ कि जाँच गर्नुहोस्', s2: 'Wetax, वा बिलको QR / भर्चुअल खाताबाट तिर्नुहोस्', s3: 'नबुझेको कुरा आफ्नै भाषामा सोध्नुहोस्', speak: 'पढेर सुनाउनुहोस्', won: '₩{a}' },
 };
 
+/* ---------- 고지서 안내 문구 (프로토타입문구 확정본 2026-10-07) ---------- */
+
+/**
+ * 세정과 확정 문구. [ko, en] 쌍이고 zh/vi/ne 는 Tr/translate 로 런타임 번역.
+ * 가산세는 AI 가 세액을 판정하지 않고 penalty 문구를 그대로 낸다 (TAX_SCENARIOS 'late').
+ * 납부 방법 pay 는 우선순위 순서 그대로 화면에 번호 매겨 나간다 — 순서 바꾸지 말 것.
+ */
+export const NOTICE_TEXT = {
+  penalty: ['납부기한이 지나면 3%가 더해집니다. 세목별 세액이 45만 원 이상이면 이후 매월 0.66%씩 추가됩니다(최대 60개월). 정확한 금액은 위택스에서 확인하세요.',
+    'After the due date, 3% is added. If the tax for one item is 450,000 won or more, a further 0.66% is added every month (up to 60 months). Check the exact amount on Wetax.'],
+  payTitle: ['납부 방법 (우선순위)', 'How to pay (in order)'],
+  pay: [
+    ['위택스에서 전자납부번호로 조회 후 납부 (계좌·카드·간편결제, 00:30~23:30)', 'Look up your e-payment number on Wetax and pay (bank account, card or easy pay; 00:30–23:30)'],
+    ['은행 앱에서 고지서의 가상계좌번호로 이체', 'Transfer to the virtual account number on the notice from your bank app'],
+    ['은행 ATM·무인공과금기에서 카드/통장 납부', 'Pay by card or bankbook at a bank ATM or self-service bill machine'],
+    ['전화 ARS 142211 (계좌·카드)', 'Phone ARS 142211 (bank account or card)'],
+  ],
+  epayTitle: ['전자납부번호로 내는 방법', 'Paying with the e-payment number'],
+  epay1: ['아래 번호를 복사하세요', 'Copy the number below'],
+  epay2: ['위택스(www.wetax.go.kr) → 납부 → 납부대상조회 → 전자납부번호 탭에 붙여 넣기', 'Wetax (www.wetax.go.kr) → 납부 (Pay) → 납부대상조회 (Search) → paste into the 전자납부번호 (e-payment number) tab'],
+  epay3: ["보안문자 입력 → 검색 → '보기'를 눌러 납부", "Enter the security code → Search → tap '보기' (View) to pay"],
+  vacct: ['가상계좌', 'Virtual account'],
+  copy: ['복사', 'Copy'],
+  copied: ['복사했어요', 'Copied'],
+  outOfScope: ['이 질문은 정확히 답하기 어렵습니다. ☎1345 또는 고지서의 담당 부서로 문의하세요.', 'This question is hard to answer accurately. Please contact ☎1345 or the office printed on your notice.'],
+} as const satisfies Record<string, Bi | readonly Bi[]>;
+
 /* ---------- 세금 종류 ---------- */
 
 /** 직접 입력 화면의 세금 종류 선택지. 양주시가 다국어 안내 중인 세목 위주 */
@@ -68,10 +95,11 @@ export const TAX_NAME_MULTI: Record<string, [string, string, string]> = {
 export const TAX_SCENARIOS: TaxScenario[] = [
   // top: 추천 칩으로 먼저 노출
   { id: 'card', top: 1, k: /카드|card|thẻ|कार्ड/i, q: ['카드로 낼 수 있나요?', 'Can I pay by card?'], a: ['네. 위택스(wetax.go.kr), 은행·카드사 앱, 은행 ATM에서 신용·체크카드로 낼 수 있어요. 고지서에 적힌 납부 방법도 함께 확인하세요.', 'Yes. You can pay by credit or debit card on Wetax (wetax.go.kr), bank or card apps, or bank ATMs. Also check the payment methods printed on your notice.'] },
-  { id: 'where', top: 1, k: /어디|어떻게 내|where|how.*pay|ở đâu|कहाँ/i, q: ['어디서 내나요?', 'Where can I pay?'], a: ['위택스, 고지서의 가상계좌 이체, 은행 ATM·창구, 고지서 QR(간편결제 앱)으로 낼 수 있어요.', 'On Wetax, by transfer to the virtual account on the notice, at a bank ATM or counter, or with the QR code on the notice (payment apps).'] },
+  // 납부 방법은 NOTICE_TEXT.pay 우선순위와 같은 순서로
+  { id: 'where', top: 1, k: /어디|어떻게 내|where|how.*pay|ở đâu|कहाँ/i, q: ['어디서 내나요?', 'Where can I pay?'], a: ['1순위 위택스에서 전자납부번호로 조회 후 납부(계좌·카드·간편결제, 00:30~23:30), 2순위 은행 앱에서 가상계좌 이체, 3순위 은행 ATM·무인공과금기, 4순위 전화 ARS 142211이에요.', 'First, look up your e-payment number on Wetax and pay (account, card or easy pay; 00:30–23:30). Then: transfer to the virtual account from your bank app, a bank ATM or self-service bill machine, or phone ARS 142211.'] },
   { id: 'due', top: 1, k: /언제|기한|마감|when|deadline|due|hạn|मिति/i, q: ['언제까지 내야 하나요?', 'When is it due?'], a: ['이 고지서의 납부 기한은 {due}이에요. {left}', 'The due date on this notice is {due}. {left}'] },
-  // 가산세 금액은 케이스마다 달라서 partial: 원칙만 말하고 상담 버튼을 붙인다
-  { id: 'late', top: 1, k: /지나|늦|연체|late|overdue|quá hạn|ढिला/i, q: ['기한이 지나면 어떻게 되나요?', 'What if I pay late?'], a: ['기한이 지나면 가산세가 붙을 수 있어요. 정확한 금액은 상황마다 달라서 담당 부서에 확인해야 해요.', 'A late-payment charge can be added after the due date. The exact amount depends on your case, so please check with the office.'], partial: 1 },
+  // 가산세: 세액 판정은 하지 않고 확정 문구(NOTICE_TEXT.penalty)를 일괄 제공
+  { id: 'late', top: 1, k: /지나|늦|연체|가산|late|overdue|penalty|quá hạn|ढिला/i, q: ['기한이 지나면 어떻게 되나요?', 'What if I pay late?'], a: NOTICE_TEXT.penalty },
   { id: 'vacct', top: 1, k: /가상계좌|계좌|virtual|account|tài khoản|खाता/i, q: ['가상계좌가 뭐예요?', 'What is a virtual account?'], a: ['고지서마다 붙는 전용 계좌번호예요. 이 계좌로 {amount}을 보내면 이 세금만 납부돼요. 은행 앱의 이체에서 보낼 수 있어요.', 'It is an account number made only for this notice. Sending {amount} to it pays this tax. You can send it from your bank app.'] },
   { id: 'split', top: 1, out: 1, k: /나눠|분할|installment|split|trả góp|किस्ता/i, q: ['나눠서 낼 수 있나요?', 'Can I pay in installments?'] },
 
@@ -85,8 +113,9 @@ export const TAX_SCENARIOS: TaxScenario[] = [
   { id: 'interp', k: /통역|interpret|phiên dịch|दोभाषे/i, q: ['통역이 필요해요', 'I need an interpreter'], a: ['외국인종합안내센터 1345에 전화하면 여러 언어로 통역을 도와줘요. 지원 언어는 확인 중이에요.', 'Call the Immigration Contact Center at 1345 for help in many languages. Supported languages are being confirmed.'] },
   { id: 'edeliv', k: /전자|이메일|문자로|electronic|email|điện tử|इमेल/i, q: ['전자고지로 받고 싶어요', 'I want notices by phone/email'], a: ['위택스에서 전자송달을 신청하면 다음부터 휴대폰·이메일로 받을 수 있어요. 공제 혜택은 고지서 안내를 참고하세요.', 'Apply for electronic delivery on Wetax to get future notices by phone or email. See your notice for any discount.'] },
   { id: 'auto', k: /자동이체|auto|tự động/i, q: ['자동이체 할 수 있나요?', 'Can I set up auto-pay?'], a: ['위택스나 은행에서 자동이체를 신청할 수 있어요.', 'You can set up automatic payment on Wetax or at your bank.'] },
+  // 1345 최우선: 고지서에 명시된 통역 전문 창구라 외국인 주민에겐 담당 부서보다 먼저 안내한다.
   // {phone} 은 고지서에서 전화번호를 읽었을 때만 " (031-...)" 식으로 채워지고 아니면 빈 문자열
-  { id: 'who', k: /누구|문의|전화번호|who.*ask|contact|hỏi ai|सम्पर्क/i, q: ['누구에게 물어봐야 하나요?', 'Who do I ask?'], a: ['고지서에 적힌 담당 부서 전화번호로 물어보세요{phone}. 한국어가 어려우면 1345 통역을 함께 쓰세요.', 'Call the office number on your notice{phone}. If Korean is hard, use the 1345 interpreting line.'] },
+  { id: 'who', k: /누구|문의|전화번호|who.*ask|contact|hỏi ai|सम्पर्क/i, q: ['누구에게 물어봐야 하나요?', 'Who do I ask?'], a: ['먼저 ☎1345(외국인종합안내센터)에 전화하세요. 고지서에 적힌 통역 전문 창구예요. 고지서 내용을 더 확인하려면 고지서의 담당 부서{phone}로 문의하세요.', 'Call ☎1345 (Immigration Contact Center) first — it is the interpreting line printed on your notice. For details of this notice, contact the office printed on it{phone}.'] },
 
   // 여기부터는 전부 out: 담당자 판단이 필요한 질문
   { id: 'reduce', out: 1, k: /감면|깎|면제|reduc|exempt|giảm|छुट/i, q: ['감면받을 수 있나요?', 'Can it be reduced?'] },

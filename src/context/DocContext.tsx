@@ -77,10 +77,12 @@ export function DocProvider({ children }: { children: ReactNode }) {
   const sampleData = useCallback((): DocData => ({
     doc_type: 'tax_notice',
     tax_name: { ko: '자동차세 (12월 정기분)', en: 'Automobile tax (December)', vi: 'Thuế ô tô (kỳ tháng 12)', ne: 'सवारी कर (डिसेम्बर)', zh: '汽车税（12月定期）' },
-    amount_won: 87500,
+    amount_won: 143000,
     due_date: '2026-12-31',
     phone_on_doc: '031-8082-0000 (가상)',
-    amount_quote: '87,500 원',
+    epay_no: '1163-0202-6120-0043-21',
+    vacct: '농협 790-9999-1234-567 (가상)',
+    amount_quote: '143,000 원',
     due_quote: '2026. 12. 31.',
     confidence: 'high',
   }), []);

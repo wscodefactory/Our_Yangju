@@ -19,10 +19,10 @@ export function GuideButton() {
   );
 }
 
-/** 모든 화면 아래에 붙는 "이것은 시안입니다" 한 줄 */
+/** 모든 화면 아래에 붙는 공통 문구: 참고용 안내(양주시 공식 답변 아님) + 시안 표시 */
 export function DemoNote() {
   const { L } = useApp();
-  return <p className="demo">{L(UI.demo)}</p>;
+  return <p className="demo">{L(UI.disclaimer)}<br />{L(UI.demo)}</p>;
 }
 
 /**

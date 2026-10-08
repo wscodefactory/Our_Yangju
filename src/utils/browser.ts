@@ -35,6 +35,8 @@ export const STORAGE_KEYS = {
   cardLang: 'hy-cl',
   mine: 'hy-mine',
   newBenefits: 'hy-newb',
+  /** 시연 기기에서 직접 넣은 Gemini 키 (빌드 env가 비었을 때만 쓰임). 기기 밖으로 안 나감 */
+  geminiKey: 'hy-gemini-key',
 } as const;
 
 /** 음성 합성 지원 여부. SSR 은 안 하지만 혹시 몰라 window 체크를 넣어둠 */

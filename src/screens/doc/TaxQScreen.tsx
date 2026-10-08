@@ -5,11 +5,13 @@
 // 원본 html의 #taxq 섹션 + askTax().
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Crumb } from '@/components/layout/Crumb';
+import { Hint } from '@/components/ui/Notes';
 import { AiModeBadge } from '@/components/ui/Status';
+import { UI } from '@/data/ui';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { translate } from '@/hooks/useTranslate';
-import { CARD_TEXT, TAX_SCENARIOS } from '@/data/tax';
+import { CARD_TEXT, NOTICE_TEXT, TAX_SCENARIOS } from '@/data/tax';
 import { getAi } from '@/services/ai';
 import { classifyPrompt, toKoreanPrompt } from '@/services/prompts';
 import type { CardLang, DocData, TaxScenario } from '@/types';
@@ -50,7 +52,7 @@ const PLACEHOLDER: Record<CardLang, string> = {
 
 /** 할 일 카드 › 추가 질문 */
 export function TaxQScreen() {
-  const { T, cl, go } = useApp();
+  const { T, L, cl, go } = useApp();
   const { data, setLastQ } = useDoc();
   const [log, setLog] = useState<Entry[]>([]);
   const [input, setInput] = useState('');
@@ -107,15 +109,10 @@ export function TaxQScreen() {
       return;
     }
 
-    // 매칭 안 됨 or out 시나리오 → 답하지 않고 담당자 메모로 넘긴다
+    // 매칭 안 됨 or out 시나리오 → 답하지 않고 범위 밖 확정 문구(1345 최우선) + 담당자 메모로 넘긴다
     const koQuestion = await toKorean(text);
     setLastQ(koQuestion); // CardScreen에서 q:'' 로 상담에 들어와도 마지막 질문이 메모에 남게
-    const msg = await translate(
-      cl === 'ko'
-        ? '이 질문은 담당자 확인이 필요해서 답하지 않을게요. 담당자에게 보여줄 한국어 메모를 만들었어요.'
-        : 'This needs an officer to decide, so I will not guess. I made a Korean note you can show them.',
-      cl, 'plain',
-    );
+    const msg = await translate(cl === 'ko' ? NOTICE_TEXT.outOfScope[0] : NOTICE_TEXT.outOfScope[1], cl, 'plain');
     push({ kind: 'escalate', text: msg, note: koNote(data, koQuestion), counselQ: koQuestion });
   };
 
@@ -164,6 +161,7 @@ export function TaxQScreen() {
           );
         })}
       </div>
+      <Hint>{L(UI.privacy)}</Hint>
       <form className="ask" onSubmit={submit}>
         <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={PLACEHOLDER[cl]} aria-label={t.ask} autoComplete="off" />
         <button type="submit">{T('보내기', 'Send')}</button>

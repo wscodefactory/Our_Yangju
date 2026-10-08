@@ -10,6 +10,7 @@ import { WideButton } from '@/components/ui/WideButton';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { getAi } from '@/services/ai';
+import { STORAGE_KEYS, storage } from '@/utils/browser';
 
 /**
  * 받은 문서 찍기 — 진입 화면.
@@ -22,6 +23,15 @@ export function DocScreen() {
   const fileRef = useRef<HTMLInputElement>(null);
   // 키 없음 / 텍스트 전용 모델이면 false
   const imgOk = !!getAi()?.supportsImages;
+
+  // 배포 번들에 키가 안 들어간 경우(공유 링크)의 우회로: 시연 기기에서 키를 한 번 넣으면 localStorage에만 저장된다.
+  // getAi()가 모듈 캐시를 들고 있어서 다시 읽게 하려면 새로고침이 가장 짧다.
+  const enterKey = () => {
+    const k = window.prompt(T('Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)', 'Paste your Gemini API key (stored on this device only)'))?.trim();
+    if (!k) return;
+    storage.set(STORAGE_KEYS.geminiKey, k);
+    location.reload();
+  };
 
   const onFile = async (picked: File | undefined) => {
     if (!picked) return;
@@ -56,7 +66,12 @@ export function DocScreen() {
         <WideButton label={T('직접 입력하기', 'Enter it myself')} onClick={() => go({ k: 'manual' })} />
       </Stack>
       {!imgOk && (
-        <Note>{T('AI 키가 없어 사진 읽기를 쓸 수 없어 샘플과 직접 입력만 보여요.', 'Photo reading needs an AI key, so only the sample and manual entry are shown.')}</Note>
+        <>
+          <Note>{T('AI 키가 없어 사진 읽기를 쓸 수 없어 샘플과 직접 입력만 보여요.', 'Photo reading needs an AI key, so only the sample and manual entry are shown.')}</Note>
+          <Stack>
+            <WideButton label={T('AI 키 넣고 사진 읽기 켜기', 'Enter an AI key to turn on photo reading')} onClick={enterKey} />
+          </Stack>
+        </>
       )}
       {/* capture="environment" → 모바일에서 후면 카메라 바로 열림. 데스크톱은 그냥 파일 선택창 */}
       <input

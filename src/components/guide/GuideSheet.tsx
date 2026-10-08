@@ -99,6 +99,7 @@ export function GuideSheet() {
             ))}
           </div>
         )}
+        <p className="hint">{L(UI.privacy)}</p>
         <form className="ask" onSubmit={submit}>
           <input
             ref={inputRef}

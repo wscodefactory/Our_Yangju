@@ -28,7 +28,7 @@ export function ManualScreen() {
         </div>
         <div className="field">
           <label htmlFor="fAmt">{T('납부 금액(원)', 'Amount (KRW)')}</label>
-          <input id="fAmt" inputMode="numeric" placeholder="87500" value={amt} onChange={(e) => setAmt(e.target.value)} />
+          <input id="fAmt" inputMode="numeric" placeholder="143000" value={amt} onChange={(e) => setAmt(e.target.value)} />
         </div>
         <div className="field">
           <label htmlFor="fDue">{T('납부 기한', 'Due date')}</label>

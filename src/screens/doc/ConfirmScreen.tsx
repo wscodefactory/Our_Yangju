@@ -24,6 +24,8 @@ export function ConfirmScreen() {
   const [tax, setTax] = useState(d.tax_name?.ko || '');
   const [amt, setAmt] = useState(d.amount_won != null ? String(d.amount_won) : '');
   const [due, setDue] = useState(d.due_date || '');
+  const [epay, setEpay] = useState(d.epay_no || '');
+  const [vacct, setVacct] = useState(d.vacct || '');
   // 화질 0.6이면 썸네일로 충분하고 dataURL 길이도 적당히 짧다
   const img = canvas ? canvas.toDataURL('image/jpeg', 0.6) : '';
 
@@ -48,12 +50,21 @@ export function ConfirmScreen() {
           <input id="fDue" type="date" value={due} onChange={(e) => setDue(e.target.value)} />
           {d.due_quote && <span className="hint">{T('문서 표기', 'On the document')}: {d.due_quote}</span>}
         </div>
+        {/* 전자납부번호·가상계좌는 고지서 전용 번호. 못 읽었으면 비워 두고 카드에서 해당 블록이 빠진다 */}
+        <div className="field">
+          <label htmlFor="fEpay">{T('전자납부번호', 'e-Payment number')}</label>
+          <input id="fEpay" inputMode="numeric" value={epay} onChange={(e) => setEpay(e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="fVacct">{T('가상계좌 (은행·번호)', 'Virtual account (bank, number)')}</label>
+          <input id="fVacct" value={vacct} onChange={(e) => setVacct(e.target.value)} />
+        </div>
       </div>
       {d.confidence === 'low' && (
         <Note>{T('글씨가 흐려 확신이 낮아요. 꼭 고지서와 비교해 주세요.', 'The photo is unclear. Please compare carefully with your notice.')}</Note>
       )}
       <Stack mt={12}>
-        <WideButton primary label={T('맞아요 → 할 일 보기', 'Correct → Show what to do')} onClick={() => confirm(tax.trim(), amt, due)} />
+        <WideButton primary label={T('맞아요 → 할 일 보기', 'Correct → Show what to do')} onClick={() => confirm(tax.trim(), amt, due, { epay_no: epay.trim() || null, vacct: vacct.trim() || null })} />
       </Stack>
     </>
   );

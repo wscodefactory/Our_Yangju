@@ -9,9 +9,10 @@ import type { CardLang } from '@/types';
  *  사진은 이미 사용자가 가린 뒤의 것이지만, 못 가린 부분이 있을 수 있어 프롬프트에서도 한 번 더 막는다.
  *  amount_quote/due_quote는 "원문 그대로"를 받아서 확인 화면에서 사용자가 대조할 수 있게 한다. 응답 타입은 DocData. */
 export const READ_NOTICE_PROMPT =
-  'This image is a photo of a document sent by a Korean local government (likely a local tax notice or a city letter). Some personal details are covered with black boxes; never guess them. Never output any personal data (names, addresses, registration numbers, tax numbers, vehicle plates, account numbers). Read only what is printed.\n' +
+  'This image is a photo of a document sent by a Korean local government (likely a local tax notice or a city letter). Some personal details are covered with black boxes; never guess them. Never output personal data: names, addresses, resident/alien registration numbers, taxpayer numbers (납세번호), vehicle plates. Read only what is printed.\n' +
+  'DO read these two payment identifiers if printed — they belong to the notice, not to the person: 전자납부번호 (e-payment number, usually 19 digits, may be grouped with hyphens) and 가상계좌 (virtual account: bank name + account number).\n' +
   'Reply with only JSON:\n' +
-  '{"doc_type":"tax_notice|welfare_notice|other","tax_name":{"ko":"","en":"","zh":"","vi":"","ne":""},"amount_won":number or null,"due_date":"YYYY-MM-DD" or null,"phone_on_doc":"office phone number printed on the notice, or null","amount_quote":"the amount exactly as printed","due_quote":"the due date exactly as printed","confidence":"high|low"}';
+  '{"doc_type":"tax_notice|welfare_notice|other","tax_name":{"ko":"","en":"","zh":"","vi":"","ne":""},"amount_won":number or null,"due_date":"YYYY-MM-DD" or null,"phone_on_doc":"office phone number printed on the notice, or null","epay_no":"전자납부번호 exactly as printed, or null","vacct":"bank name and virtual account number exactly as printed, or null","amount_quote":"the amount exactly as printed","due_quote":"the due date exactly as printed","confidence":"high|low"}';
 
 /** 세금 질문 → 시나리오 분류
  *  TAX_SCENARIOS의 영어 질문(q[1])을 목록으로 넘기고 id 하나만 받는다. 답변 문구는 데이터에 있는 걸 쓰므로

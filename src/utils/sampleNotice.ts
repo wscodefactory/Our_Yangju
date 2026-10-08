@@ -37,19 +37,22 @@ export async function drawSampleNotice(): Promise<{ canvas: HTMLCanvasElement; r
     g.fillStyle = '#444'; g.font = F(20, 600); g.fillText(label, 68, y + 39);
     g.fillStyle = '#111'; g.font = F(24, highlight ? 700 : 400); g.fillText(value, 300, y + 40);
   };
-  // 위 4줄은 개인정보(가림 대상), 아래 2줄은 AI 가 읽어야 할 금액·기한
+  // 위 4줄은 개인정보(가림 대상), 아래 4줄은 AI 가 읽어야 할 금액·기한·전자납부번호·가상계좌
+  // (전자납부번호·가상계좌는 고지서 전용 번호라 가리지 않는다. 값은 테스트 고지서 143,000원 기준)
   row(260, '납세자 / Taxpayer', '김영희 (KIM YEONGHUI)');
   row(332, '주소 / Address', '경기도 양주시 남면 상수로 123, 101호');
   row(404, '납세번호 / Tax No.', '41630-2026-12-0004321');
   row(476, '과세대상 / Vehicle', '12가 3456 (승용 1,598cc)');
-  row(560, '납부금액 / Amount', '87,500 원', true);
+  row(560, '납부금액 / Amount', '143,000 원', true);
   row(632, '납부기한 / Due date', '2026. 12. 31.', true);
+  row(704, '전자납부번호 / e-Pay No.', '1163-0202-6120-0043-21', true);
+  row(776, '가상계좌 / Virtual acct', '농협 790-9999-1234-567 (가상)', true);
 
   // 납부 방법 안내
-  g.fillStyle = '#1d4f91'; g.font = F(22, 700); g.fillText('납부 방법 / How to pay', 48, 760);
+  g.fillStyle = '#1d4f91'; g.font = F(22, 700); g.fillText('납부 방법 / How to pay', 48, 880);
   g.fillStyle = '#222'; g.font = F(19);
-  ['• 위택스(www.wetax.go.kr) — 카드·계좌이체', '• 가상계좌 이체 (고지서 뒷면 은행별 계좌)', '• 은행 ATM·창구, 간편결제 앱 QR', '• 외국어 통역 상담 1345  /  담당부서 031-8082-0000 (가상)']
-    .forEach((line, i) => g.fillText(line, 60, 800 + i * 38));
+  ['• 위택스(www.wetax.go.kr) 전자납부번호 조회 — 계좌·카드·간편결제', '• 은행 앱에서 가상계좌 이체', '• 은행 ATM·무인공과금기 / 전화 ARS 142211', '• 외국어 통역 상담 1345  /  담당부서 031-8082-0000 (가상)']
+    .forEach((line, i) => g.fillText(line, 60, 912 + i * 34));
 
   // 가짜 QR. 10x10 격자에서 (i*7+j*3)%4<2 인 칸만 채워서 QR 비슷한 무늬를 만든다. 스캔되지 않음
   g.strokeStyle = '#bbb'; g.strokeRect(640, 930, 212, 212);

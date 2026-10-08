@@ -131,6 +131,10 @@ export interface DocData {
   /** 금액을 읽어낸 원문 조각. 확인 화면에서 근거로 보여줌 */
   amount_quote?: string;
   due_quote?: string;
+  /** 전자납부번호 (위택스 납부대상조회용). 고지서 전용 번호라 개인정보가 아니고, 읽어서 카드의 복사 버튼에 쓴다 */
+  epay_no?: string | null;
+  /** 가상계좌 (은행명 + 계좌번호). 이 고지서 전용 */
+  vacct?: string | null;
   confidence?: 'high' | 'low';
 }
 

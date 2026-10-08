@@ -33,6 +33,11 @@ export const UI = {
   // 헤더·공통 버튼
   home: ['처음으로', 'Home'], big: ['큰 글씨', 'Large text'], lang: ['언어', 'Language'], mine: ['☆ 내 혜택', '☆ Saved'],
 
+  // 안전장치 공통 문구 (프로토타입문구 확정본 2026-10-07). disclaimer 는 모든 화면 하단, privacy 는 입력창 위
+  disclaimer: ['이 안내는 참고용이며, 양주시의 공식 답변이 아닙니다. 정확한 내용은 위택스 또는 고지서의 담당 부서에서 확인하세요.',
+    'This guidance is for reference only and is not an official answer from Yangju City. Confirm details on Wetax or with the office printed on your notice.'],
+  privacy: ['주민등록번호·외국인등록번호 등 개인정보는 질문에 쓰지 마세요.', 'Do not put personal data such as your resident or alien registration number in your question.'],
+
   // 양주무관(가이드) 시트
   guide: ['양주무관에게 물어보기', 'Ask Yangju Guide'], gname: ['양주무관', 'Yangju Guide'], send: ['보내기', 'Send'],
   ph: ['예: 월세 살고 취업 준비 중이에요', 'e.g. I rent a room and I am looking for a job'],

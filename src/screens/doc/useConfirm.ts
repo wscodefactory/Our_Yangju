@@ -13,7 +13,8 @@ import type { DocData, TaxName } from '@/types';
 export function useConfirm() {
   const { T, go, toast } = useApp();
   const { data, setData } = useDoc();
-  return (tax: string, amtRaw: string, due: string) => {
+  // extra: 확인 화면에서 사용자가 고친 전자납부번호·가상계좌 등. 직접 입력(ManualScreen)은 안 넘김
+  return (tax: string, amtRaw: string, due: string, extra: Partial<DocData> = {}) => {
     // "87,500원" 같이 들어와도 숫자만 남긴다
     const amt = Number(String(amtRaw).replace(/[^0-9]/g, ''));
     if (!amt || !due) { toast(T('금액과 기한을 넣어 주세요', 'Enter the amount and date')); return; }
@@ -28,7 +29,7 @@ export function useConfirm() {
       if (multi) tax_name = { ...tax_name, vi: multi[0], ne: multi[1], zh: multi[2] };
     }
     // phone_on_doc, confidence 같은 나머지 필드는 prev에서 그대로 따라온다
-    setData({ ...prev, amount_won: amt, due_date: due, tax_name });
+    setData({ ...prev, ...extra, amount_won: amt, due_date: due, tax_name });
     go({ k: 'card' });
   };
 }
