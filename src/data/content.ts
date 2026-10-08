@@ -554,6 +554,10 @@ const UI_BANK = {
   photoFail:["이 사진을 열 수 없어요","Cannot open this photo","无法打开这张照片","Không mở được ảnh này","यो फोटो खोल्न सकिएन"],
   keyBtn:["AI 키 넣고 사진 읽기 켜기","Enter an AI key to turn on photo reading","输入 AI 密钥以开启照片读取","Nhập khóa AI để bật đọc ảnh","फोटो पढ्न AI कुञ्जी हाल्नुहोस्"],
   keyPrompt:["Gemini API 키를 붙여 넣으세요 (이 기기에만 저장돼요)","Paste your Gemini API key (stored on this device only)","请粘贴 Gemini API 密钥（仅保存在本设备）","Dán khóa Gemini API (chỉ lưu trên thiết bị này)","Gemini API कुञ्जी टाँस्नुहोस् (यो उपकरणमा मात्र राखिन्छ)"],
+  // 연·월·일 입력 칸 (DateFields)
+  year:["연도","Year","年","Năm","वर्ष"],
+  month:["월","Month","月","Tháng","महिना"],
+  day:["일","Day","日","Ngày","दिन"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 

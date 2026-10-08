@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';
+import { DateFields } from '@/components/ui/DateFields';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
@@ -72,22 +73,21 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
             {(Object.keys(TAX_TYPES) as TaxType[]).map((k) => <option key={k} value={k}>{tx(TAX_TYPES[k])}</option>)}
           </select>
         </div>
-        <div className="grid2">
-          <div className={`fld ${amtErr ? 'err' : ''}`.trim()}>
-            <label htmlFor="f-amt">{t('fAmount')}</label>
-            <input id="f-amt" name="amount" ref={amtRef} inputMode="numeric" autoComplete="off" value={amount} placeholder="143,000" aria-invalid={amtErr} onChange={(e) => setAmount(e.target.value)} />
-          </div>
-          <div className={`fld ${dueErr ? 'err' : ''}`.trim()}>
-            <label htmlFor="f-due">{t('fDue')}</label>
-            <input id="f-due" name="due" ref={dueRef} type="date" value={due} aria-invalid={dueErr} onChange={(e) => setDue(e.target.value)} />
-          </div>
+        <div className={`fld ${amtErr ? 'err' : ''}`.trim()}>
+          <label htmlFor="f-amt">{t('fAmount')}</label>
+          <input id="f-amt" name="amount" ref={amtRef} inputMode="numeric" autoComplete="off" value={amount} placeholder="143,000" aria-invalid={amtErr} onChange={(e) => setAmount(e.target.value)} />
+        </div>
+        {/* 기한은 연·월·일 세 칸. 브라우저 달력(type=date)은 기기 언어로 고정돼 앱 언어를 못 따라와서 */}
+        <div className={`fld ${dueErr ? 'err' : ''}`.trim()}>
+          <label htmlFor="f-due-year">{t('fDue')}</label>
+          <DateFields idPrefix="f-due" ref={dueRef} value={due} invalid={dueErr} onChange={setDue} />
         </div>
         <div className="fld">
-          <label htmlFor="f-epay">{t('fEpay')} <span className="opt">({t('optional')})</span></label>
+          <label htmlFor="f-epay">{t('fEpay')} <span className="optl">({t('optional')})</span></label>
           <input id="f-epay" name="epay" inputMode="numeric" autoComplete="off" value={epay} placeholder="0000-0000-0000-0000-00" onChange={(e) => setEpay(e.target.value)} />
         </div>
         <div className="fld">
-          <label htmlFor="f-vacct">{t('fVacct')} <span className="opt">({t('optional')})</span></label>
+          <label htmlFor="f-vacct">{t('fVacct')} <span className="optl">({t('optional')})</span></label>
           <input id="f-vacct" name="vacct" autoComplete="off" value={vacct} onChange={(e) => setVacct(e.target.value)} />
         </div>
         {err && <p className="err-msg" role="alert"><Ic n="alert" cls="sm" /> {t('needFields')}</p>}

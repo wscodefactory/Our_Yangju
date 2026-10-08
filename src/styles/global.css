@@ -253,7 +253,7 @@ main{max-width:var(--app-w);margin:0 auto;padding:0 16px 32px}
 /* form */
 .form{display:flex;flex-direction:column;gap:14px}
 .fld label{display:block;font-size:.875rem;font-weight:700;margin-bottom:6px}
-.fld label .opt{font-weight:500;color:var(--text-2);font-size:.8125rem}
+.fld label .optl{font-weight:500;color:var(--text-2);font-size:.8125rem}
 .fld input,.fld select{width:100%;min-height:52px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--surface);font-size:1rem}
 .fld input:focus,.fld select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint-2)}
 .fld .help{font-size:.8125rem;color:var(--text-2);margin-top:4px}
@@ -461,6 +461,10 @@ body.has-bar main{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .form{gap:12px}
 .fld input,.fld select{min-height:48px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* 연·월·일 세 칸 (DateFields). 라벨은 칸 위 작은 글자 */
+.dategrid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px}
+.datef span{display:block;font-size:.75rem;color:var(--text-2);font-weight:600;margin-bottom:4px}
+.datef input{text-align:center;padding:0 8px}
 .sample-row{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--primary-tint);font-size:.8125rem;color:var(--text)}
 .sample-row .btn{min-height:36px}
 .sum-top{padding:14px 10px 10px 14px}
