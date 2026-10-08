@@ -66,6 +66,8 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
           )}
         </div>
       )}
+      {/* 읽은 값(샘플·사진)은 사용자가 고칠 수 있다는 안내 (구현요청 A표) */}
+      {!manual && <p className="lead" style={{ margin: '0 0 12px' }}>{t('confirmLead')}</p>}
       <form className="form" id="docform" noValidate onSubmit={onSubmit}>
         <div className="fld">
           <label htmlFor="f-type">{t('fTax')}</label>

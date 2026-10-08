@@ -33,7 +33,7 @@ export function DocResultScreen() {
   const n = daysUntil(d.due);
   const dd = n < 0 ? <span className="bdg red">{t('over')}</span>
     : n === 0 ? <span className="bdg red">{t('today')}</span>
-    : <span className={`bdg ${n <= 7 ? 'red' : 'orange'}`}>D-{n} ({t('left', { n })})</span>;
+    : <span className={`bdg ${n <= 7 ? 'red' : 'orange'}`}>{t('left', { n })}</span>;
   const taxName = tx(TAX_TYPES[d.type]);
   const dueShort = fmtDate(d.due, { year: 'numeric', month: 'long', day: 'numeric' });
   const amount = fmtWon(d.amount);
@@ -41,6 +41,8 @@ export function DocResultScreen() {
   const copy = (text: string) => { void copyText(text); toast(t('copied')); };
   const foreign = lang !== 'ko';
   const { bank, acct } = splitVacct(d.vacct || '');
+  const taxKo = TAX_TYPES[d.type][0];
+  const koNote = `제목: ${taxKo} 고지서 관련 문의\n\n안녕하세요. 양주시에 사는 외국인 주민입니다.\n${taxKo} 고지서(납부기한 ${d.due.replace(/-/g, '.')}, 금액 ${d.amount.toLocaleString('ko-KR')}원)와 관련해 문의드립니다.\n\n문의 내용: (고지서 내용 확인 요청)\n\n한국어가 서툴러 통역(1345)과 함께 연락드릴 수 있습니다. 감사합니다.`;
 
   const onPaid = () => setAskSave(true);
   const savePaid = (yes: boolean) => {
@@ -151,6 +153,14 @@ export function DocResultScreen() {
         {d.phone && (
           <a className="row" href={`tel:${d.phone.replace(/[^0-9]/g, '')}`}><span className="ibox tone-green"><Ic n="building" /></span><span className="tx"><span className="t">{d.phone}</span><span className="d">{t('officeL')}</span></span><span className="act">{t('call')}</span></a>
         )}
+      </section>
+      {/* 담당자에게 보여 줄 한국어 메모 (구현요청 G표). 받는 쪽이 담당자라 언어와 무관하게 한국어 */}
+      <section className="panel">
+        <h2>{t('noteKoT')}</h2>
+        <div className="codebox" style={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+          <code lang="ko" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontWeight: 500, fontSize: '.875rem' }}>{koNote}</code>
+        </div>
+        <button type="button" className="btn secondary sm" style={{ marginTop: 10 }} onClick={() => copy(koNote)}><Ic n="copy" cls="sm" />{t('copyNote')}</button>
       </section>
       <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('verNote')}</span></p>
     </div>
