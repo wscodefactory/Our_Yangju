@@ -1,0 +1,39 @@
+# GitHub Pages 배포. main 또는 feature/* 에 푸시하면 dist/ 를 빌드해 올린다.
+# 저장소 Settings → Pages → Source 를 "GitHub Actions" 로 한 번 바꿔 둬야 동작한다.
+# Gemini 키는 기본적으로 넣지 않는다(공개 번들에 키가 노출되므로). 시연 기기에서 "AI 키 넣기" 버튼으로 넣는 게 기본.
+# 꼭 번들에 넣어야 하면 Settings → Secrets → VITE_GEMINI_API_KEY 를 등록하면 아래 env 로 들어간다.
+name: pages
+on:
+  push:
+    branches: [main, 'feature/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc -b && npx vite build --mode pages
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_GEMINI_MODEL: gemini-3.8-flash
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deploy
+        uses: actions/deploy-pages@v4

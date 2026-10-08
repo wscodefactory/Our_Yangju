@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 
 // Vite 설정. 특별한 건 없고 '@' 별칭과 포트 고정 정도.
 // tsconfig.app.json 의 paths 에도 같은 '@/*' 매핑이 있어야 타입 검사가 맞는다. 한쪽만 바꾸지 말 것.
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages 는 https://wscodefactory.github.io/Our_Yangju/ 아래에 올라가므로 에셋 경로 앞에 저장소 이름이 붙어야 한다.
+  // 로컬 dev/preview 는 '/' 그대로. (.github/workflows/pages.yml 이 `vite build --mode pages` 로 빌드)
+  base: mode === 'pages' ? '/Our_Yangju/' : '/',
   plugins: [react()],
   resolve: {
     // '@/…' → 프로젝트 루트의 src/
@@ -17,4 +20,4 @@ export default defineConfig({
   preview: {
     port: 4173,        // npm run preview 포트
   },
-});
+}));
