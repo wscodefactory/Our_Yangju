@@ -35,7 +35,8 @@ export const LIFE_LINKS: Record<string, LinkRow[]> = {
   ],
   bus: [{ label: ['똑버스는 \'똑타\' 앱으로 부릅니다', 'Call a Ttokbus with the Ttokta app', '通过“똑타”APP 呼叫 Ttok 巴士', 'Gọi Ttokbus bằng ứng dụng Ttokta', 'टकबस बोलाउन Ttokta एप प्रयोग गर्नुहोस्'] }],
   work: [{ label: ['산재 문의: 근로복지공단 1588-0075', 'Work injury: Workers\' Compensation Service 1588-0075', '工伤咨询：劳动福利公团 1588-0075', 'Tai nạn lao động: Cơ quan Phúc lợi Lao động 1588-0075', 'कार्यस्थल चोट: श्रमिक कल्याण सेवा 1588-0075'], tel: '1588-0075' }],
-  trash: [{ label: ['배출 요일 문의: 양주시 누리집', 'Collection days: Yangju City website', '投放日期咨询：杨州市官网', 'Ngày thu gom: trang web thành phố Yangju', 'सङ्कलन दिन: याङ्जु सहरको वेबसाइट'], href: CITY_URL }],
+  // 양주시 누리집 > 분야별정보 > 환경·위생·청소 > 생활쓰레기배출 (배출 요일·시간)
+  trash: [{ label: ['배출 요일·시간: 양주시 생활쓰레기배출 안내', 'Collection days and hours: Yangju City waste guide', '投放日期与时间：杨州市生活垃圾投放指南', 'Ngày và giờ thu gom: hướng dẫn đổ rác của TP Yangju', 'सङ्कलन दिन र समय: याङ्जु सहर फोहोर गाइड'], href: `${CITY_URL}/www/contents.do?key=688` }],
 };
 
 /** 혜택 신청 사이트. 신청처 이름(ch.where 한국어)에 이 글자가 들어 있으면 링크를 붙인다 */
