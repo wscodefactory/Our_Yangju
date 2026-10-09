@@ -91,7 +91,7 @@ const UI_BASE = {
   btnSample:["샘플 고지서로 해보기","Try a sample notice","用示例税单试试","Thử với giấy báo mẫu","नमुना बिलबाट प्रयास गर्नुहोस्"],
   btnManual:["직접 입력","Enter manually","手动输入","Nhập thủ công","आफैं लेख्नुहोस्"],
   btnPhoto:["촬영 / 사진 불러오기","Take a photo / Choose a photo","拍照 / 选择照片","Chụp ảnh / Chọn ảnh","फोटो खिच्नुहोस् / फोटो छान्नुहोस्"],
-  photoOff:["시연판에서는 사진 판독(AI)이 꺼져 있어요. 샘플이나 직접 입력을 이용하세요.","Photo reading (AI) is off in this prototype. Use the sample or enter details yourself.","演示版未开启照片识别（AI），请使用示例或手动输入。","Bản thử nghiệm chưa bật đọc ảnh (AI). Hãy dùng mẫu hoặc tự nhập.","यस नमुनामा फोटो पढाइ (AI) बन्द छ। नमुना वा आफैं भर्ने विकल्प प्रयोग गर्नुहोस्।"],
+  photoOff:["AI 키가 없어 사진 판독을 쓸 수 없어요. 아래 버튼으로 키를 넣거나 샘플·직접 입력을 이용하세요.","Photo reading needs an AI key. Enter one with the button below, or use the sample or manual entry.","没有 AI 密钥，无法读取照片。请用下方按钮输入密钥，或使用示例、手动输入。","Không có khóa AI nên không đọc được ảnh. Nhập khóa bằng nút bên dưới, hoặc dùng mẫu / nhập thủ công.","AI कुञ्जी नभएकाले फोटो पढ्न सकिँदैन। तलको बटनबाट कुञ्जी हाल्नुहोस्, वा नमुना / आफैं लेख्नुहोस्।"],
   confirmTitle:["고지서 내용과 일치하나요?","Does this match your notice?","与税单内容一致吗？","Thông tin có khớp với giấy báo không?","के यो जानकारी बिलसँग मिल्छ?"],
   manualTitle:["고지서 내용 입력","Enter notice details","输入税单内容","Nhập thông tin giấy báo","बिलको विवरण भर्नुहोस्"],
   confirmLead:["숫자가 다르면 고지서에 적힌 대로 고쳐 주세요.","If anything differs, correct it to match the notice.","如有不同，请按税单内容修改。","Nếu có chỗ khác, hãy sửa theo giấy báo.","फरक भए बिलमा लेखिएअनुसार सच्याउनुहोस्।"],
