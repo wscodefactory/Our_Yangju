@@ -35,11 +35,11 @@ const UI_BASE = {
   heroDesc:["민원 준비물부터 받은 고지서, 지원 혜택, 생활 정보까지 한곳에서 안내해요.","City office paperwork, tax notices, benefits and daily life, explained in one place.","从办事材料、收到的税单，到福利和生活信息，一站式为您说明。","Từ giấy tờ hành chính, giấy báo thuế đến phúc lợi và đời sống, tất cả ở một nơi.","कार्यालयका कागजात, कर बिल, सुविधा र दैनिक जीवनको जानकारी, सबै एकै ठाउँमा।"],
   secTasks:["무엇을 도와드릴까요?","How can we help?","需要什么帮助？","Bạn cần giúp gì?","हामी के मद्दत गरौं?"],
   visitT:["시청과 주민센터 업무","City office tasks","市政府、居民中心办事","Thủ tục hành chính","सहर कार्यालयका काम"],
-  visitD:["이사 신고, 외국인등록, 건강보험 등 어디서 무엇을 준비할지 안내","Moving, alien registration, health insurance: where, when, what to bring","搬家申报、外国人登录、健康保险等：地点、期限、材料","Báo chuyển nhà, đăng ký cư trú, bảo hiểm y tế: nơi, hạn, giấy tờ","ठेगाना परिवर्तन, विदेशी दर्ता, स्वास्थ्य बीमा: कहाँ, कहिले, के लैजाने"],
+  visitD:["이사 신고, 외국인등록, 건강보험: 어디서, 언제까지, 무엇을","Where to go, deadlines, what to bring","去哪里、期限、带什么","Nơi đến, thời hạn, giấy tờ cần mang","कहाँ जाने, म्याद, के लैजाने"],
   docT:["받은 고지서 읽기","Understand a tax notice","看懂收到的税单","Đọc giấy báo thuế","कर बिल बुझ्नुहोस्"],
-  docD:["금액, 납부기한, 납부 방법을 내 언어로","Amount, due date and how to pay, in your language","用您的语言说明金额、期限和缴纳方法","Số tiền, hạn nộp và cách nộp bằng ngôn ngữ của bạn","रकम, अन्तिम मिति र तिर्ने तरिका तपाईंकै भाषामा"],
+  docD:["금액, 납부기한, 납부 방법을 내 언어로","Amount, due date, how to pay","金额、期限、缴纳方法","Số tiền, hạn nộp, cách nộp","रकम, अन्तिम मिति, तिर्ने तरिका"],
   welT:["지원 혜택 찾기","Find benefits","查找福利","Tìm phúc lợi","सुविधा खोज्नुहोस्"],
-  welD:["상황별 지원, 신청 방법, 자격 간단 확인","Support by life stage, how to apply, quick eligibility check","按阶段查看支援、申请方法、资格自测","Hỗ trợ theo giai đoạn, cách đăng ký, kiểm tra điều kiện","चरण अनुसार सहयोग, आवेदन तरिका, योग्यता जाँच"],
+  welD:["상황별 지원, 신청 방법, 자격 간단 확인","Benefits by situation, how to apply","按情况查看支援、申请方法","Hỗ trợ theo hoàn cảnh, cách đăng ký","अवस्था अनुसार सहयोग, आवेदन तरिका"],
   lifeT:["생활 정보","Daily life","生活信息","Thông tin đời sống","दैनिक जीवन"],
   lifeD:["긴급 전화, 쓰레기 배출, 병원, 교통, 일","Emergency numbers, trash, hospitals, transport, work","紧急电话、垃圾分类、医院、交通、工作","Số khẩn cấp, rác thải, bệnh viện, giao thông, việc làm","आपतकालीन नम्बर, फोहोर, अस्पताल, यातायात, काम"],
   secExplore:["양주 둘러보기","Explore Yangju","探索杨州","Khám phá Yangju","याङ्जु घुम्नुहोस्"],
@@ -468,18 +468,27 @@ export const TAX_TYPES = {
 };
 export const SAMPLE = {type:"auto", amount:143000, due:"2026-12-31", epay:"1163-0202-6120-0043-21", vacct:"농협 790-9999-1234-567", phone:"031-8082-0000", amountQ:"143,000 원", dueQ:"2026. 12. 31.", sample:true};
 export const FAQ = [
- {id:"card", q:["카드로 낼 수 있나요?","Can I pay by card?","可以用银行卡缴纳吗？","Tôi có thể trả bằng thẻ không?","कार्डबाट तिर्न मिल्छ?"],
+ {id:"card", k:/카드|card|thẻ|कार्ड|卡/i, q:["카드로 낼 수 있나요?","Can I pay by card?","可以用银行卡缴纳吗？","Tôi có thể trả bằng thẻ không?","कार्डबाट तिर्न मिल्छ?"],
   a:["네. 위택스에서 전자납부번호로 조회한 뒤 카드로 납부할 수 있습니다(본인 인증이 필요할 수 있습니다). 은행 ATM에서도 카드로 납부할 수 있습니다.","Yes. Look up the notice on Wetax with the e-payment number and pay by card (identity verification may be required). You can also pay by card at a bank ATM.","可以。在 WeTax 用电子缴纳号码查询后可用银行卡缴纳（可能需要身份认证）。也可以在银行 ATM 用卡缴纳。","Có. Bạn có thể tra cứu bằng số nộp điện tử trên WeTax rồi thanh toán bằng thẻ (có thể cần xác minh danh tính). Bạn cũng có thể nộp bằng thẻ tại ATM ngân hàng.","हो। WeTax मा इलेक्ट्रोनिक भुक्तानी नम्बरले खोजेर कार्डबाट तिर्न सकिन्छ (पहिचान प्रमाणीकरण चाहिन सक्छ)। बैंक ATM मा पनि कार्डबाट तिर्न सकिन्छ।"]},
- {id:"where", q:["어디서 내나요?","Where can I pay?","在哪里缴纳？","Nộp ở đâu?","कहाँ तिर्ने?"],
+ {id:"where", k:/어디|where|ở đâu|कहाँ|哪里/i, q:["어디서 내나요?","Where can I pay?","在哪里缴纳？","Nộp ở đâu?","कहाँ तिर्ने?"],
   a:["가장 쉬운 방법은 사용 중인 은행 앱에서 고지서의 가상계좌로 송금하는 것입니다. 위택스, 은행 ATM, ARS 142211로도 납부할 수 있습니다.","The easiest way is to transfer to the virtual account on the notice from the bank app you already use. You can also pay on Wetax, at a bank ATM or by phone ARS 142211.","最简单的方法是用您正在使用的银行 APP 向税单上的虚拟账户转账。也可以通过 WeTax、银行 ATM 或 ARS 142211 缴纳。","Cách dễ nhất là chuyển tiền vào tài khoản ảo ghi trên giấy báo bằng ứng dụng ngân hàng bạn đang dùng. Bạn cũng có thể nộp qua WeTax, ATM ngân hàng hoặc ARS 142211.","सबैभन्दा सजिलो तरिका भनेको तपाईंले प्रयोग गर्ने बैंक एपबाट बिलमा लेखिएको भर्चुअल खातामा रकम पठाउनु हो। WeTax, बैंक ATM वा ARS 142211 बाट पनि तिर्न सकिन्छ।"]},
- {id:"due", q:["언제까지 내야 하나요?","When is it due?","要在什么时候之前缴纳？","Hạn nộp đến khi nào?","कहिलेसम्म तिर्नुपर्छ?"],
+ {id:"due", k:/언제|기한|when|due|hạn|कहिले|什么时候|期限/i, q:["언제까지 내야 하나요?","When is it due?","要在什么时候之前缴纳？","Hạn nộp đến khi nào?","कहिलेसम्म तिर्नुपर्छ?"],
   a:["납부 기한은 {due}입니다. 기한이 토·일요일이나 공휴일이면 그다음 날까지 납부할 수 있습니다.","The due date is {due}. If it falls on a Saturday, Sunday or public holiday, you can pay on the next day.","缴纳期限为 {due}。如果期限是周六、周日或公休日，可延至下一天缴纳。","Hạn nộp là ngày {due}. Nếu hạn nộp rơi vào thứ Bảy, Chủ nhật hoặc ngày lễ, bạn có thể nộp đến ngày tiếp theo.","भुक्तानी अन्तिम मिति {due} हो। यो मिति शनिबार, आइतबार वा सार्वजनिक बिदा परेमा भोलिपल्टसम्म तिर्न सकिन्छ।"]},
- {id:"late", q:["기한이 지나면 어떻게 되나요?","What if I pay late?","逾期会怎样？","Nếu quá hạn thì sao?","म्याद नाघेमा के हुन्छ?"],
+ {id:"late", k:/지나|늦|연체|가산|late|overdue|quá hạn|trễ|ढिला|逾期/i, q:["기한이 지나면 어떻게 되나요?","What if I pay late?","逾期会怎样？","Nếu quá hạn thì sao?","म्याद नाघेमा के हुन्छ?"],
   a:["납부 기한이 지나면 3%가 가산됩니다. 세목별 세액이 45만 원 이상이면, 이후 매월 0.66%가 추가로 가산됩니다(최대 60개월). 정확한 금액은 위택스 또는 고지서에 적힌 담당 부서에서 확인하세요.","After the due date, 3% is added. If the tax for one item is ₩450,000 or more, a further 0.66% is added every month (up to 60 months). Check the exact amount on Wetax or with the office printed on your notice.","逾期缴纳将加收 3%。每一税目税额达 45 万韩元以上的，此后每月再加收 0.66%（最多 60 个月）。准确金额请在 WeTax 或税单上的主管部门确认。","Nếu quá hạn nộp, sẽ bị cộng thêm 3%. Nếu số thuế của mỗi loại từ ₩450,000 trở lên, mỗi tháng sau đó bị cộng thêm 0,66% (tối đa 60 tháng). Hãy kiểm tra số tiền chính xác trên WeTax hoặc với bộ phận phụ trách ghi trên giấy báo.","भुक्तानी अन्तिम मिति नाघेमा 3% थप लाग्छ। प्रत्येक करको रकम ₩450,000 वा बढी भए, त्यसपछि हरेक महिना 0.66% थप लाग्छ (बढीमा 60 महिना)। सही रकम WeTax वा बिलमा लेखिएको कार्यालयमा जाँच्नुहोस्।"]},
- {id:"vacct", q:["가상계좌가 뭐예요?","What is a virtual account?","什么是虚拟账户？","Tài khoản ảo là gì?","भर्चुअल खाता भनेको के हो?"],
+ {id:"vacct", k:/가상계좌|계좌|virtual|account|tài khoản|खाता|虚拟|账户/i, q:["가상계좌가 뭐예요?","What is a virtual account?","什么是虚拟账户？","Tài khoản ảo là gì?","भर्चुअल खाता भनेको के हो?"],
   a:["가상계좌는 이 고지서 납부를 위해 만들어진 계좌번호입니다. 이 계좌로 송금하면 이 세금이 납부됩니다.","A virtual account is an account number created just for paying this notice. Sending money to it pays this tax.","虚拟账户是专为缴纳这张税单而开设的账号。向该账户转账即完成本税款的缴纳。","Tài khoản ảo là số tài khoản được tạo riêng để nộp giấy báo này. Chuyển tiền vào tài khoản này là khoản thuế này được nộp.","भर्चुअल खाता यो बिल तिर्नका लागि बनाइएको खाता नम्बर हो। यस खातामा रकम पठाए यो कर तिरिन्छ।"]},
- {id:"split", q:["나눠서 낼 수 있나요?","Can I pay in installments?","可以分期缴纳吗？","Tôi có thể trả góp không?","किस्तामा तिर्न मिल्छ?"],
-  a:["분할 납부와 감면은 세목마다 법에 정해진 기준이 다릅니다. 해당되는지는 고지서에 적힌 담당 부서에 문의하세요.","Installment payments and reductions follow different legal rules for each tax. Ask the office printed on your notice whether they apply to you.","分期缴纳和减免的标准因税种依法不同。是否适用请咨询税单上的主管部门。","Việc nộp chia nhiều lần và miễn giảm thuế có tiêu chuẩn khác nhau tùy loại thuế theo luật. Hãy hỏi bộ phận phụ trách ghi trên giấy báo để biết bạn có thuộc diện áp dụng không.","किस्तामा तिर्ने र कर छुटका नियम करको प्रकार अनुसार कानुनमा फरक छन्। तपाईंलाई लागू हुन्छ कि हुँदैन, बिलमा लेखिएको कार्यालयमा सोध्नुहोस्।"]}
+ {id:"split", k:/나눠|분할|감면|installment|split|reduc|trả góp|giảm|किस्ता|छुट|分期|减免/i, q:["나눠서 낼 수 있나요?","Can I pay in installments?","可以分期缴纳吗？","Tôi có thể trả góp không?","किस्तामा तिर्न मिल्छ?"],
+  a:["분할 납부와 감면은 세목마다 법에 정해진 기준이 다릅니다. 해당되는지는 고지서에 적힌 담당 부서에 문의하세요.","Installment payments and reductions follow different legal rules for each tax. Ask the office printed on your notice whether they apply to you.","分期缴纳和减免的标准因税种依法不同。是否适用请咨询税单上的主管部门。","Việc nộp chia nhiều lần và miễn giảm thuế có tiêu chuẩn khác nhau tùy loại thuế theo luật. Hãy hỏi bộ phận phụ trách ghi trên giấy báo để biết bạn có thuộc diện áp dụng không.","किस्तामा तिर्ने र कर छुटका नियम करको प्रकार अनुसार कानुनमा फरक छन्। तपाईंलाई लागू हुन्छ कि हुँदैन, बिलमा लेखिएको कार्यालयमा सोध्नुहोस्।"]},
+
+ {id:"wrong", k:/잘못|틀|이의|wrong|mistake|sai|गलत|错/i, out:true, q:["금액이 잘못된 것 같아요","The amount looks wrong","金额好像不对","Số tiền có vẻ sai","रकम गलत जस्तो छ"],
+  a:["이 질문은 정확히 답변하기 어렵습니다. 1345(통역) 또는 고지서에 적힌 담당 부서에 문의하세요. 상담 탭의 한국어 메모를 보여 주면 됩니다.","This question is hard to answer accurately. Call 1345 (interpreting) or contact the office printed on your notice. You can show them the Korean note in the Help tab.","此问题难以准确回答。请拨打 1345（翻译）或咨询税单上的主管部门。可出示“咨询”标签中的韩语便条。","Câu hỏi này khó trả lời chính xác. Hãy gọi 1345 (phiên dịch) hoặc hỏi bộ phận phụ trách ghi trên giấy báo. Bạn có thể đưa ghi chú tiếng Hàn trong mục Hỗ trợ.","यो प्रश्नको सही जवाफ दिन गाह्रो छ। 1345 (दोभाषे) मा फोन गर्नुहोस् वा बिलमा लेखिएको कार्यालयमा सोध्नुहोस्। सहायता ट्याबको कोरियाली नोट देखाउन सक्नुहुन्छ।"]},
+ {id:"already", k:/이미 냈|또 왔|already|đã trả|đã nộp|पहिल्यै|已经缴/i, out:true, q:["이미 냈는데 또 고지서가 왔어요","I already paid but got another notice","已经缴了又收到税单","Tôi đã nộp nhưng lại nhận giấy báo","तिरिसकेँ तर फेरि बिल आयो"],
+  a:["이 질문은 정확히 답변하기 어렵습니다. 1345(통역) 또는 고지서에 적힌 담당 부서에 문의하세요. 상담 탭의 한국어 메모를 보여 주면 됩니다.","This question is hard to answer accurately. Call 1345 (interpreting) or contact the office printed on your notice. You can show them the Korean note in the Help tab.","此问题难以准确回答。请拨打 1345（翻译）或咨询税单上的主管部门。可出示“咨询”标签中的韩语便条。","Câu hỏi này khó trả lời chính xác. Hãy gọi 1345 (phiên dịch) hoặc hỏi bộ phận phụ trách ghi trên giấy báo. Bạn có thể đưa ghi chú tiếng Hàn trong mục Hỗ trợ.","यो प्रश्नको सही जवाफ दिन गाह्रो छ। 1345 (दोभाषे) मा फोन गर्नुहोस् वा बिलमा लेखिएको कार्यालयमा सोध्नुहोस्। सहायता ट्याबको कोरियाली नोट देखाउन सक्नुहुन्छ।"]},
+ {id:"moved", k:/이사|팔았|폐차|moved|sold|chuyển nhà|bán xe|बेचे|सरें|搬家|卖/i, out:true, q:["이사했거나 차를 팔았어요","I moved or sold my car","我搬家了或卖了车","Tôi đã chuyển nhà hoặc bán xe","म सरें वा गाडी बेचें"],
+  a:["이 질문은 정확히 답변하기 어렵습니다. 1345(통역) 또는 고지서에 적힌 담당 부서에 문의하세요. 상담 탭의 한국어 메모를 보여 주면 됩니다.","This question is hard to answer accurately. Call 1345 (interpreting) or contact the office printed on your notice. You can show them the Korean note in the Help tab.","此问题难以准确回答。请拨打 1345（翻译）或咨询税单上的主管部门。可出示“咨询”标签中的韩语便条。","Câu hỏi này khó trả lời chính xác. Hãy gọi 1345 (phiên dịch) hoặc hỏi bộ phận phụ trách ghi trên giấy báo. Bạn có thể đưa ghi chú tiếng Hàn trong mục Hỗ trợ.","यो प्रश्नको सही जवाफ दिन गाह्रो छ। 1345 (दोभाषे) मा फोन गर्नुहोस् वा बिलमा लेखिएको कार्यालयमा सोध्नुहोस्। सहायता ट्याबको कोरियाली नोट देखाउन सक्नुहुन्छ।"]},
+ {id:"leave", k:/출국|떠나|귀국|leav|về nước|फर्क|出境|离开/i, out:true, q:["한국을 떠나요","I am leaving Korea","我要离开韩国","Tôi sắp rời Hàn Quốc","म कोरिया छोड्दैछु"],
+  a:["이 질문은 정확히 답변하기 어렵습니다. 1345(통역) 또는 고지서에 적힌 담당 부서에 문의하세요. 상담 탭의 한국어 메모를 보여 주면 됩니다.","This question is hard to answer accurately. Call 1345 (interpreting) or contact the office printed on your notice. You can show them the Korean note in the Help tab.","此问题难以准确回答。请拨打 1345（翻译）或咨询税单上的主管部门。可出示“咨询”标签中的韩语便条。","Câu hỏi này khó trả lời chính xác. Hãy gọi 1345 (phiên dịch) hoặc hỏi bộ phận phụ trách ghi trên giấy báo. Bạn có thể đưa ghi chú tiếng Hàn trong mục Hỗ trợ.","यो प्रश्नको सही जवाफ दिन गाह्रो छ। 1345 (दोभाषे) मा फोन गर्नुहोस् वा बिलमा लेखिएको कार्यालयमा सोध्नुहोस्। सहायता ट्याबको कोरियाली नोट देखाउन सक्नुहुन्छ।"]},
 ];
 
 /* 키워드로 안내 찾기 (시연용 다국어 규칙) */
@@ -560,6 +569,16 @@ const UI_BANK = {
   day:["일","Day","日","Ngày","दिन"],
   confirmLead:["다른 부분은 직접 수정하세요.","Correct anything that differs.","如有不同，请直接修改。","Nếu có chỗ khác, hãy sửa trực tiếp.","फरक भएको भाग आफैं सच्याउनुहोस्।"],
   noteKoT:["담당자에게 보여 줄 한국어 메모","Korean note to show the officer","给工作人员看的韩语便条","Ghi chú tiếng Hàn để đưa cho nhân viên","कर्मचारीलाई देखाउने कोरियाली नोट"],
+  // 2차 개선점검: 고지서 자유 질문, 혜택 신청 바로가기, 둘러보기 보강, 공식 안내
+  askPh:["고지서에 대해 궁금한 것을 적어 주세요","Ask anything about this notice","请输入关于税单的问题","Hỏi bất cứ điều gì về giấy báo này","यो बिलबारे केही सोध्नुहोस्"],
+  askSend:["질문 보내기","Send question","发送问题","Gửi câu hỏi","प्रश्न पठाउनुहोस्"],
+  otherBenefits:["같은 단계의 다른 지원 보기","See other benefits for this stage","查看同阶段的其他支援","Xem hỗ trợ khác cùng giai đoạn","यही चरणका अन्य सुविधा हेर्नुहोस्"],
+  centerMap:["가까운 행정복지센터 지도","Nearest community service center (map)","附近行政福利中心地图","Trung tâm hành chính phúc lợi gần nhất (bản đồ)","नजिकको सामुदायिक सेवा केन्द्र (नक्सा)"],
+  centerHours:["행정복지센터 운영 시간: 평일 09:00-18:00","Community service center hours: weekdays 09:00-18:00","行政福利中心办公时间：工作日 09:00-18:00","Giờ làm việc: ngày thường 09:00-18:00","सामुदायिक सेवा केन्द्र समय: कार्यदिन 09:00-18:00"],
+  checkDocsFirst:["신청 전에 준비물 탭을 확인하세요.","Check the Documents tab before you apply.","申请前请先查看“材料”标签。","Hãy kiểm tra mục Giấy tờ trước khi đăng ký.","आवेदन अघि कागजात ट्याब जाँच्नुहोस्।"],
+  eventsSrc:["양주시 누리집에서 행사 원문 보기","See the original notice on the Yangju City website","在杨州市官网查看活动原文","Xem thông báo gốc trên trang web thành phố Yangju","याङ्जु सहरको वेबसाइटमा मूल सूचना हेर्नुहोस्"],
+  foodAreas:["동네별 맛집 지도","Restaurants by neighborhood (map)","各街区美食地图","Quán ăn theo khu vực (bản đồ)","टोल अनुसार रेस्टुरेन्ट (नक्सा)"],
+  officialT:["공식 안내","Official information","官方信息","Thông tin chính thức","आधिकारिक जानकारी"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 
@@ -568,7 +587,7 @@ export const UI = { ...UI_BASE, ...UI_BANK,
   payOtherD:["ATM은 카드나 통장, 전화는 한국어 음성 안내","ATM: card or bankbook. Phone: Korean voice guide","ATM 用银行卡或存折，电话为韩语语音","ATM dùng thẻ hoặc sổ, điện thoại bằng tiếng Hàn","ATM मा कार्ड वा पासबुक, फोन कोरियाली आवाजमा"],
   pay1D:["전자납부번호로 조회해서 납부 (00:30~23:30)","Search with the e-payment number and pay (00:30-23:30)","用电子缴纳号码查询后缴纳（00:30～23:30）","Tra cứu bằng mã nộp điện tử rồi nộp (00:30-23:30)","इ-भुक्तानी नम्बरले खोजेर तिर्नुहोस् (00:30-23:30)"],
   pay2D:["고지서의 가상계좌로 금액 그대로 보내기","Send the exact amount to the virtual account","向虚拟账户转入相同金额","Chuyển đúng số tiền vào tài khoản ảo","भर्चुअल खातामा उही रकम पठाउनुहोस्"],
-  faqShort:["추가 질문","More questions","更多问题","Hỏi thêm","थप प्रश्न"],
+  faqShort:["추가 질문","Questions","更多问题","Hỏi thêm","थप प्रश्न"],
   tabHelp:["상담","Get help","咨询","Hỗ trợ","सहायता"],
   payWetax:["위택스에서 납부하기","Pay on Wetax","在 Wetax 缴纳","Nộp trên Wetax","Wetax मा तिर्नुहोस्"],
   lateShort:["기한을 넘기면 3% 가산금이 붙어요","3% is added if you pay late","逾期将加收 3%","Nộp trễ sẽ bị cộng thêm 3%","ढिला तिरे 3% थपिन्छ"],

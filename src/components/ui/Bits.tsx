@@ -54,6 +54,22 @@ export function RowBtn({ icon, tone = 'tone-green', title, desc, onClick }: {
   );
 }
 
+/** 공식 안내 줄: 링크·전화·그냥 글. data/links.ts 의 LinkRow[] (2차 개선점검 3.6) */
+export function LinkList({ rows, title }: { rows: { label: string[]; href?: string; tel?: string }[]; title: string }) {
+  const { tx, t } = useApp();
+  if (!rows.length) return null;
+  return (
+    <section className="list" aria-label={title}>
+      {rows.map((r, i) => {
+        const inner = <><span className="ibox tone-blue"><Ic n={r.tel ? 'phone' : r.href ? 'ext' : 'info'} /></span><span className="tx"><span className="t" style={{ fontWeight: 500 }}>{tx(r.label)}</span></span></>;
+        if (r.tel) return <a key={i} className="row" href={`tel:${r.tel.replace(/-/g, '')}`}>{inner}<span className="act">{t('call')}</span></a>;
+        if (r.href) return <a key={i} className="row" href={r.href} target="_blank" rel="noopener">{inner}<Ic n="chev" cls="sm" /></a>;
+        return <div key={i} className="row">{inner}</div>;
+      })}
+    </section>
+  );
+}
+
 /** 시행 주체 배지: 양주시 amber / 경기도 blue / 중앙 gray */
 export function LvBadge({ lv }: { lv: 'C' | 'G' | 'Y' }) {
   const { tx } = useApp();

@@ -1,9 +1,10 @@
 // 업무 하나: 어디서·언제, 준비물 체크리스트, 직원에게 보여주기. 참고용 html 의 SCREENS.visitItem
 import { BottomBar, Title } from '@/components/layout/Chrome';
-import { Checklist } from '@/components/ui/Bits';
+import { Checklist, LinkList } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { VISIT } from '@/data/content';
+import { VISIT_LINKS } from '@/data/links';
 
 export function VisitItemScreen({ id }: { id: string }) {
   const { t, tx, openOverlay } = useApp();
@@ -26,6 +27,8 @@ export function VisitItemScreen({ id }: { id: string }) {
         </section>
         <p className="hint-line"><Ic n="users" cls="sm" /><span>{t('tapToShow')}</span></p>
         {v.src && <p className="src"><Ic n="info" cls="sm" /><span>{t('basis')}: {tx(v.src)}</span></p>}
+        {/* 업무별 공식 안내 (2차 개선점검 3.6) */}
+        <LinkList rows={VISIT_LINKS[v.id] || []} title={t('officialT')} />
       </div>
       <BottomBar>
         <a className="btn secondary side" href="tel:1345" aria-label={t('interpCall')}><Ic n="phone" cls="sm" />1345</a>

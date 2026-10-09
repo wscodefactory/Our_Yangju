@@ -58,7 +58,7 @@ export function DocScreen() {
             </button>
           </>
         )}
-        <button type="button" className={`btn ${imgOk ? 'secondary' : 'primary'}`} onClick={() => { startSample(); go({ k: 'docConfirm' }); }}>
+        <button type="button" className={`btn ${imgOk ? 'secondary' : 'primary'}`} onClick={() => { void startSample().then(() => go({ k: 'mask' })); }}>
           <Ic n="sample" cls="sm" />{t('btnSample')}
         </button>
         <button type="button" className="btn secondary" onClick={() => { startManual(); go({ k: 'docConfirm', manual: true }); }}>

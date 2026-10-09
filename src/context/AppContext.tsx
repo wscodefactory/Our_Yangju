@@ -114,6 +114,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return next;
   }), []);
 
+  /* ----- 시트 상태 (내비게이션이 참조하므로 먼저 선언) ----- */
+  const [overlay, setOverlay] = useState<Overlay | null>(null);
+  const overlayRef = useRef<Overlay | null>(null);
+
   /* ----- 내비게이션 (history 와 동기) ----- */
   const [nav, setNav] = useState<Screen[]>(() => {
     if (location.hash === '#admin') return [{ k: 'admin', tab: 'reg' }];
@@ -122,7 +126,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const navRef = useRef(nav);
   navRef.current = nav;
   const screen = nav[nav.length - 1];
-  const go = useCallback((s: Screen) => { setNav((st) => [...st, s]); history.pushState({ d: Date.now() }, ''); }, []);
+  // 시트가 열린 채 화면을 옮기면(AI 상담 → 이동) 시트의 history 칸을 새 화면 칸으로 바꿔 쓴다
+  const go = useCallback((s: Screen) => {
+    setNav((st) => [...st, s]);
+    if (overlayRef.current) { setOverlay(null); history.replaceState({ d: Date.now() }, ''); } else history.pushState({ d: Date.now() }, '');
+  }, []);
   const back = useCallback(() => {
     if (navRef.current.length > 1) history.back();
     else setNav([{ k: 'home' }]);
@@ -140,33 +148,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
   const replaceNav = useCallback((stack: Screen[]) => {
     setNav(stack.length ? stack : [{ k: 'home' }]);
-    history.pushState({ d: Date.now() }, '');
+    if (overlayRef.current) { setOverlay(null); history.replaceState({ d: Date.now() }, ''); } else history.pushState({ d: Date.now() }, '');
   }, []);
   useEffect(() => {
     history.replaceState({ d: 1 }, '');
-    const onPop = () => setNav((st) => (st.length > 1 ? st.slice(0, -1) : st));
+    // 뒤로 가기: 시트가 열려 있으면 시트만 닫는다
+    const onPop = () => { if (overlayRef.current) { setOverlay(null); return; } setNav((st) => (st.length > 1 ? st.slice(0, -1) : st)); };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
   /* ----- 시트·전체 화면 ----- */
-  const [overlay, setOverlay] = useState<Overlay | null>(null);
+  overlayRef.current = overlay;
   // 화면이 바뀌거나 시트가 닫히면 읽어주기를 멈춘다 (뒤로가기 포함). 안 그러면 다음 화면에서도 계속 들린다
   useEffect(() => { stopSpeaking(); }, [nav, overlay]);
-  const openOverlay = useCallback((o: Overlay) => setOverlay(o), []);
-  const closeOverlay = useCallback(() => setOverlay(null), []);
+  // 시트는 history 한 칸을 차지한다. 열 때 push, 닫을 때는 back() → popstate 가 닫는다.
+  // 닫기 버튼·Esc·바깥 탭·휴대폰 뒤로 가기가 전부 같은 결과 (2차 개선점검 3.5)
+  const openOverlay = useCallback((o: Overlay) => { setOverlay(o); history.pushState({ d: Date.now(), ov: 1 }, ''); }, []);
+  const closeOverlay = useCallback(() => { if (overlayRef.current) history.back(); }, []);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOverlay(null); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeOverlay(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, []);
+  }, [closeOverlay]);
 
   /** 언어 고르기. 첫 실행이면 홈으로, 아니면 그 자리에서 문구만 바뀜 */
   const setLang = useCallback((c: Lang) => {
     const first = !langState;
     storage.set(STORAGE_KEYS.cardLang, c);
     setLangState(c);
-    setOverlay(null);
+    if (overlayRef.current) history.back();
     if (first) setNav([{ k: 'home' }]);
   }, [langState]);
 

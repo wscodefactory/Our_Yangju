@@ -48,7 +48,7 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
   return (
     <>
       <Title>{manual ? t('manualTitle') : t('confirmTitle')}</Title>
-      <Stepper step={2} />
+      {!manual && <Stepper step={2} />}
       {manual ? (
         <p className="lead">{t('manualLead')}</p>
       ) : d.sample ? (

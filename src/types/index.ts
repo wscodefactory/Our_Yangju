@@ -30,6 +30,8 @@ export interface DocInfo {
   dueQ?: string | null;
   /** 샘플 고지서로 시작했으면 true (제목에 "(샘플)" 표시, 원본 보기 시트) */
   sample?: boolean;
+  /** 직접 입력으로 시작했으면 true. 사진·가리기 단계가 없으니 단계 표시를 숨긴다 */
+  manual?: boolean;
   /** AI 가 읽은 결과의 확신도. low 면 확인 화면에서 주의 문구 */
   confidence?: 'high' | 'low';
 }

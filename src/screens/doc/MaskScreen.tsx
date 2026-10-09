@@ -16,7 +16,7 @@ const MIN_RECT_PX = 8;
  */
 export function MaskScreen() {
   const { t, go } = useApp();
-  const { canvas, rects, addRect, undoRect } = useDoc();
+  const { canvas, rects, addRect, undoRect, doc } = useDoc();
   const viewRef = useRef<HTMLCanvasElement>(null);
   const dragStart = useRef<[number, number] | null>(null);
   const cur = useRef<Rect | null>(null);
@@ -96,7 +96,7 @@ export function MaskScreen() {
         </div>
       )}
       <BottomBar>
-        <button type="button" className="btn primary" onClick={() => go({ k: 'reading' })}>{t('maskDone')}</button>
+        <button type="button" className="btn primary" onClick={() => go(doc?.sample ? { k: 'docConfirm' } : { k: 'reading' })}>{t('maskDone')}</button>
       </BottomBar>
     </>
   );

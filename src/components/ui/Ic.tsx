@@ -2,14 +2,14 @@
 // 크기·선 굵기는 global.css의 .ic / .ic.sm / .ic.lg 가 정한다 (24px, 1.9, 둥근 끝 = 디자인시스템 §5).
 // 장식용이라 전부 aria-hidden. 버튼의 이름은 호출부가 aria-label로 준다.
 import {
-  AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
+  AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, BookmarkCheck, BookmarkPlus, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
   ChevronRight, CircleHelp, Copy, Cross, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,
   Landmark, MapPin, Maximize, MessageCircle, Mountain, Palette, Pencil, Phone, Send, ShieldCheck, Siren, Smile, TrainFront,
   Trash2, User, Users, Utensils, Volume2, X, type LucideIcon,
 } from 'lucide-react';
 
 const MAP = {
-  globe: Globe, textsize: ALargeSmall, bookmark: Bookmark, back: ArrowLeft, chev: ChevronRight, close: X, chat: MessageCircle,
+  globe: Globe, textsize: ALargeSmall, bookmark: Bookmark, bookmarkPlus: BookmarkPlus, bookmarkCheck: BookmarkCheck, back: ArrowLeft, chev: ChevronRight, close: X, chat: MessageCircle,
   send: Send, phone: Phone, copy: Copy, ext: ExternalLink, volume: Volume2, expand: Maximize, check: Check, landmark: Landmark,
   file: FileText, heart: Heart, house: House, idcard: IdCard, medical: Cross, smile: Smile, car: Car, help: CircleHelp,
   siren: Siren, trash: Trash2, bus: Bus, train: TrainFront, briefcase: Briefcase, calendar: Calendar, pin: MapPin, info: Info,

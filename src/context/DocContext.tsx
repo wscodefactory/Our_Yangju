@@ -14,8 +14,8 @@ export interface DocState {
   /** 확인·결과 화면이 보는 고지서 정보 */
   doc: DocInfo | null;
   setDoc: (d: DocInfo | null) => void;
-  /** 샘플 고지서: 캔버스 없이 SAMPLE 값으로 바로 확인 화면 */
-  startSample: () => void;
+  /** 샘플 고지서: 미리 가려진 가상 고지서 캔버스 + SAMPLE 값. 가리기 단계를 거쳐 확인 화면으로 (AI 호출 없음) */
+  startSample: () => Promise<void>;
   /** 직접 입력: 빈 고지서 */
   startManual: () => void;
   /** 사진 파일 → 캔버스 (가리기 화면으로) */
@@ -35,8 +35,14 @@ export function DocProvider({ children }: { children: ReactNode }) {
   const [rects, setRects] = useState<Rect[]>([]);
   const [doc, setDoc] = useState<DocInfo | null>(null);
 
-  const startSample = useCallback(() => { setCanvas(null); setRects([]); setDoc({ ...SAMPLE } as DocInfo); }, []);
-  const startManual = useCallback(() => { setCanvas(null); setRects([]); setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '' }); }, []);
+  // 샘플도 1→4단계를 차례로 밟는다 (2차 개선점검 3.5). 가림 사각형은 미리 그려져 온다
+  const startSample = useCallback(async () => {
+    const sample = await drawSampleNotice();
+    setCanvas(sample.canvas);
+    setRects(sample.rects.slice());
+    setDoc({ ...SAMPLE } as DocInfo);
+  }, []);
+  const startManual = useCallback(() => { setCanvas(null); setRects([]); setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '', manual: true }); }, []);
 
   const loadFile = useCallback(async (file: File) => {
     const c = await fileToCanvas(file);

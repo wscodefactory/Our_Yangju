@@ -14,6 +14,11 @@ export function LangScreen() {
         </p>
         <h1 tabIndex={-1}><span lang="ko">사용할 언어를 선택하세요</span></h1>
         <p className="sub" lang="en">Choose your language</p>
+        {/* 무슨 서비스인지 먼저 (2차 개선점검 3.2). 언어를 고르기 전이라 한국어·영어 병기 */}
+        <p className="muted" style={{ margin: '0 0 16px' }}>
+          <span lang="ko">양주시 외국인 주민을 위한 민원·고지서·혜택·생활 안내</span><br />
+          <span lang="en">Yangju City guide to office tasks, tax notices, benefits and daily life</span>
+        </p>
       </section>
       <LangOptions />
       <p className="muted" style={{ textAlign: 'center', marginTop: 14 }}>

@@ -5,13 +5,16 @@ import { Checklist, LvBadge, Seg, StBadge } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { BEN } from '@/data/content';
+import { APPLY_SITES, CENTER_MAP } from '@/data/links';
 
 type Tab = 'elig' | 'docs' | 'apply';
+/** 단계 → 대상 그룹 (GROUPS.stages 와 같다) */
+const groupOf = (stage: string) => (stage === 'care' ? 'child' : stage === 'marry' || stage === 'birth' ? 'newly' : 'youth');
 type Ans = 'yes' | 'no' | 'unsure';
 const ANSWERS: Ans[] = ['yes', 'no', 'unsure'];
 
 export function BenefitScreen({ id }: { id: string }) {
-  const { t, tx, fmtRange, isSaved, toggleSaved, toast, openOverlay } = useApp();
+  const { t, tx, fmtRange, isSaved, toggleSaved, toast, openOverlay, go } = useApp();
   const [tab, setTab] = useState<Tab>('elig');
   const [ans, setAns] = useState<Record<number, Ans>>({});
   const b = BEN.find((x) => x.id === id);
@@ -36,7 +39,9 @@ export function BenefitScreen({ id }: { id: string }) {
           </div>
         ))}
         {done && (vals.includes('no')
-          ? <div className="callout warn sm result"><Ic n="alert" cls="sm" /><span>{t('rNo')}</span></div>
+          ? <div className="callout warn sm result"><Ic n="alert" cls="sm" /><span>{t('rNo')}<br />
+              {/* 해당 안 됨 → 같은 단계의 다른 지원으로 (2차 개선점검 3.1) */}
+              <button type="button" className="btn ghost sm" style={{ marginTop: 6, padding: 0 }} onClick={() => go({ k: 'welfare', g: groupOf(b.stage), s: b.stage })}>{t('otherBenefits')}<Ic n="chev" cls="sm" /></button></span></div>
           : vals.includes('unsure')
             ? <div className="callout info sm result"><Ic n="help" cls="sm" /><span>{t('rUn')}</span></div>
             : <div className="callout green sm result"><Ic n="check" cls="sm" /><span>{t('rYes')}</span></div>)}
@@ -52,7 +57,19 @@ export function BenefitScreen({ id }: { id: string }) {
           <span className={`bdg ${online ? 'blue' : 'green'}`}><Ic n={online ? 'web' : 'building'} cls="sm" />{t(online ? 'online' : 'visit')}</span>
         </div>
         <p style={{ margin: '0 0 8px', fontWeight: 700 }}>{tx(b.ch.where)}</p>
-        <p className="muted" style={{ margin: 0 }}>{t('noteD')}</p>
+        {/* 신청 바로가기: 온라인은 신청 사이트, 방문은 행정복지센터 지도·운영 시간 (2차 개선점검 3.1·3.6) */}
+        <div className="stack" style={{ gap: 8, margin: '0 0 10px' }}>
+          {APPLY_SITES.filter((x) => b.ch.where[0].includes(x.match)).map((x) => (
+            <a key={x.href} className="btn secondary sm" href={x.href} target="_blank" rel="noopener">{tx(x.label)}<Ic n="ext" cls="sm" /></a>
+          ))}
+          {!online && (
+            <>
+              <a className="btn secondary sm" href={CENTER_MAP} target="_blank" rel="noopener"><Ic n="pin" cls="sm" />{t('centerMap')}</a>
+              <p className="muted" style={{ margin: 0 }}>{t('centerHours')}</p>
+            </>
+          )}
+        </div>
+        <p className="muted" style={{ margin: 0 }}>{t('checkDocsFirst')} {t('noteD')}</p>
       </section>
     );
   }
@@ -77,7 +94,8 @@ export function BenefitScreen({ id }: { id: string }) {
       <div className="tabpanel">{panel}</div>
       <BottomBar>
         <button type="button" className="btn secondary side" aria-pressed={on} onClick={() => { toggleSaved(b.id); toast(on ? t('unsavedToast') : t('savedToast')); }}>
-          <Ic n="bookmark" cls={on ? 'filled' : ''} />{on ? t('savedState') : t('save')}
+          {/* 헤더 북마크(목록 열기)와 구분: 담기 전 '북마크 추가', 담은 뒤 '체크 북마크' (2차 개선점검 3.2) */}
+          <Ic n={on ? 'bookmarkCheck' : 'bookmarkPlus'} />{on ? t('savedState') : t('save')}
         </button>
         <button type="button" className="btn primary" onClick={() => openOverlay({ k: 'note', id: b.id })}><Ic n="pencil" cls="sm" />{t('noteBtn')}</button>
       </BottomBar>

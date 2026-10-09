@@ -6,25 +6,32 @@ import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { LANGS } from '@/data/content';
 
-const LOGO = `${import.meta.env.BASE_URL}yangju-ci.png`;
+// 로고: 한국어는 국문 시그니처(심벌 + '양주시'), 다른 언어는 심벌마크(YangJu)만. 외국어 화면에 한글이 남지 않게 (2차 개선점검 3.4)
+const LOGO_KO = `${import.meta.env.BASE_URL}yangju-ci.png`;
+const LOGO_SYMBOL = `${import.meta.env.BASE_URL}yangju-symbol.png`;
+const logoFor = (lang: string, chosen: boolean) => (lang === 'ko' || !chosen ? LOGO_KO : LOGO_SYMBOL);
 
 /**
  * 앱 바. 홈·언어 화면은 양주시 CI + 서비스명, 하위 화면은 뒤로 버튼 + 제목(<Title> 이 포털로 채움).
  * 도구 버튼 3개(지구본·Aa·북마크)는 언어 선택 화면에서만 숨긴다 (디자인시스템 §6).
  */
 export function AppBar() {
-  const { screen, lang, t, big, toggleBig, saved, goHome, back, go, openOverlay, setTitleEl } = useApp();
+  const { screen, lang, langChosen, t, big, toggleBig, saved, goHome, back, go, openOverlay, setTitleEl } = useApp();
   const root = screen.k === 'home' || screen.k === 'lang';
   const n = saved.length;
   const native = LANGS.find((l) => l.code === lang)?.native ?? '';
+  const onLang = screen.k === 'lang';
   return (
     <header className="appbar">
       <div className={`appbar-in ${root ? '' : 'sub'}`}>
         {root ? (
-          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); if (screen.k !== 'lang') goHome(); }} aria-label={`${t('appName')}, ${t('aHome')}`}>
-            <span className="logo-plate"><img src={LOGO} alt={t('city')} width={58} height={40} /></span>
+          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); if (!onLang) goHome(); }} aria-label={`${t('appName')}, ${t('aHome')}`}>
+            <span className="logo-plate"><img src={logoFor(lang, langChosen)} alt={t('city')} width={58} height={40} /></span>
             <span className="brand-div" aria-hidden="true" />
-            <span className="brand-txt"><strong>{t('appName')}</strong><small>{t('appSub')}</small></span>
+            {/* 언어를 고르기 전에는 한국어·영어 병기 (3.2) */}
+            {onLang
+              ? <span className="brand-txt"><strong><span lang="ko">한눈에 양주</span> / <span lang="en">Our Yangju</span></strong><small><span lang="ko">양주시 생활 안내</span> / <span lang="en">Yangju City living guide</span></small></span>
+              : <span className="brand-txt"><strong>{t('appName')}</strong><small>{t('appSub')}</small></span>}
           </a>
         ) : (
           <>
@@ -68,7 +75,8 @@ export function BarHost() {
 }
 
 // FAB 를 숨기는 화면: 하단 바가 있거나 전용 연락 수단이 있는 화면 (디자인시스템 §7.2)
-const NO_FAB = new Set(['lang', 'visitItem', 'doc', 'mask', 'reading', 'docConfirm', 'docResult', 'benefit', 'lifeItem', 'admin', 'counter']);
+// lifeItem 은 다른 연락 수단이 없는 화면이 있어(쓰레기·교통·일) FAB 를 남긴다 (2차 개선점검 3.2)
+const NO_FAB = new Set(['lang', 'visitItem', 'doc', 'mask', 'reading', 'docConfirm', 'docResult', 'benefit', 'admin', 'counter']);
 
 /** 오른쪽 아래 "AI 상담" 플로팅 버튼. 한 화면에 AI 진입점은 이것 하나 */
 export function Fab() {
@@ -83,11 +91,11 @@ export function Fab() {
 
 /** 푸터: 면책·시연 안내는 홈에서 한 번만 */
 export function Footer() {
-  const { screen, t } = useApp();
+  const { screen, lang, langChosen, t } = useApp();
   if (screen.k !== 'home') return null;
   return (
     <footer className="foot">
-      <div className="ci"><img src={LOGO} alt={t('city')} width={41} height={28} /><span className="demo-flag"><Ic n="info" cls="sm" />{t('proto')}</span></div>
+      <div className="ci"><img src={logoFor(lang, langChosen)} alt={t('city')} width={41} height={28} /><span className="demo-flag"><Ic n="info" cls="sm" />{t('proto')}</span></div>
       <p>{t('disclaimer')}</p>
       <p>{t('demoNote')}</p>
       <div className="links">

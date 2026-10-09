@@ -4,6 +4,7 @@ import { Title } from '@/components/layout/Chrome';
 import { Seg } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { AREAS, CERTS, EVENTS, HERITAGE, PLACES, type T5 } from '@/data/content';
+import { CITY_URL, FOOD_AREAS } from '@/data/links';
 import { useApp } from '@/context/AppContext';
 import { loc, parseDate } from '@/i18n';
 import { eventStatus, mapUrl } from '@/utils/events';
@@ -58,6 +59,8 @@ function Events() {
           ? <a key={e.id} className="ev" href={mapUrl(e.map)} target="_blank" rel="noopener" aria-label={`${tx(e.name)}, ${t('openMap')}`}>{inner}</a>
           : <article key={e.id} className="ev done">{inner}</article>;
       })}
+      {/* 행사 원문은 양주시 누리집 (2차 개선점검 3.1) */}
+      <a className="btn secondary sm" href={CITY_URL} target="_blank" rel="noopener">{t('eventsSrc')}<Ic n="ext" cls="sm" /></a>
     </div>
   );
 }
@@ -82,7 +85,12 @@ function Food() {
   const { t, tx } = useApp();
   return (
     <>
-      <p className="lead" style={{ margin: '0 0 10px' }}>{t('secFood')}</p>
+      {/* 동네별 맛집 지도 (2차 개선점검 3.1: 원본에 있던 흐름 복원) */}
+      <h2 className="sec-title" style={{ marginTop: 4 }}>{t('foodAreas')}</h2>
+      <div className="chips" role="list">
+        {FOOD_AREAS.map((a) => <a key={a.q} className="chip" role="listitem" href={mapUrl(a.q)} target="_blank" rel="noopener"><Ic n="pin" cls="sm" />{tx(a.name)}</a>)}
+      </div>
+      <p className="lead" style={{ margin: '10px 0' }}>{t('secFood')}</p>
       <div className="list">{CERTS.map((c) => <MapRow key={c.q} q={c.q} icon="utensils" tone="tone-orange" name={tx(c.name)} desc={`${tx(c.d)} (${tx(c.by)})`} />)}</div>
     </>
   );

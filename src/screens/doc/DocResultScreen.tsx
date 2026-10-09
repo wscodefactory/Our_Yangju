@@ -2,7 +2,7 @@
 // 「고지서화면_구현요청_26.10.08」요청 ②(은행 앱 가상계좌 이체를 1순위로)를 얹은 화면.
 //   요약 → 지금 할 일: 은행 앱 송금(입금 은행·계좌·금액 상자, 7단계, 복사 버튼, 사기 주의)
 //   → 다른 납부 방법(접힘: 위택스 카드·ATM·ARS) → 기한이 지나면 → 하단 [위택스] [납부 완료]
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Callout, Seg } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
@@ -28,6 +28,8 @@ export function DocResultScreen() {
   const [tab, setTab] = useState<Tab>('pay');
   // [납부 완료] 뒤 "기록을 저장할까요?" 질문 표시
   const [askSave, setAskSave] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [asked, setAsked] = useState<string | null>(null);
   if (!d) return null;
 
   const n = daysUntil(d.due);
@@ -131,18 +133,32 @@ export function DocResultScreen() {
     </div>
   );
 
+  // 자유 질문: 키워드로 FAQ 를 찾아 그 항목을 펼친다. 못 찾으면 범위 밖 안내 (2차 개선점검 3.1)
+  const submitQ = (e: FormEvent) => {
+    e.preventDefault();
+    const q = question.trim();
+    if (!q) return;
+    const hit = FAQ.find((f) => f.k.test(q));
+    setAsked(hit ? hit.id : 'none');
+    setQuestion('');
+  };
   const faqPanel = (
     <div className="stack">
+      <form className="ask" onSubmit={submitQ}>
+        <label className="sr-only" htmlFor="tax-q">{t('askPh')}</label>
+        <input id="tax-q" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t('askPh')} autoComplete="off" />
+        <button type="submit" className="icon-btn" aria-label={t('askSend')}><Ic n="send" /></button>
+      </form>
+      <p className="hint-line" style={{ margin: 0 }}><Ic n="shield" cls="sm" /><span>{t('chatPrivacy')}</span></p>
+      {asked === 'none' && <Callout kind="info" icon="info" sm>{t('faqMiss')}</Callout>}
       <section className="panel">
         {FAQ.map((f) => (
-          <details key={f.id} className="faq">
+          <details key={f.id} className="faq" open={asked === f.id}>
             <summary><Ic n="chev" cls="sm" /><span className="q">{tx(f.q)}</span></summary>
             <p>{tx(f.a).replace('{due}', dueShort)}</p>
           </details>
         ))}
       </section>
-      <Callout kind="info" icon="info" sm>{t('faqMiss')}</Callout>
-      <p className="hint-line"><Ic n="shield" cls="sm" /><span>{t('chatPrivacy')}</span></p>
     </div>
   );
 
@@ -169,20 +185,21 @@ export function DocResultScreen() {
   return (
     <>
       <Title>{taxName + (d.sample ? ` (${t('sample')})` : '')}</Title>
-      <Stepper step={3} />
-      <section className="sum" aria-label={`${t('docIs')}: ${taxName}`}>
+      {!d.manual && <Stepper step={3} />}
+      {/* 질문·상담 탭에서는 요약 카드를 한 줄로 줄여 한 화면을 지킨다 (2차 개선점검 3.3) */}
+      <section className={`sum ${tab === 'pay' ? '' : 'compact'}`.trim()} aria-label={`${t('docIs')}: ${taxName}`}>
         <button type="button" className="icon-btn sum-speak" onClick={() => { if (!speak(readText, lang)) toast(t('noVoice')); }} aria-label={t('aRead')}><Ic n="volume" /></button>
         <div className="sum-grid">
           <div>
             <div className="lab">{t('amountL')}</div><div className="val">{amount}</div>
-            {d.amountQ && foreign && <div className="orig">{t('asPrinted')} <span lang="ko">{d.amountQ}</span></div>}
+            {d.amountQ && foreign && tab === 'pay' && <div className="orig">{t('asPrinted')} <span lang="ko">{d.amountQ}</span></div>}
           </div>
           <div>
-            <div className="lab">{t('dueL')}</div><div className="val sm">{dueShort}</div>{dd}
-            {d.dueQ && foreign && <div className="orig" style={{ marginTop: 4 }}>{t('asPrinted')} <span lang="ko">{d.dueQ}</span></div>}
+            <div className="lab">{t('dueL')}</div><div className="val sm">{dueShort}</div>{tab === 'pay' && dd}
+            {d.dueQ && foreign && tab === 'pay' && <div className="orig" style={{ marginTop: 4 }}>{t('asPrinted')} <span lang="ko">{d.dueQ}</span></div>}
           </div>
         </div>
-        <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{t('lateShort')}</span></div>
+        {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{t('lateShort')}</span></div>}
       </section>
 
       {askSave && (
