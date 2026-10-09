@@ -10,3 +10,6 @@ dist
 
 # Office lock files
 ~$*
+
+# 팀 내부 문서 (깃에 올리지 않음)
+요청사항/
