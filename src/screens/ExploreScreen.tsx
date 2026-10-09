@@ -4,7 +4,7 @@ import { Title } from '@/components/layout/Chrome';
 import { Seg } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { AREAS, CERTS, EVENTS, HERITAGE, PLACES, type T5 } from '@/data/content';
-import { CITY_URL, FOOD_AREAS } from '@/data/links';
+import { EVENTS_URL, FOOD_AREAS } from '@/data/links';
 import { useApp } from '@/context/AppContext';
 import { loc, parseDate } from '@/i18n';
 import { eventStatus, mapUrl } from '@/utils/events';
@@ -60,7 +60,7 @@ function Events() {
           : <article key={e.id} className="ev done">{inner}</article>;
       })}
       {/* 행사 원문은 양주시 누리집 (2차 개선점검 3.1) */}
-      <a className="btn secondary sm" href={CITY_URL} target="_blank" rel="noopener">{t('eventsSrc')}<Ic n="ext" cls="sm" /></a>
+      <a className="btn secondary sm" href={EVENTS_URL} target="_blank" rel="noopener">{t('eventsSrc')}<Ic n="ext" cls="sm" /></a>
     </div>
   );
 }

@@ -4,6 +4,8 @@ import type { T5 } from './content';
 import { mapUrl } from '@/utils/events';
 
 export const CITY_URL = 'https://www.yangju.go.kr';
+/** 양주시 누리집 행사 게시판 (행사 원문 보기) */
+export const EVENTS_URL = 'https://www.yangju.go.kr/www/selectBbsNttList.do?bbsNo=14&key=203';
 export const HIKOREA_URL = 'https://www.hikorea.go.kr';
 /** 가까운 행정복지센터 (네이버 지도 검색) */
 export const CENTER_MAP = mapUrl('양주시 행정복지센터');
