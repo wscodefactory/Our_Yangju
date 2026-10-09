@@ -20,7 +20,7 @@ export interface LinkRow {
 /** 시청·주민센터 업무별 공식 안내 */
 export const VISIT_LINKS: Record<string, LinkRow[]> = {
   move: [{ label: ['하이코리아 (체류지 변경 신고 안내)', 'HiKorea (address change guide)', 'HiKorea（居留地变更申报指南）', 'HiKorea (hướng dẫn báo đổi nơi cư trú)', 'HiKorea (ठेगाना परिवर्तन सूचना गाइड)'], href: HIKOREA_URL }],
-  reg: [{ label: ['하이코리아 (출입국 방문 예약)', 'HiKorea (immigration office reservation)', 'HiKorea（出入境办事处预约）', 'HiKorea (đặt lịch văn phòng xuất nhập cảnh)', 'HiKorea (अध्यागमन कार्यालय बुकिङ)'], href: HIKOREA_URL }],
+  reg: [{ label: ['하이코리아 (출입국 방문 예약)', 'HiKorea (immigration office reservation)', 'HiKorea（出入境办事处预约）', 'HiKorea (đặt lịch văn phòng xuất nhập cảnh)', 'HiKorea (अध्यागमन कार्यालय बुकिङ)'], href: 'https://www.hikorea.go.kr/resv/ResvIntroR.pt' }],
   nhis: [{ label: ['국민건강보험 외국어 상담 033-811-2000', 'National Health Insurance foreign-language line 033-811-2000', '国民健康保险外语咨询 033-811-2000', 'Tổng đài ngoại ngữ Bảo hiểm y tế 033-811-2000', 'राष्ट्रिय स्वास्थ्य बीमा विदेशी भाषा लाइन 033-811-2000'], tel: '033-811-2000' }],
   drive: [{ label: ['도로교통공단 고객센터 1577-1120', 'Korea Road Traffic Authority 1577-1120', '道路交通公团客服 1577-1120', 'Tổng đài Cơ quan Giao thông đường bộ 1577-1120', 'सडक यातायात प्राधिकरण 1577-1120'], tel: '1577-1120' }],
   kid: [{ label: ['동두천양주교육지원청 위치', 'Dongducheon-Yangju Office of Education (map)', '东豆川杨州教育支援厅位置', 'Phòng Giáo dục Dongducheon-Yangju (bản đồ)', 'दोङदुचन-याङ्जु शिक्षा कार्यालय (नक्सा)'], href: mapUrl('동두천양주교육지원청') }],
