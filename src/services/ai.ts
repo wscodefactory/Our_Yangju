@@ -40,13 +40,22 @@ export class GeminiProvider implements AiProvider {
   // json()은 이미지가 섞이고 매번 다른 입력이라 캐시하지 않음.
   private cache = new Map<string, string>();
 
-  constructor(private apiKey: string, private model = 'gemini-2.5-flash') {}
+  constructor(private apiKey: string, private model = 'gemini-3.5-flash-lite') {
+    this.thinkingOff = /^gemini-3/.test(model) ? { thinkingLevel: 'minimal' } : /^gemini-2\.5/.test(model) ? { thinkingBudget: 0 } : null;
+  }
 
   /**
    * generateContent 한 번 호출. temperature 0.2는 분류/추출 작업이라 낮게 잡은 것.
    * json=true면 responseMimeType을 걸어 모델이 JSON만 내게 유도한다 (완전히 보장되진 않음, 아래 json() 참고).
    * API 키가 쿼리스트링에 노출되는 건 Gemini REST 방식이 그렇다 — 시안이라 그대로 두지만 운영에선 서버를 거쳐야 함.
    */
+  /**
+   * "생각(thinking)" 끄기. 금액·기한 추출, 분류, 번역은 추론이 필요 없는데 3.x Flash 는 기본으로 생각 토큰을 써서
+   * 사진 한 장에 수십 초가 걸렸다. 3.x 는 thinkingLevel, 2.5 는 thinkingBudget 이고 둘을 같이 보내면 400 이라 모델 세대로 고른다.
+   * 모델이 이 필드를 모르면(400) 한 번은 빼고 다시 보낸다.
+   */
+  private thinkingOff: Record<string, unknown> | null;
+
   private async call(parts: GeminiPart[], json: boolean): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
     const body = {
@@ -54,11 +63,18 @@ export class GeminiProvider implements AiProvider {
       generationConfig: {
         temperature: 0.2,
         ...(json ? { responseMimeType: 'application/json' } : {}),
+        ...(this.thinkingOff ? { thinkingConfig: this.thinkingOff } : {}),
       },
     };
+    const t0 = performance.now();
     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     // 에러 응답도 JSON 바디에 메시지가 있어서 일단 파싱 시도. 바디가 비어도 죽지 않게 catch
     const data = (await res.json().catch(() => ({}))) as GeminiResponse;
+    if (res.status === 400 && this.thinkingOff && /thinking/i.test(data.error?.message || '')) {
+      this.thinkingOff = null; // 이 모델은 생각 설정을 안 받는다 → 빼고 재시도
+      return this.call(parts, json);
+    }
+    if (import.meta.env.DEV) console.info(`[gemini ${this.model}] ${Math.round(performance.now() - t0)}ms, ${Math.round(JSON.stringify(body).length / 1024)}KB`);
     if (!res.ok) throw new AiError(data.error?.message || `Gemini HTTP ${res.status}`, res.status);
     // 후보 여러 개 중 첫 번째, parts를 이어 붙임 (텍스트가 여러 part로 쪼개져 오는 경우가 있다)
     const out = data.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') ?? '';
@@ -108,7 +124,7 @@ export function getAi(): AiProvider | null {
   if (instance !== undefined) return instance;
   // 빌드 env → 없으면 기기에 저장한 키(DocScreen에서 입력). 공유 링크 배포본에 키가 안 들어가도 시연 기기에서 사진 읽기를 켤 수 있게
   const key = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || storage.get(STORAGE_KEYS.geminiKey) || '';
-  const model = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-2.5-flash';
+  const model = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-3.5-flash-lite';
   instance = key ? new GeminiProvider(key, model) : null;
   return instance;
 }

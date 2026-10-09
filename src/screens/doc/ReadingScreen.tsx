@@ -31,18 +31,19 @@ function toDocInfo(r: DocData): DocInfo {
 }
 
 /**
- * 화면 전환은 전부 back() 다음 go(). 이 화면이 스택에 남으면 결과에서 뒤로가기 때 AI 를 또 부르기 때문.
+ * 결과 화면으로는 replace() 로 바꿔치기한다. 이 화면이 스택에 남으면 결과에서 뒤로가기 때 AI 를 또 부르기 때문.
+ * (back() 뒤 go() 는 history.back() 이 비동기라 새 화면이 도로 빠진다)
  */
 export function ReadingScreen() {
-  const { t, back, go, toast } = useApp();
+  const { t, back, replace, toast } = useApp();
   const { finalizeMask, setDoc } = useDoc();
-  // StrictMode(dev) 는 effect 가 두 번 돌아 AI 호출·back() 이 겹치므로 한 번만
+  // StrictMode(dev) 는 effect 가 두 번 돌아 AI 호출이 겹치므로 한 번만
   const ran = useRef(false);
 
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
-    const toManual = (msg: string) => { toast(msg); back(); go({ k: 'docConfirm', manual: true }); };
+    const toManual = (msg: string) => { toast(msg); replace({ k: 'docConfirm', manual: true }); };
 
     (async () => {
       let blob: Blob;
@@ -61,13 +62,12 @@ export function ReadingScreen() {
       try {
         const r = await ai.json<DocData>(READ_NOTICE_PROMPT, { image: blob });
         setDoc(toDocInfo(r));
-        back();
         if (r.doc_type === 'welfare_notice') {
           toast(t('welfareLetter'));
-          go({ k: 'welfare' });
+          replace({ k: 'welfare' });
           return;
         }
-        go({ k: 'docConfirm' });
+        replace({ k: 'docConfirm' });
       } catch {
         // 네트워크든 JSON 파싱이든 사용자 입장에선 같다 — 직접 입력으로 우회
         setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '' });

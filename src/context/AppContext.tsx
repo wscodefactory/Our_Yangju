@@ -51,6 +51,8 @@ export interface AppState {
   back: () => void;
   goHome: () => void;
   replaceNav: (stack: Screen[]) => void;
+  /** 맨 위 화면만 바꿔치기 (history 항목은 그대로). "읽는 중" 처럼 스택에 남으면 안 되는 화면이 결과로 넘어갈 때 */
+  replace: (s: Screen) => void;
 
   /* 시트·전체 화면 */
   overlay: Overlay | null;
@@ -130,6 +132,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setNav([{ k: 'home' }]);
     if (n > 0) history.go(-n);
   }, []);
+  // back() 은 history.back() 이라 비동기다. back() 뒤에 바로 go() 하면 popstate 가 새로 push 한 화면을 도로 빼 버리므로
+  // 그 조합 대신 이걸 쓴다
+  const replace = useCallback((s: Screen) => {
+    setNav((st) => [...st.slice(0, -1), s]);
+    history.replaceState({ d: Date.now() }, '');
+  }, []);
   const replaceNav = useCallback((stack: Screen[]) => {
     setNav(stack.length ? stack : [{ k: 'home' }]);
     history.pushState({ d: Date.now() }, '');
@@ -185,7 +193,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     lang, langChosen: !!langState, setLang, tx, t, fmtDate, fmtRange, fmtWon, fmtNum,
     big, toggleBig,
     saved, isSaved, toggleSaved,
-    nav, screen, go, back, goHome, replaceNav,
+    nav, screen, go, back, goHome, replaceNav, replace,
     overlay, openOverlay, closeOverlay,
     titleEl, setTitleEl, barEl, setBarEl, barUsed, setBarUsed,
     toast, toastMsg,

@@ -74,17 +74,17 @@ export function maskCanvas(src: HTMLCanvasElement, rects: Rect[]): HTMLCanvasEle
 }
 
 /** 캔버스 → JPEG Blob. 전송용이라 품질 0.9 기본. toBlob 이 null 을 주면(메모리 부족 등) reject */
-export const canvasToBlob = (canvas: HTMLCanvasElement, quality = 0.9) =>
+export const canvasToBlob = (canvas: HTMLCanvasElement, quality = 0.8) =>
   new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('toBlob failed'))), 'image/jpeg', quality));
 
 /**
- * 업로드한 사진을 캔버스로. 가로 1400px 넘으면 비율 유지하며 줄인다.
- * 휴대폰 사진은 4000px 이 넘어서 그대로 보내면 느리고, 고지서 글자 읽기엔 1400 이면 충분했다.
+ * 업로드한 사진을 캔버스로. 긴 변이 1200px 넘으면 비율 유지하며 줄인다.
+ * 휴대폰 사진은 4000px 이 넘어서 그대로 보내면 느리고, 고지서 글자 읽기엔 1200 이면 충분했다 (전송량이 체감 시간의 큰 몫).
  * 작은 사진은 키우지 않음(Math.min(1, ...)).
  */
 export async function fileToCanvas(file: File): Promise<HTMLCanvasElement> {
   const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, 1400 / bmp.width);
+  const scale = Math.min(1, 1200 / Math.max(bmp.width, bmp.height));
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
   canvas.getContext('2d')!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
