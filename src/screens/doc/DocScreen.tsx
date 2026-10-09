@@ -44,19 +44,21 @@ export function DocScreen() {
       <Stepper step={0} />
       <p className="lead">{t('docLead')}</p>
       <Callout kind="green" icon="shield" style={{ marginBottom: 16 }}>{t('privacyDoc')}</Callout>
+      {/* 개편 전(v1) 방식: 키가 있으면 사진 버튼, 없으면 사진 버튼 대신 안내 + 키 입력 버튼. 참고용 html 의 "비활성 사진 버튼"은 쓰지 않는다 */}
       <div className="stack">
-        <button type="button" className="btn primary" disabled={!imgOk} aria-describedby={imgOk ? undefined : 'photo-off'} onClick={() => fileRef.current?.click()}>
-          <Ic n="camera" cls="sm" />{t('btnPhoto')}
-        </button>
-        {!imgOk && (
+        {imgOk ? (
+          <button type="button" className="btn primary" onClick={() => fileRef.current?.click()}>
+            <Ic n="camera" cls="sm" />{t('btnPhoto')}
+          </button>
+        ) : (
           <>
-            <p className="muted" id="photo-off" style={{ margin: 0 }}>{t('photoOff')}</p>
+            <p className="muted" style={{ margin: 0 }}>{t('photoOff')}</p>
             <button type="button" className="btn secondary" onClick={enterKey}>
-              {t('keyBtn')}
+              <Ic n="camera" cls="sm" />{t('keyBtn')}
             </button>
           </>
         )}
-        <button type="button" className="btn secondary" onClick={() => { startSample(); go({ k: 'docConfirm' }); }}>
+        <button type="button" className={`btn ${imgOk ? 'secondary' : 'primary'}`} onClick={() => { startSample(); go({ k: 'docConfirm' }); }}>
           <Ic n="sample" cls="sm" />{t('btnSample')}
         </button>
         <button type="button" className="btn secondary" onClick={() => { startManual(); go({ k: 'docConfirm', manual: true }); }}>
