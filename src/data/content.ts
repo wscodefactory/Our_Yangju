@@ -494,6 +494,7 @@ export const FAQ = [
 /* 키워드로 안내 찾기 (시연용 다국어 규칙) */
 export const INTENTS = [
  {re:/임금|월급|체불|산재|wage|salary|paid me|injur|工资|欠薪|工伤|lương|tai nạn|तलब|चोट/i, go:{k:"lifeItem",id:"work"}},
+ {re:/잃어|분실|lost|mất|हराए|丢|遗失/i, go:{k:"lifeItem",id:"sos"}},
  {re:/긴급|응급|불이|화재|경찰|emergenc|police|fire|紧急|报警|火灾|khẩn|cảnh sát|cháy|आपत|प्रहरी|आगो/i, go:{k:"lifeItem",id:"sos"}},
  {re:/이사|전입|체류지|주소|moved|moving|address|搬家|地址|chuyển nhà|địa chỉ|सरें|सर्नु|सरेको|ठेगाना/i, go:{k:"visitItem",id:"move"}},
  {re:/외국인등록|등록증|처음 왔|registration|arriv|ARC|登录|đăng ký|mới đến|दर्ता/i, go:{k:"visitItem",id:"reg"}},

@@ -49,8 +49,9 @@ export function ChatSheet() {
           return (
             <div key={m.id} className="msg bot">
               {t(m.key ?? '')}
+              {/* go() 가 시트를 닫고 history 칸을 바꿔 쓴다. closeOverlay()(=history.back) 를 먼저 부르면 그 popstate 가 새 화면을 도로 빼 버린다 */}
               {dest && (
-                <button type="button" className="btn secondary sm" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => { closeOverlay(); go(dest); }}>
+                <button type="button" className="btn secondary sm" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => go(dest)}>
                   <span>{routeTitle(dest)}</span><Ic n="chev" cls="sm" />
                 </button>
               )}

@@ -43,17 +43,16 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   // 언어가 바뀌면 대화를 비움. 이미 쌓인 사용자 말풍선은 한 언어로 굳어 있어서
   useEffect(() => { setMessages([]); }, [lang]);
 
-  const byRules = useCallback((q: string) => {
-    const hit = INTENTS.find((i) => i.re.test(q));
-    push(hit ? { key: 'chatFound', go: hit.go as Screen } : { key: 'chatMiss' });
-  }, [push]);
-
   const ask = useCallback(async (raw: string) => {
     const q = raw.trim();
     if (!q) return;
     push({ me: true, text: q });
+    // 1) 규칙 먼저: 5개 언어 키워드로 정해 둔 화면이 가장 정확하고 즉시 답한다 ("이사했어요" → 체류지 변경 신고)
+    const hit = INTENTS.find((i) => i.re.test(q));
+    if (hit) { push({ key: 'chatFound', go: hit.go as Screen }); return; }
+    // 2) 규칙에 없으면 AI 가 생애 단계·고지서 여부를 뽑는다. AI 가 없거나 실패하면 "조금 더 알려 주세요"
     const ai = getAi();
-    if (!ai) return byRules(q);
+    if (!ai) { push({ key: 'chatMiss' }); return; }
     setBusy(true);
     try {
       const r = await ai.json<GuideResult>(guidePrompt(q));
@@ -63,14 +62,14 @@ export function GuideProvider({ children }: { children: ReactNode }) {
         if (s) {
           const g = s === 'care' ? 'child' : s === 'marry' || s === 'birth' ? 'newly' : 'youth';
           push({ key: 'chatFound', go: { k: 'welfare', g, s } });
-        } else byRules(q);
+        } else push({ key: 'chatMiss' });
       }
     } catch {
-      byRules(q);
+      push({ key: 'chatMiss' });
     } finally {
       setBusy(false);
     }
-  }, [push, byRules]);
+  }, [push]);
 
   const routeTitle = useCallback((r: Screen): string => {
     if (r.k === 'visitItem') return tx(VISIT.find((v) => v.id === r.id)?.name);
