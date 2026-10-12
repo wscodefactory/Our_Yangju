@@ -46,6 +46,18 @@ export const APPLY_SITES: { match: string; label: T5; href: string }[] = [
   { match: '주택도시기금', label: ['주택도시기금 바로가기', 'Open Housing & Urban Fund', '打开住宅城市基金', 'Mở Quỹ Nhà ở và Đô thị', 'आवास तथा सहरी कोष खोल्नुहोस्'], href: 'https://nhuf.molit.go.kr' },
 ];
 
+/** 은행 이름 영문 병기 (1012 요청). 고지서의 한글 은행명 앞부분이 키와 일치하면 "농협 (NongHyup)" 처럼 보여 준다 */
+export const BANK_EN: Record<string, string> = {
+  농협: 'NongHyup (NH)', 신한: 'Shinhan', 국민: 'KB Kookmin', KB: 'KB Kookmin', 우리: 'Woori', 하나: 'Hana', 기업: 'IBK',
+  카카오뱅크: 'KakaoBank', 토스뱅크: 'Toss Bank', 케이뱅크: 'Kbank', 새마을금고: 'MG Community Credit', 우체국: 'Korea Post',
+  수협: 'Suhyup (Sh)', 신협: 'Credit Union (CU)', 대구: 'iM Bank', 부산: 'Busan', 경남: 'Kyongnam', 광주: 'Gwangju', 전북: 'Jeonbuk', 제주: 'Jeju', 씨티: 'Citi', SC제일: 'SC First',
+};
+/** "농협은행" → "농협 (NongHyup (NH))". 모르는 은행이면 그대로 */
+export const bankWithEn = (ko: string) => {
+  const hit = Object.keys(BANK_EN).find((k) => ko.startsWith(k));
+  return hit ? `${ko} (${BANK_EN[hit]})` : ko;
+};
+
 /** 동네별 맛집 (네이버 지도 검색). 이름은 고유명사라 로마자 표기 */
 export const FOOD_AREAS: { q: string; name: T5 }[] = [
   { q: '옥정 맛집', name: ['옥정', 'Okjeong', '玉井', 'Okjeong', 'ओक्जङ'] },

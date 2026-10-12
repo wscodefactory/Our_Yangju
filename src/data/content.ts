@@ -580,6 +580,12 @@ const UI_BANK = {
   eventsSrc:["양주시 누리집에서 행사 원문 보기","See the original notice on the Yangju City website","在杨州市官网查看活动原文","Xem thông báo gốc trên trang web thành phố Yangju","याङ्जु सहरको वेबसाइटमा मूल सूचना हेर्नुहोस्"],
   foodAreas:["동네별 맛집 지도","Restaurants by neighborhood (map)","各街区美食地图","Quán ăn theo khu vực (bản đồ)","टोल अनुसार रेस्टुरेन्ट (नक्सा)"],
   officialT:["공식 안내","Official information","官方信息","Thông tin chính thức","आधिकारिक जानकारी"],
+  // 기한 경과 화면 (1012_유진_요청사항). vi 는 유진 님 번역, en·zh·ne 는 AI 초안을 역번역으로 검증
+  overdueWarn:["납부 기한이 지나 납부지연가산세 3%가 더해졌을 수 있어요","The due date has passed, so a 3% late-payment penalty may have been added","已过缴纳期限，可能已加收 3% 的滞纳金","Đã quá hạn nộp nên có thể đã bị cộng thêm 3% tiền phạt nộp chậm.","भुक्तानी अन्तिम मिति नाघेकाले 3% ढिलो भुक्तानी जरिवाना थपिएको हुन सक्छ"],
+  overdueSend:["기한이 지났어요. 가능한 빨리 송금하세요.","The due date has passed. Transfer as soon as possible.","已过期限，请尽快转账。","Đã quá hạn nộp. Hãy chuyển tiền càng sớm càng tốt.","म्याद नाघिसक्यो। सकेसम्म चाँडो रकम पठाउनुहोस्।"],
+  overdueCheckT:["위택스에서 지금 낼 금액 확인하기","Check the current amount due on Wetax","在 WeTax 确认现在应缴金额","Kiểm tra số tiền phải nộp hiện tại trên WeTax","WeTax मा अहिले तिर्नुपर्ने रकम जाँच्नुहोस्"],
+  overdueCheckD:["기한이 지나면 낼 금액이 고지서와 다를 수 있어요. 위택스에서 지금 낼 금액을 확인한 뒤 송금하세요.","After the due date, the amount due may differ from the notice. Check the current amount on Wetax before you transfer.","过期后应缴金额可能与税单不同。请先在 WeTax 确认现在应缴金额，再转账。","Sau khi quá hạn, số tiền phải nộp có thể khác với giấy báo. Hãy kiểm tra số tiền hiện tại trên WeTax rồi mới chuyển tiền.","म्याद नाघेपछि तिर्नुपर्ने रकम बिलभन्दा फरक हुन सक्छ। WeTax मा अहिलेको रकम जाँचेर मात्र पठाउनुहोस्।"],
+  amountBefore:["고지서 금액 (기한 전)","Amount on notice (before due date)","税单金额（逾期前）","Số tiền trên giấy báo (trước hạn)","बिलको रकम (म्याद अघि)"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 
@@ -591,7 +597,7 @@ export const UI = { ...UI_BASE, ...UI_BANK,
   faqShort:["추가 질문","Questions","更多问题","Hỏi thêm","थप प्रश्न"],
   tabHelp:["상담","Get help","咨询","Hỗ trợ","सहायता"],
   payWetax:["위택스에서 납부하기","Pay on Wetax","在 Wetax 缴纳","Nộp trên Wetax","Wetax मा तिर्नुहोस्"],
-  lateShort:["기한을 넘기면 3% 가산금이 붙어요","3% is added if you pay late","逾期将加收 3%","Nộp trễ sẽ bị cộng thêm 3%","ढिला तिरे 3% थपिन्छ"],
+  lateShort:["기한을 넘기면 납부지연가산세 3%가 붙어요","If you miss the due date, a 3% late-payment penalty is added","逾期将加收 3% 的滞纳金","Nếu quá hạn nộp, sẽ bị cộng thêm 3% tiền phạt nộp chậm","म्याद नाघे 3% ढिलो भुक्तानी जरिवाना थपिन्छ"],
   viewNotice:["원본 보기","View notice","查看原件","Xem bản gốc","मूल प्रति"],
   readFromSample:["샘플 고지서에서 읽은 내용이에요","Read from the sample notice","从示例税单读取的内容","Đọc từ giấy báo mẫu","नमुना बिलबाट पढिएको"],
   noticeT:["가린 고지서","Covered notice","已遮挡的税单","Giấy báo đã che","छोपिएको बिल"],

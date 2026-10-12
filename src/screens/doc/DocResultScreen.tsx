@@ -9,6 +9,7 @@ import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { FAQ, TAX_TYPES } from '@/data/content';
+import { bankWithEn } from '@/data/links';
 import { daysUntil } from '@/i18n';
 import { copyText, speak } from '@/utils/browser';
 import { paidStore } from '@/utils/paid';
@@ -43,6 +44,9 @@ export function DocResultScreen() {
   const copy = (text: string) => { void copyText(text); toast(t('copied')); };
   const foreign = lang !== 'ko';
   const { bank, acct } = splitVacct(d.vacct || '');
+  // 외국어 화면에서는 은행명에 영문 병기 (1012 요청: 은행 앱에서 찾기 쉽게)
+  const bankShown = foreign ? bankWithEn(bank) : bank;
+  const overdue = n < 0;
   const taxKo = TAX_TYPES[d.type][0];
   const koNote = `제목: ${taxKo} 고지서 관련 문의\n\n안녕하세요. 양주시에 사는 외국인 주민입니다.\n${taxKo} 고지서(납부기한 ${d.due.replace(/-/g, '.')}, 금액 ${d.amount.toLocaleString('ko-KR')}원)와 관련해 문의드립니다.\n\n문의 내용: (고지서 내용 확인 요청)\n\n한국어가 서툴러 통역(1345)과 함께 연락드릴 수 있습니다. 감사합니다.`;
 
@@ -57,7 +61,7 @@ export function DocResultScreen() {
   const steps: { text: string; copyLabel?: string; copyValue?: string }[] = [
     { text: t('bs1'), copyLabel: t('copyAcct'), copyValue: acct },
     { text: t('bs2') },
-    { text: t('bs3', { bank }) },
+    { text: t('bs3', { bank: bankShown }) },
     { text: t('bs4') },
     { text: t('bs5', { amount }), copyLabel: t('copyAmt'), copyValue: String(d.amount) },
     { text: t('bs6') },
@@ -69,15 +73,25 @@ export function DocResultScreen() {
       {d.vacct ? (
         <section className="panel">
           <h2><span className="grow">{t('todoNow')}</span><span className="bdg green">{t('easiest')}</span></h2>
+          {/* 기한 경과: 낼 금액이 고지서와 다를 수 있으니 위택스에서 지금 금액 확인이 1순위 (1012 요청) */}
+          {overdue && (
+            <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
+              <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('overdueCheckT')}</p>
+              <p className="muted" style={{ margin: '0 0 8px' }}>{t('overdueCheckD')}</p>
+              <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (d.epay) copy(d.epay); }}>
+                {t('wetaxLookup')}<Ic n="ext" cls="sm" />
+              </a>
+            </div>
+          )}
           <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('bankT')}</p>
-          <p className="muted" style={{ margin: '0 0 10px' }}>{t('bankBy', { d: dueShort })}</p>
+          <p className="muted" style={{ margin: '0 0 10px', ...(overdue ? { color: 'var(--danger)', fontWeight: 600 } : {}) }}>{overdue ? t('overdueSend') : t('bankBy', { d: dueShort })}</p>
           {/* 입금 은행 / 계좌번호 / 금액 한 상자 */}
           <dl className="kv" style={{ marginBottom: 12 }}>
-            <dt>{t('bankName')}</dt><dd lang="ko">{bank}</dd>
+            <dt>{t('bankName')}</dt><dd lang="ko">{bankShown}</dd>
             <dt>{t('bankAcct')}</dt>
             <dd><span className="codebox" style={{ margin: 0 }}><code>{acct}</code>
               <button type="button" className="icon-btn copy-btn" onClick={() => copy(acct)} aria-label={t('copyAcct')}><Ic n="copy" cls="sm" /></button></span></dd>
-            <dt>{t('bankAmt')}</dt>
+            <dt>{overdue ? t('amountBefore') : t('bankAmt')}</dt>
             <dd><span className="codebox" style={{ margin: 0 }}><code>{amount}</code>
               <button type="button" className="icon-btn copy-btn" onClick={() => copy(String(d.amount))} aria-label={t('copyAmt')}><Ic n="copy" cls="sm" /></button></span></dd>
           </dl>
@@ -199,7 +213,7 @@ export function DocResultScreen() {
             {d.dueQ && foreign && tab === 'pay' && <div className="orig" style={{ marginTop: 4 }}>{t('asPrinted')} <span lang="ko">{d.dueQ}</span></div>}
           </div>
         </div>
-        {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{t('lateShort')}</span></div>}
+        {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{overdue ? t('overdueWarn') : t('lateShort')}</span></div>}
       </section>
 
       {askSave && (
