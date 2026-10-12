@@ -100,10 +100,12 @@ const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !(window as 
  * "앱으로 설치" 버튼. 안드로이드 크롬은 설치 창을 바로 띄우고, 아이폰은 배너가 없으므로 공유 → 홈 화면에 추가 안내를 보여 준다.
  * 크롬의 자동 배너는 체류 시간 등 자체 조건이라 타이밍을 믿을 수 없어서 버튼을 둔다.
  */
-function InstallHint() {
-  const { t } = useApp();
+export function InstallBanner() {
+  const { screen, t } = useApp();
   const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
   const [done, setDone] = useState(() => standalone());
+  // 닫으면 이 세션에서는 다시 안 띄운다 (설치는 홈 푸터 없이도 크롬 메뉴로 가능)
+  const [closed, setClosed] = useState(() => sessionStorage.getItem('hy-install-closed') === '1');
   useEffect(() => {
     const onPrompt = (e: Event) => { e.preventDefault(); setPrompt(e as InstallPromptEvent); };
     const onInstalled = () => { setDone(true); setPrompt(null); };
@@ -111,16 +113,18 @@ function InstallHint() {
     window.addEventListener('appinstalled', onInstalled);
     return () => { window.removeEventListener('beforeinstallprompt', onPrompt); window.removeEventListener('appinstalled', onInstalled); };
   }, []);
-  if (done) return null;
-  if (prompt) {
-    return (
-      <button type="button" className="btn secondary sm" style={{ marginBottom: 12 }} onClick={() => { void prompt.prompt(); }}>
-        <Ic n="house" cls="sm" />{t('installApp')}
-      </button>
-    );
-  }
-  if (isIos()) return <p className="muted" style={{ margin: '0 0 12px' }}>{t('installIos')}</p>;
-  return null;
+  if (screen.k !== 'home' || done || closed) return null;
+  const close = () => { setClosed(true); try { sessionStorage.setItem('hy-install-closed', '1'); } catch { /* 무시 */ } };
+  if (!prompt && !isIos()) return null;
+  return (
+    <div className="install" role="region" aria-label={t('installApp')}>
+      <Ic n="house" cls="sm" />
+      {prompt
+        ? <><span className="tx">{t('installApp')}</span><button type="button" className="btn primary sm" onClick={() => { void prompt.prompt(); }}>{t('installApp')}</button></>
+        : <span className="tx">{t('installIos')}</span>}
+      <button type="button" className="icon-btn" onClick={close} aria-label={t('aClose')}><Ic n="close" cls="sm" /></button>
+    </div>
+  );
 }
 
 export function Footer() {
@@ -128,7 +132,6 @@ export function Footer() {
   if (screen.k !== 'home') return null;
   return (
     <footer className="foot">
-      <InstallHint />
       <div className="ci"><img src={logoFor(lang, langChosen)} alt={t('city')} width={41} height={28} /><span className="demo-flag"><Ic n="info" cls="sm" />{t('proto')}</span></div>
       <p>{t('disclaimer')}</p>
       <p>{t('demoNote')}</p>

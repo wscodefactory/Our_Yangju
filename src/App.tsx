@@ -1,4 +1,4 @@
-import { AppBar, BarHost, Fab, Footer, SkipLink, Toast } from '@/components/layout/Chrome';
+import { AppBar, BarHost, Fab, Footer, InstallBanner, SkipLink, Toast } from '@/components/layout/Chrome';
 import { Overlays } from '@/components/layout/Overlays';
 import { AppProvider } from '@/context/AppContext';
 import { DocProvider } from '@/context/DocContext';
@@ -17,6 +17,7 @@ export default function App() {
         <GuideProvider>
           <SkipLink />
           <AppBar />
+          <InstallBanner />
           <ScreenRouter />
           <Footer />
           <BarHost />

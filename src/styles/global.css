@@ -437,6 +437,11 @@ main h1:focus,main h1:focus-visible{outline:none;box-shadow:none}
 /* 송금 상자: 라벨(베트남어 "고지서 금액 (기한 전)" 등)이 길면 줄바꿈하고, 계좌번호·금액은 한 줄 유지 */
 .bankbox dt{white-space:normal}
 .bankbox .codebox code{white-space:nowrap}
+/* 홈 상단 "앱으로 설치" 배너 (PWA). 앱 바 바로 아래 한 줄 */
+.install{max-width:var(--app-w);margin:8px auto 0;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:10px;background:var(--primary-tint);border:1px solid var(--primary-tint-2);border-radius:var(--radius-sm);color:var(--text);font-size:.875rem}
+.install .tx{flex:1;min-width:0}
+.install .btn.sm{min-height:36px;padding:0 12px}
+@media (max-width:519px){.install{margin:8px 16px 0}}
 /* 홈 푸터가 FAB 에 가리지 않게 (3.2) */
 .foot{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 main{padding-top:8px}
