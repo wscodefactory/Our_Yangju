@@ -1,6 +1,6 @@
 // 화면 바깥 고정 요소: 앱 바, 제목·하단 바 포털, FAB, 푸터, 토스트, 본문 바로가기.
 // 참고용 html 의 renderHeader / renderFoot / bbar / fab / toast 에 해당한다.
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
@@ -90,11 +90,45 @@ export function Fab() {
 }
 
 /** 푸터: 면책·시연 안내는 홈에서 한 번만 */
+/** 크롬의 설치 신호(beforeinstallprompt). 이벤트 객체를 들고 있다가 버튼에서 prompt() 를 부른다 */
+interface InstallPromptEvent extends Event { prompt: () => Promise<void> }
+// 이미 홈 화면 앱으로 열렸으면 설치 안내가 필요 없다
+const standalone = () => window.matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true;
+const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !(window as { MSStream?: unknown }).MSStream;
+
+/**
+ * "앱으로 설치" 버튼. 안드로이드 크롬은 설치 창을 바로 띄우고, 아이폰은 배너가 없으므로 공유 → 홈 화면에 추가 안내를 보여 준다.
+ * 크롬의 자동 배너는 체류 시간 등 자체 조건이라 타이밍을 믿을 수 없어서 버튼을 둔다.
+ */
+function InstallHint() {
+  const { t } = useApp();
+  const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
+  const [done, setDone] = useState(() => standalone());
+  useEffect(() => {
+    const onPrompt = (e: Event) => { e.preventDefault(); setPrompt(e as InstallPromptEvent); };
+    const onInstalled = () => { setDone(true); setPrompt(null); };
+    window.addEventListener('beforeinstallprompt', onPrompt);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => { window.removeEventListener('beforeinstallprompt', onPrompt); window.removeEventListener('appinstalled', onInstalled); };
+  }, []);
+  if (done) return null;
+  if (prompt) {
+    return (
+      <button type="button" className="btn secondary sm" style={{ marginBottom: 12 }} onClick={() => { void prompt.prompt(); }}>
+        <Ic n="house" cls="sm" />{t('installApp')}
+      </button>
+    );
+  }
+  if (isIos()) return <p className="muted" style={{ margin: '0 0 12px' }}>{t('installIos')}</p>;
+  return null;
+}
+
 export function Footer() {
   const { screen, lang, langChosen, t } = useApp();
   if (screen.k !== 'home') return null;
   return (
     <footer className="foot">
+      <InstallHint />
       <div className="ci"><img src={logoFor(lang, langChosen)} alt={t('city')} width={41} height={28} /><span className="demo-flag"><Ic n="info" cls="sm" />{t('proto')}</span></div>
       <p>{t('disclaimer')}</p>
       <p>{t('demoNote')}</p>

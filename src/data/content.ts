@@ -586,6 +586,9 @@ const UI_BANK = {
   overdueCheckT:["위택스에서 지금 낼 금액 확인하기","Check the current amount due on Wetax","在 WeTax 确认现在应缴金额","Kiểm tra số tiền phải nộp hiện tại trên WeTax","WeTax मा अहिले तिर्नुपर्ने रकम जाँच्नुहोस्"],
   overdueCheckD:["기한이 지나면 낼 금액이 고지서와 다를 수 있어요. 위택스에서 지금 낼 금액을 확인한 뒤 송금하세요.","After the due date, the amount due may differ from the notice. Check the current amount on Wetax before you transfer.","过期后应缴金额可能与税单不同。请先在 WeTax 确认现在应缴金额，再转账。","Sau khi quá hạn, số tiền phải nộp có thể khác với giấy báo. Hãy kiểm tra số tiền hiện tại trên WeTax rồi mới chuyển tiền.","म्याद नाघेपछि तिर्नुपर्ने रकम बिलभन्दा फरक हुन सक्छ। WeTax मा अहिलेको रकम जाँचेर मात्र पठाउनुहोस्।"],
   amountBefore:["고지서 금액 (기한 전)","Amount on notice (before due date)","税单金额（逾期前）","Số tiền trên giấy báo (trước hạn)","बिलको रकम (म्याद अघि)"],
+  // 홈 화면 설치 (PWA)
+  installApp:["앱으로 설치","Install as an app","安装为应用","Cài đặt như ứng dụng","एपको रूपमा इन्स्टल गर्नुहोस्"],
+  installIos:["아이폰: 공유 버튼 → \"홈 화면에 추가\"로 앱처럼 쓸 수 있어요.","iPhone: tap Share → \"Add to Home Screen\" to use this as an app.","iPhone：点击分享 → \"添加到主屏幕\"即可像应用一样使用。","iPhone: nhấn Chia sẻ → \"Thêm vào Màn hình chính\" để dùng như ứng dụng.","iPhone: सेयर → \"Add to Home Screen\" थिचेर एप जस्तै चलाउनुहोस्।"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 
