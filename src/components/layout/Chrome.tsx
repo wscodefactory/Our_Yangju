@@ -120,7 +120,7 @@ export function InstallBanner() {
     <div className="install" role="region" aria-label={t('installApp')}>
       <Ic n="house" cls="sm" />
       {prompt
-        ? <><span className="tx">{t('installApp')}</span><button type="button" className="btn primary sm" onClick={() => { void prompt.prompt(); }}>{t('installApp')}</button></>
+        ? <><span className="tx">{t('installLead')}</span><button type="button" className="btn primary sm" onClick={() => { void prompt.prompt(); }}>{t('installApp')}</button></>
         : <span className="tx">{t('installIos')}</span>}
       <button type="button" className="icon-btn" onClick={close} aria-label={t('aClose')}><Ic n="close" cls="sm" /></button>
     </div>
