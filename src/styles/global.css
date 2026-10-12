@@ -434,6 +434,9 @@ main h1:focus,main h1:focus-visible{outline:none;box-shadow:none}
 /* 요약 카드 축소: 질문·상담 탭에서는 금액과 기한 한 줄 (3.3) */
 .sum.compact .sum-grid > div{padding:8px 12px}
 .sum.compact .sum-grid .val{font-size:1.0625rem;margin:0}
+/* 송금 상자: 라벨(베트남어 "고지서 금액 (기한 전)" 등)이 길면 줄바꿈하고, 계좌번호·금액은 한 줄 유지 */
+.bankbox dt{white-space:normal}
+.bankbox .codebox code{white-space:nowrap}
 /* 홈 푸터가 FAB 에 가리지 않게 (3.2) */
 .foot{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 main{padding-top:8px}

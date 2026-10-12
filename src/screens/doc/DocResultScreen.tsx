@@ -86,7 +86,7 @@ export function DocResultScreen() {
           <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('bankT')}</p>
           <p className="muted" style={{ margin: '0 0 10px', ...(overdue ? { color: 'var(--danger)', fontWeight: 600 } : {}) }}>{overdue ? t('overdueSend') : t('bankBy', { d: dueShort })}</p>
           {/* 입금 은행 / 계좌번호 / 금액 한 상자 */}
-          <dl className="kv" style={{ marginBottom: 12 }}>
+          <dl className="kv bankbox" style={{ marginBottom: 12 }}>
             <dt>{t('bankName')}</dt><dd lang="ko">{bankShown}</dd>
             <dt>{t('bankAcct')}</dt>
             <dd><span className="codebox" style={{ margin: 0 }}><code>{acct}</code>
