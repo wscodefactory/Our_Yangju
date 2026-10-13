@@ -114,4 +114,5 @@ async function main() {
   console.log(`[events] ${fetched}행 수집, ${rows.length}건 유지(종료일 ≥ ${cutoff}, 오늘 ${today}), ${translated}건 새로 번역, ${events.filter((e) => e.draft).length}건 draft → ${path.relative(ROOT, OUT)}`);
 }
 
-main().catch((e) => { console.warn(`[events] 실패, 기존 events.json 유지: ${e.message}`); process.exit(0); });
+// fetch 뒤에 process.exit() 를 부르면 Windows 의 Node 24 가 libuv assertion 으로 죽는다. 그냥 끝내면 종료 코드 0
+main().catch((e) => { console.warn(`[events] 실패, 기존 events.json 유지: ${e.message}`); });

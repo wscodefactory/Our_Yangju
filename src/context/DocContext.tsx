@@ -20,8 +20,6 @@ export interface DocState {
   startManual: () => void;
   /** 사진 파일 → 캔버스 (가리기 화면으로) */
   loadFile: (f: File) => Promise<void>;
-  /** 시연용 가상 고지서 그림을 캔버스에 올려 가리기 화면부터 보여줄 때 */
-  loadSampleCanvas: () => Promise<void>;
   addRect: (r: Rect) => void;
   undoRect: () => void;
   /** 가린 캔버스를 확정하고 JPEG Blob 반환. 이 뒤로 원본 픽셀은 없다 */
@@ -35,24 +33,22 @@ export function DocProvider({ children }: { children: ReactNode }) {
   const [rects, setRects] = useState<Rect[]>([]);
   const [doc, setDoc] = useState<DocInfo | null>(null);
 
-  // 샘플도 1→4단계를 차례로 밟는다 (2차 개선점검 3.5). 가림 사각형은 미리 그려져 온다
+  // 샘플도 사진과 같은 단계를 차례로 밟는다. 가림 사각형은 미리 그려져 온다
   const startSample = useCallback(async () => {
     const sample = await drawSampleNotice();
     setCanvas(sample.canvas);
-    setRects(sample.rects.slice());
+    setRects(sample.rects);
     setDoc({ ...SAMPLE } as DocInfo);
   }, []);
-  const startManual = useCallback(() => { setCanvas(null); setRects([]); setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '', manual: true }); }, []);
+  const startManual = useCallback(() => {
+    setCanvas(null);
+    setRects([]);
+    setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '', manual: true });
+  }, []);
 
   const loadFile = useCallback(async (file: File) => {
-    const c = await fileToCanvas(file);
-    setCanvas(c);
+    setCanvas(await fileToCanvas(file));
     setRects([]);
-  }, []);
-  const loadSampleCanvas = useCallback(async () => {
-    const sample = await drawSampleNotice();
-    setCanvas(sample.canvas);
-    setRects(sample.rects.slice());
   }, []);
 
   const addRect = useCallback((r: Rect) => setRects((prev) => [...prev, r]), []);
@@ -67,7 +63,7 @@ export function DocProvider({ children }: { children: ReactNode }) {
     return canvasToBlob(masked);
   }, [canvas, rects]);
 
-  const value: DocState = { canvas, rects, doc, setDoc, startSample, startManual, loadFile, loadSampleCanvas, addRect, undoRect, finalizeMask };
+  const value: DocState = { canvas, rects, doc, setDoc, startSample, startManual, loadFile, addRect, undoRect, finalizeMask };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

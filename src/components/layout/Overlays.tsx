@@ -16,7 +16,7 @@ export function Overlays() {
       return (
         <Sheet id="lang-h" title={t('chooseLang')} icon="globe" onClose={closeOverlay}>
           <LangOptions />
-          {/* 쉬운 한국어 (기능 9): 한국어 화면에서만. 문장은 AI 초안 */}
+          {/* 쉬운 한국어 스위치는 한국어 화면에서만. 문구가 한국어 고정이라 t() 를 안 쓴다 */}
           {lang === 'ko' && (
             <button type="button" className="opt" role="switch" aria-checked={easy} onClick={toggleEasy} style={{ marginTop: 12 }}>
               <span className="tx"><span className="t">쉬운 한국어</span><span className="d">짧고 쉬운 문장으로 보여줘요 (AI가 바꾼 초안)</span></span>

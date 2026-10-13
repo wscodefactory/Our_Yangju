@@ -1,4 +1,4 @@
-// 첫 실행 언어 선택. 참고용 html 의 SCREENS.lang. 앱 바 제목 없음.
+// 첫 실행 언어 선택. 아직 언어가 없으니 문구는 한국어·영어 병기로 직접 적는다. 앱 바 제목 없음.
 import { Callout } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { LangOptions } from '@/components/ui/LangOptions';
@@ -9,7 +9,7 @@ export function LangScreen() {
   const { pendingQr } = useApp();
   return (
     <>
-      {/* 고지서 QR 로 들어온 사람: 왜 언어부터 고르는지 한국어·영어로 (3차 개선제안 2.1) */}
+      {/* 고지서 QR 로 들어온 사람에게 왜 언어부터 고르는지 */}
       {pendingQr && (
         <Callout kind="green" icon="file" sm style={{ margin: '8px 0 0' }}>
           <b lang="ko">{UI.qrHere[0]}</b> <span lang="ko">{UI.qrLang[0]}</span><br />
@@ -24,7 +24,6 @@ export function LangScreen() {
         </p>
         <h1 tabIndex={-1}><span lang="ko">사용할 언어를 선택하세요</span></h1>
         <p className="sub" lang="en">Choose your language</p>
-        {/* 무슨 서비스인지 먼저 (2차 개선점검 3.2). 언어를 고르기 전이라 한국어·영어 병기 */}
         <p className="muted" style={{ margin: '0 0 16px' }}>
           <span lang="ko">양주시 외국인 주민을 위한 민원·고지서·혜택·생활 안내</span><br />
           <span lang="en">Yangju City guide to office tasks, tax notices, benefits and daily life</span>

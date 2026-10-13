@@ -1,4 +1,4 @@
-// 혜택 카드 하나. 참고용 html 의 bcard + bmBtn. 본문 버튼은 상세로, 오른쪽 위 북마크는 저장 토글.
+// 혜택 카드 하나. 본문 버튼은 상세로, 오른쪽 위 북마크는 저장 토글.
 import { LvBadge, StBadge } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';

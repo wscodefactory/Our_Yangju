@@ -1,7 +1,5 @@
-// 고지서 흐름 4단계: 할 일. 참고용 html 의 SCREENS.docResult 골격(요약 카드 + 납부/FAQ/상담 탭)에
-// 「고지서화면_구현요청_26.10.08」요청 ②(은행 앱 가상계좌 이체를 1순위로)를 얹은 화면.
-//   요약 → 지금 할 일: 은행 앱 송금(입금 은행·계좌·금액 상자, 7단계, 복사 버튼, 사기 주의)
-//   → 다른 납부 방법(접힘: 위택스 카드·ATM·ARS) → 기한이 지나면 → 하단 [위택스] [납부 완료]
+// 고지서 흐름 4단계: 할 일. 요약 카드 아래에 납부 / 질문 / 상담 탭.
+// 납부 탭은 은행 앱 가상계좌 이체를 1순위로 두고(입금 정보 상자 + 7단계 + 복사), 다른 방법은 접어 둔다.
 import { useState, type FormEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Callout, Seg } from '@/components/ui/Bits';
@@ -31,14 +29,15 @@ export function DocResultScreen() {
   const { doc: d } = useDoc();
   const { state: review } = useReview();
   const [tab, setTab] = useState<Tab>('pay');
-  // [납부 완료] 뒤 "기록을 저장할까요?" 질문 표시
+  // [납부 완료] 뒤 "기록을 저장할까요?"
   const [askSave, setAskSave] = useState(false);
   const [question, setQuestion] = useState('');
   const [asked, setAsked] = useState<string | null>(null);
   if (!d) return null;
 
   const n = daysUntil(d.due);
-  const dd = n < 0 ? <span className="bdg red">{t('over')}</span>
+  const overdue = n < 0;
+  const dd = overdue ? <span className="bdg red">{t('over')}</span>
     : n === 0 ? <span className="bdg red">{t('today')}</span>
     : <span className={`bdg ${n <= 7 ? 'red' : 'orange'}`}>{t('left', { n })}</span>;
   const taxName = tx(TAX_TYPES[d.type]);
@@ -48,20 +47,24 @@ export function DocResultScreen() {
   const copy = (text: string) => { void copyText(text); toast(t('copied')); };
   const foreign = lang !== 'ko';
   const { bank, acct } = splitVacct(d.vacct || '');
-  // 외국어 화면에서는 은행명에 영문 병기 (1012 요청: 은행 앱에서 찾기 쉽게)
+  // 외국어 화면에서는 은행 앱에서 찾기 쉽게 은행명에 영문 병기
   const bankShown = foreign ? bankWithEn(bank) : bank;
-  const overdue = n < 0;
   const taxKo = TAX_TYPES[d.type][0];
   const koNote = `제목: ${taxKo} 고지서 관련 문의\n\n안녕하세요. 양주시에 사는 외국인 주민입니다.\n${taxKo} 고지서(납부기한 ${d.due.replace(/-/g, '.')}, 금액 ${d.amount.toLocaleString('ko-KR')}원)와 관련해 문의드립니다.\n\n문의 내용: (고지서 내용 확인 요청)\n\n한국어가 서툴러 통역(1345)과 함께 연락드릴 수 있습니다. 감사합니다.`;
 
-  const onPaid = () => setAskSave(true);
   const savePaid = (yes: boolean) => {
     if (yes) { paidStore.add({ type: d.type, amount: d.amount, due: d.due, paidAt: Date.now() }); toast(t('paidSaved')); }
-    setAskSave(false);
     goHome();
   };
 
-  // 7단계. {bank} {amount} 치환. 1·5단계 옆에 복사 버튼
+  // 위택스 첫 화면으로 보내면서 전자납부번호를 미리 복사해 둔다. 조회 화면 직접 링크는 로그인 없이 열리는지 미확인이라 보류
+  const wetaxLookup = (
+    <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (d.epay) copy(d.epay); }}>
+      {t('wetaxLookup')}<Ic n="ext" cls="sm" />
+    </a>
+  );
+
+  // 7단계. 1·5단계에는 복사 버튼
   const steps: { text: string; copyLabel?: string; copyValue?: string }[] = [
     { text: t('bs1'), copyLabel: t('copyAcct'), copyValue: acct },
     { text: t('bs2') },
@@ -77,19 +80,16 @@ export function DocResultScreen() {
       {d.vacct ? (
         <section className="panel">
           <h2><span className="grow">{t('todoNow')}</span><span className="bdg green">{t('easiest')}</span></h2>
-          {/* 기한 경과: 낼 금액이 고지서와 다를 수 있으니 위택스에서 지금 금액 확인이 1순위 (1012 요청) */}
+          {/* 기한이 지났으면 가산금 때문에 낼 금액이 고지서와 다르다. 위택스에서 지금 금액 확인이 먼저 */}
           {overdue && (
             <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
               <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('overdueCheckT')}</p>
               <p className="muted" style={{ margin: '0 0 8px' }}>{t('overdueCheckD')}</p>
-              <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (d.epay) copy(d.epay); }}>
-                {t('wetaxLookup')}<Ic n="ext" cls="sm" />
-              </a>
+              {wetaxLookup}
             </div>
           )}
           <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('bankT')}</p>
           <p className="muted" style={{ margin: '0 0 10px', ...(overdue ? { color: 'var(--danger)', fontWeight: 600 } : {}) }}>{overdue ? t('overdueSend') : t('bankBy', { d: dueShort })}</p>
-          {/* 입금 은행 / 계좌번호 / 금액 한 상자 */}
           <dl className="kv bankbox" style={{ marginBottom: 12 }}>
             <dt>{t('bankName')}</dt><dd lang="ko">{bankShown}</dd>
             <dt>{t('bankAcct')}</dt>
@@ -100,15 +100,15 @@ export function DocResultScreen() {
               <button type="button" className="icon-btn copy-btn" onClick={() => copy(String(d.amount))} aria-label={t('copyAmt')}><Ic n="copy" cls="sm" /></button></span></dd>
           </dl>
           <ol className="steps">
-            {steps.map((s, i) => (
+            {steps.map(({ text, copyLabel, copyValue }, i) => (
               <li key={i}>
                 {/* 복사 버튼은 글 아래 줄에. 옆에 두면 베트남어·네팔어처럼 긴 문장이 한 글자씩 꺾인다 */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <span>{s.text}</span>
-                  {s.copyValue && (
+                  <span>{text}</span>
+                  {copyValue && (
                     <div style={{ marginTop: 6 }}>
-                      <button type="button" className="btn secondary sm" onClick={() => copy(s.copyValue!)}>
-                        <Ic n="copy" cls="sm" />{s.copyLabel}
+                      <button type="button" className="btn secondary sm" onClick={() => copy(copyValue)}>
+                        <Ic n="copy" cls="sm" />{copyLabel}
                       </button>
                     </div>
                   )}
@@ -122,7 +122,7 @@ export function DocResultScreen() {
         <Callout kind="info" icon="info">{t('pay2D')}</Callout>
       )}
 
-      {/* 다른 납부 방법: 접어 두기 (가상계좌가 없으면 펼침) */}
+      {/* 다른 납부 방법은 접어 두되, 가상계좌가 없으면 이게 전부라 펼친다 */}
       <section className="panel">
         <details className="faq" open={!d.vacct}>
           <summary><Ic n="chev" cls="sm" /><span className="q">{t('otherPayT')}</span></summary>
@@ -133,10 +133,7 @@ export function DocResultScreen() {
                 <button type="button" className="icon-btn copy-btn" onClick={() => copy(d.epay)} aria-label={`${t('copy')}: ${t('fEpay')}`}><Ic n="copy" cls="sm" /></button>
               </div>
             )}
-            {/* 위택스 첫 화면으로. 조회 화면 직접 연결 주소는 로그인 없이 열리는지 미확인이라 보류 (구현요청 [위택스 연결 제안]) */}
-            <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (d.epay) copy(d.epay); }}>
-              {t('wetaxLookup')}<Ic n="ext" cls="sm" />
-            </a>
+            {wetaxLookup}
             <p style={{ margin: 0 }}>{t('otherAtm')}</p>
             <p style={{ margin: 0 }}>{t('otherArs')} <a href="tel:142211" aria-label={`${t('call')} 142211`}>142211</a></p>
           </div>
@@ -151,7 +148,7 @@ export function DocResultScreen() {
     </div>
   );
 
-  // 자유 질문: 키워드로 FAQ 를 찾아 그 항목을 펼친다. 못 찾으면 범위 밖 안내 (2차 개선점검 3.1)
+  // 자유 질문은 AI 없이 키워드로 FAQ 를 찾아 그 항목만 펼친다. 못 찾으면 범위 밖 안내
   const submitQ = (e: FormEvent) => {
     e.preventDefault();
     const q = question.trim();
@@ -189,7 +186,7 @@ export function DocResultScreen() {
           <a className="row" href={`tel:${d.phone.replace(/[^0-9]/g, '')}`}><span className="ibox tone-green"><Ic n="building" /></span><span className="tx"><span className="t">{d.phone}</span><span className="d">{t('officeL')}</span></span><span className="act">{t('call')}</span></a>
         )}
       </section>
-      {/* 담당자에게 보여 줄 한국어 메모 (구현요청 G표). 받는 쪽이 담당자라 언어와 무관하게 한국어 */}
+      {/* 담당자에게 보여 줄 메모. 받는 쪽이 담당자라 화면 언어와 무관하게 한국어 */}
       <section className="panel">
         <h2>{t('noteKoT')}</h2>
         <div className="codebox" style={{ alignItems: 'flex-start', flexDirection: 'column' }}>
@@ -205,7 +202,7 @@ export function DocResultScreen() {
     <>
       <Title>{taxName + (d.sample ? ` (${t('sample')})` : '')}</Title>
       {!d.manual && <Stepper step={3} />}
-      {/* 질문·상담 탭에서는 요약 카드를 한 줄로 줄여 한 화면을 지킨다 (2차 개선점검 3.3) */}
+      {/* 질문·상담 탭에서는 요약 카드를 한 줄로 줄여 탭 내용이 한 화면에 들어오게 */}
       <section className={`sum ${tab === 'pay' ? '' : 'compact'}`.trim()} aria-label={`${t('docIs')}: ${taxName}`}>
         <button type="button" className="icon-btn sum-speak" onClick={() => { if (!speak(readText, lang)) toast(t('noVoice')); }} aria-label={t('aRead')}><Ic n="volume" /></button>
         <div className="sum-grid">
@@ -220,7 +217,7 @@ export function DocResultScreen() {
         </div>
         {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{overdue ? t('overdueWarn') : t('lateShort')}</span></div>}
       </section>
-      {/* 기한을 휴대폰 달력에: 종일 일정 + 3일 전 알림 (.ics). 기한이 지났으면 의미 없으니 숨김 */}
+      {/* 기한을 휴대폰 달력에 (종일 일정 + 3일 전 알림). 지난 기한은 넣을 이유가 없다 */}
       {tab === 'pay' && !overdue && (
         <button type="button" className="btn secondary sm" style={{ marginTop: 10 }}
           onClick={() => { downloadIcs(`yangju-tax-${d.due}.ics`, buildIcs(t('calEvent', { tax: taxName }), d.due, `${amount} · ${t('calDesc')}`)); toast(t('calAdded')); }}>
@@ -229,8 +226,8 @@ export function DocResultScreen() {
       )}
 
       {askSave && (
-        <section className="panel" style={{ marginTop: 10 }} role="dialog" aria-label={t('paidQ')}>
-          <h2>{t('paidQ')}</h2>
+        <section className="panel" style={{ marginTop: 10 }} aria-labelledby="paid-q">
+          <h2 id="paid-q">{t('paidQ')}</h2>
           <p className="muted" style={{ margin: '0 0 10px' }}>{t('paidNote')}</p>
           <div className="btn-row">
             <button type="button" className="btn primary sm" onClick={() => savePaid(true)}>{t('paidSave')}</button>
@@ -247,7 +244,7 @@ export function DocResultScreen() {
         <a className="btn secondary side" href="https://www.wetax.go.kr" target="_blank" rel="noopener" aria-label={t('payWetax')}>
           <Ic n="ext" cls="sm" />Wetax
         </a>
-        <button type="button" className="btn primary" onClick={onPaid}><Ic n="check" cls="sm" />{t('paidBtn')}</button>
+        <button type="button" className="btn primary" onClick={() => setAskSave(true)}><Ic n="check" cls="sm" />{t('paidBtn')}</button>
       </BottomBar>
     </>
   );

@@ -1,4 +1,4 @@
-// 저장한 혜택 목록. 참고용 html 의 SCREENS.saved.
+// 저장한 혜택 목록.
 import { Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
 import { BenefitCard } from '@/components/welfare/BenefitCard';

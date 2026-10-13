@@ -11,15 +11,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'tests', 'notices');
 const writeJson = process.argv.includes('--json');
 
-// .env 에서 키/모델 (키는 절대 출력하지 않는다)
-const env = Object.fromEntries(
-  fs.readFileSync(path.join(root, '.env'), 'utf8').split(/\r?\n/)
-    .map(l => l.match(/^\s*([\w.]+)\s*=\s*(.*?)\s*$/)).filter(Boolean)
-    .map(m => [m[1], m[2].replace(/^(['"])(.*)\1$/, '$2')]),
-);
-const apiKey = env.VITE_CLAUDE_API_KEY;
+// .env 의 키/모델 (키는 절대 출력하지 않는다)
+try { process.loadEnvFile(path.join(root, '.env')); } catch { /* .env 없음 */ }
+const apiKey = process.env.VITE_CLAUDE_API_KEY;
 if (!apiKey) { console.error('.env 에 VITE_CLAUDE_API_KEY 가 없습니다'); process.exit(2); }
-const model = env.VITE_CLAUDE_MODEL || 'claude-haiku-5-5';
+const model = process.env.VITE_CLAUDE_MODEL || 'claude-haiku-5-5';
 const client = new Anthropic({ apiKey, maxRetries: 3 });
 
 // 앱 프롬프트를 그대로 가져온다 (prompts.ts 는 import 가 없어 transpile 만으로 실행 가능)
@@ -86,4 +82,5 @@ if (writeJson) {
   fs.writeFileSync(out, JSON.stringify({ model, ran_at: new Date().toISOString(), results }, null, 2));
   console.log(`→ ${path.relative(root, out)}`);
 }
-process.exitCode = allOk === results.length ? 0 : 1; // process.exit() 는 Windows Node 24 에서 fetch 뒤 libuv assertion 을 내서 exitCode 로
+// fetch 뒤에 process.exit() 를 부르면 Windows 의 Node 24 가 libuv assertion 으로 죽는다. exitCode 로 끝낸다
+process.exitCode = allOk === results.length ? 0 : 1;

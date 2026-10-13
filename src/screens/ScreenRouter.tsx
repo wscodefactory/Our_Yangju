@@ -1,4 +1,4 @@
-// 내비게이션 스택 맨 위 Screen 을 화면 컴포넌트로. 참고용 html 의 SCREENS 테이블에 해당.
+// 내비게이션 스택 맨 위 Screen 을 화면 컴포넌트로.
 import { useEffect, useLayoutEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import type { Screen } from '@/types';
@@ -43,15 +43,13 @@ function render(s: Screen) {
   }
 }
 
-/**
- * <main> 에 현재 화면. 화면이 바뀌면 맨 위로 스크롤하고 제목(앱 바 h1 또는 본문 h1)에 포커스를 옮긴다 (접근성 §9).
- */
+/** <main> 에 현재 화면. 화면이 바뀌면 맨 위로 스크롤하고 제목(앱 바 h1 또는 본문 h1)에 포커스를 옮긴다 */
 export function ScreenRouter() {
   const { screen, nav } = useApp();
-  // 새 화면이 이전 스크롤 위치에서 한 번 보였다가 튀지 않게, 그리기 전에 맨 위로 (3차 개선제안 5장)
+  // 새 화면이 이전 스크롤 위치에서 한 번 보였다가 튀지 않게, 그리기 전에 맨 위로
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [nav.length, screen.k]);
   useEffect(() => {
-    // 앱 바 제목 포털이 다음 렌더에 채워지므로 한 틱 뒤에
+    // 앱 바 제목은 <Title> 이 다음 렌더에 포털로 채우므로 한 틱 뒤에 찾는다
     const id = window.setTimeout(() => {
       const h = (document.getElementById('page-title') || document.querySelector('main h1')) as HTMLElement | null;
       if (h) { if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }

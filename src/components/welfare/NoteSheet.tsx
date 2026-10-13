@@ -1,4 +1,4 @@
-// 담당자에게 보낼 한국어 문의 메모 시트. 참고용 html 의 makeNote + note 시트. 메모는 일부러 한국어 고정.
+// 담당자에게 보낼 문의 메모 시트. 받는 쪽이 한국어 창구라 메모는 일부러 한국어 고정.
 import { Sheet } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';

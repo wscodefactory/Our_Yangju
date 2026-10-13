@@ -1,4 +1,4 @@
-// 홈. 참고용 html 의 SCREENS.home. 핵심 작업 4개 + 둘러보기 타일 3개.
+// 홈: 핵심 작업 4개 + 둘러보기 타일 3개.
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import type { Screen } from '@/types';

@@ -22,10 +22,11 @@ const join = (y: string, m: string, d: string) => {
 
 export const DateFields = forwardRef<HTMLInputElement, Props>(function DateFields({ value, onChange, invalid, idPrefix }, ref) {
   const { t } = useApp();
-  // 입력 중인 조각은 여기서 들고 있어야 한다. 합친 값만 바깥에 두면 "2"만 쳐도 ''가 돼서 칸이 비어 버린다
+  // 입력 중인 조각은 여기서 들고 있어야 한다. 합친 값만 바깥에 두면 "2"만 쳐도 ''가 돼서 칸이 비어 버린다.
+  // 바깥에서 value 를 바꿨을 때만 조각을 다시 쪼갠다 (parts 를 deps 에 넣으면 타자마다 되감긴다)
   const [parts, setParts] = useState(() => split(value));
-  useEffect(() => { if (value !== join(...parts)) setParts(split(value)); /* eslint-disable-line react-hooks/exhaustive-deps */ }, [value]);
-  const set = (i: 0 | 1 | 2, max: number) => (raw: string) => {
+  useEffect(() => { if (value !== join(...parts)) setParts(split(value)); }, [value]);
+  const set = (i: 0 | 1 | 2, max: number, raw: string) => {
     const next = [...parts] as [string, string, string];
     next[i] = raw.replace(/\D/g, '').slice(0, max);
     setParts(next);
@@ -35,7 +36,7 @@ export const DateFields = forwardRef<HTMLInputElement, Props>(function DateField
     <label className="datef">
       <span>{t(key)}</span>
       <input id={`${idPrefix}-${key}`} ref={r} inputMode="numeric" autoComplete="off" value={parts[i]} maxLength={max} aria-invalid={invalid}
-        placeholder={key === 'year' ? 'YYYY' : key === 'month' ? 'MM' : 'DD'} onChange={(e) => set(i, max)(e.target.value)} />
+        placeholder={key === 'year' ? 'YYYY' : key === 'month' ? 'MM' : 'DD'} onChange={(e) => set(i, max, e.target.value)} />
     </label>
   );
   return (

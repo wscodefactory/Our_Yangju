@@ -1,5 +1,4 @@
-// 납부 기록 (MY 기능). 이 휴대폰 localStorage 에만 저장하고, 사진·이름·계좌번호는 넣지 않는다.
-// 「고지서화면_구현요청_26.10.08」 요청 ② 3번: [납부 완료] → 저장할까요? (선택)
+// 납부 기록. [납부 완료] 를 누르면 저장할지 묻고, 이 휴대폰 localStorage 에만 둔다. 사진·이름·계좌번호는 넣지 않는다.
 import type { TaxType } from '@/types';
 import { STORAGE_KEYS, storage } from './browser';
 

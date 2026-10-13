@@ -1,4 +1,4 @@
-// AI 상담(양주무관) 시트. 참고용 html 의 chatSheet. 대화 상태는 GuideContext 가 들고 있다.
+// AI 상담(양주무관) 시트. 대화 상태는 GuideContext 가 들고 있다.
 import { useEffect, useRef, type FormEvent } from 'react';
 import { Sheet } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
@@ -22,7 +22,7 @@ export function ChatSheet() {
     e.preventDefault();
     const el = input.current;
     if (!el) return;
-    // 주민등록번호·외국인등록번호 모양이 들어 있으면 보내지 않는다 (안전장치, AI 비용 0)
+    // 주민등록번호·외국인등록번호 모양이 들어 있으면 보내지 않는다
     if (hasPii(el.value)) { toast(t('piiBlocked')); return; }
     void ask(el.value);
     el.value = '';
@@ -52,7 +52,7 @@ export function ChatSheet() {
           return (
             <div key={m.id} className="msg bot">
               {m.key ? t(m.key) : m.text}
-              {/* 근거 문서 (기능 5): 제목 + 링크. 답변은 이 문서 안에서만 나온 것 */}
+              {/* 근거 문서: 제목 + 링크. 답변은 이 문서 안에서만 나온 것 */}
               {m.source && (
                 <p className="src" style={{ margin: '8px 0 0' }}>
                   <Ic n="info" cls="sm" />

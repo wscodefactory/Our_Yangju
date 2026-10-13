@@ -16,7 +16,7 @@ export function VisitItemScreen({ id }: { id: string }) {
   if (!v) return null;
   const d = VISIT_DETAIL[id];
   const type = d?.types.find((x) => x.id === typeId);
-  // 공통 준비물 + 고른 상황의 서류. 언어나 상황이 바뀌면 체크 상태를 새로 시작
+  // 공통 준비물 + 고른 상황의 서류
   const docs = [...v.docs, ...(type?.docs ?? [])].map(tx);
   return (
     <>
@@ -45,12 +45,12 @@ export function VisitItemScreen({ id }: { id: string }) {
         )}
         <section className="panel">
           <h2><Ic n="file" cls="sm" />{t('lblDocs')}</h2>
+          {/* 언어나 상황이 바뀌면 체크 상태를 새로 시작 */}
           <Checklist key={`${tx(v.name)}|${typeId}`} docs={docs} />
         </section>
         {d?.tips.map((tip, i) => <Callout key={i} kind="warn" icon="alert" sm>{tx(tip)}</Callout>)}
         <p className="hint-line"><Ic n="users" cls="sm" /><span>{t('tapToShow')}</span></p>
         {v.src && <p className="src"><Ic n="info" cls="sm" /><span>{t('basis')}: {tx(v.src)}</span></p>}
-        {/* 업무별 공식 안내 (2차 개선점검 3.6) */}
         <LinkList rows={VISIT_LINKS[v.id] || []} title={t('officialT')} />
       </div>
       <BottomBar>

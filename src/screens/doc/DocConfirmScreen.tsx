@@ -1,5 +1,4 @@
-// 고지서 흐름 3단계: 읽은(또는 입력할) 내용 확인. 참고용 html 의 SCREENS.docConfirm + docform submit.
-// 사진 경로면 가린 캔버스의 축소 이미지를 위에 보여 준다.
+// 고지서 흐름 3단계: 읽은(또는 입력할) 내용 확인. 사진 경로면 가린 캔버스의 축소 이미지를 위에 보여 준다.
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';
@@ -12,6 +11,7 @@ import type { DocInfo, TaxType } from '@/types';
 import { Stepper } from './Stepper';
 
 const EMPTY: DocInfo = { type: 'auto', amount: 0, due: '', epay: '', vacct: '' };
+const digits = (s: string) => s.replace(/[^0-9]/g, '');
 
 export function DocConfirmScreen({ manual }: { manual: boolean }) {
   const { t, tx, fmtNum, go, openOverlay } = useApp();
@@ -25,26 +25,28 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
   const [err, setErr] = useState(false);
   const amtRef = useRef<HTMLInputElement>(null);
   const dueRef = useRef<HTMLInputElement>(null);
-  // 사진 경로의 가린 캔버스 (ReadingScreen 을 거쳤으면 이미 가린 버전)
+  // ReadingScreen 을 거쳤으면 canvas 는 이미 가린 버전
   const thumb = useMemo(() => (canvas && !d.sample ? canvas.toDataURL('image/jpeg', 0.6) : null), [canvas, d.sample]);
+
+  const amt = Number(digits(amount)) || 0;
+  const amtErr = err && !amt;
+  const dueErr = err && !due;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const amt = Number(amount.replace(/[^0-9]/g, '')) || 0;
     if (!amt || !due) {
       setErr(true);
       (!amt ? amtRef : dueRef).current?.focus();
       return;
     }
     const next: DocInfo = { ...d, type, amount: amt, due, epay: epay.trim(), vacct: vacct.trim() };
-    // 샘플 값을 고쳤으면 원문 표기는 더 이상 맞지 않는다
-    if (d.sample && (amt !== d.amount || due !== d.due)) { next.amountQ = null; next.dueQ = null; }
+    // 값을 고쳤으면 "원문 표기" 병기는 더 이상 맞지 않으니 뗀다
+    if (amt !== d.amount) next.amountQ = null;
+    if (due !== d.due) next.dueQ = null;
     setDoc(next);
     go({ k: 'docResult' });
   };
 
-  const amtErr = err && !amount.replace(/[^0-9]/g, '');
-  const dueErr = err && !due;
   return (
     <>
       <Title>{manual ? t('manualTitle') : t('confirmTitle')}</Title>
@@ -66,7 +68,6 @@ export function DocConfirmScreen({ manual }: { manual: boolean }) {
           )}
         </div>
       )}
-      {/* 읽은 값(샘플·사진)은 사용자가 고칠 수 있다는 안내 (구현요청 A표) */}
       {!manual && <p className="lead" style={{ margin: '0 0 12px' }}>{t('confirmLead')}</p>}
       <form className="form" id="docform" noValidate onSubmit={onSubmit}>
         <div className="fld">

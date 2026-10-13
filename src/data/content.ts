@@ -1,5 +1,5 @@
-/* 양주시 디자인시스템 기준 콘텐츠·문구. 「한눈에양주_UI개선 (참고용).html」의 데이터 블록을 그대로 옮긴 것.
-   모든 문구는 [ko, en, zh, vi, ne] 다섯 칸. 빈 칸이 생기면 i18n.ts의 audit가 콘솔에 경고한다. */
+/* 앱의 문구와 고정 콘텐츠. 모든 문구는 [ko, en, zh, vi, ne] 다섯 칸(T5)이고, 빈 칸이 있으면 i18n.ts 의 audit 가 콘솔에 경고한다.
+   UI 사전은 UI_BASE(원본 번역)에 UI_BANK·UI_EXTRA(뒤에 추가된 AI 초안)를 합친 것이다. */
 export type T5 = string[];
 
 export const LANGS = [
@@ -13,7 +13,7 @@ export const HELLO = ["안녕하세요","Hello","您好","Xin chào","नमस�
 export const TODAY = (()=>{const d=new Date();d.setHours(0,0,0,0);return d})();
 
 /* =========================================================
-   2. UI strings  [ko, en, zh, vi, ne]
+   UI 문구
    ========================================================= */
 const UI_BASE = {
   appName:["한눈에 양주","Our Yangju","一览杨州","Yangju trong tầm tay","याङ्जु एक नजरमा"],
@@ -28,9 +28,7 @@ const UI_BASE = {
   aClose:["닫기","Close","关闭","Đóng","बन्द गर्नुहोस्"],
   chooseLang:["사용할 언어를 선택하세요","Choose your language","请选择语言","Chọn ngôn ngữ của bạn","आफ्नो भाषा छान्नुहोस्"],
   langNote:["모든 안내가 선택한 언어로 바뀌어요. 창구 직원에게 보여줄 문장만 한국어로 유지돼요.","All text switches to your language. Only sentences meant for counter staff stay in Korean.","所有内容将切换为所选语言。只有给窗口工作人员看的句子保留韩语。","Toàn bộ nội dung sẽ chuyển sang ngôn ngữ bạn chọn. Chỉ câu dành cho nhân viên quầy giữ tiếng Hàn.","सबै जानकारी तपाईंको भाषामा देखिन्छ। काउन्टर कर्मचारीलाई देखाउने वाक्य मात्र कोरियालीमा रहन्छ।"],
-  langLater:["나중에 오른쪽 위 지구본 아이콘으로 바꿀 수 있어요.","You can change it later with the globe icon at the top right.","之后可通过右上角的地球图标更改。","Bạn có thể đổi sau bằng biểu tượng quả địa cầu ở góc trên bên phải.","पछि माथि दायाँको ग्लोब आइकनबाट बदल्न सकिन्छ।"],
 
-  heroEyebrow:["외국인 주민과 시민을 위한 생활 안내","For residents and newcomers","面向外国居民与市民","Dành cho cư dân và người mới đến","बासिन्दा र नयाँ आउनेहरूका लागि"],
   heroTitle:["양주 생활, 내 언어로 한눈에","Life in Yangju, in your language","用您的语言，一览杨州生活","Cuộc sống ở Yangju, bằng ngôn ngữ của bạn","याङ्जुको जीवन, तपाईंकै भाषामा"],
   heroDesc:["민원 준비물부터 받은 고지서, 지원 혜택, 생활 정보까지 한곳에서 안내해요.","City office paperwork, tax notices, benefits and daily life, explained in one place.","从办事材料、收到的税单，到福利和生活信息，一站式为您说明。","Từ giấy tờ hành chính, giấy báo thuế đến phúc lợi và đời sống, tất cả ở một nơi.","कार्यालयका कागजात, कर बिल, सुविधा र दैनिक जीवनको जानकारी, सबै एकै ठाउँमा।"],
   secTasks:["무엇을 도와드릴까요?","How can we help?","需要什么帮助？","Bạn cần giúp gì?","हामी के मद्दत गरौं?"],
@@ -46,7 +44,6 @@ const UI_BASE = {
   exEvents:["행사와 축제","Events","活动、庆典","Sự kiện, lễ hội","कार्यक्रम"],
   exPlaces:["명소와 맛집","Places & food","景点、美食","Địa điểm, ẩm thực","ठाउँ, खाना"],
   exAbout:["양주 소개","About Yangju","杨州简介","Giới thiệu Yangju","याङ्जुबारे"],
-  exLead:["양주의 행사, 가볼 만한 곳, 도시 정보를 모았어요.","Events, places to visit and facts about Yangju.","汇集杨州的活动、景点和城市信息。","Sự kiện, địa điểm tham quan và thông tin về Yangju.","याङ्जुका कार्यक्रम, घुम्ने ठाउँ र सहरको जानकारी।"],
 
   disclaimer:["이 서비스의 안내는 참고용이며 양주시의 공식 답변이 아닙니다. 정확한 내용은 담당 부서에 확인하세요.","This guide is for reference only and is not an official answer from Yangju City. Please confirm details with the responsible office.","本服务内容仅供参考，并非杨州市的正式答复。具体内容请向主管部门确认。","Thông tin chỉ mang tính tham khảo, không phải câu trả lời chính thức của thành phố Yangju. Vui lòng xác nhận với cơ quan phụ trách.","यो जानकारी सन्दर्भका लागि मात्र हो, याङ्जु सहरको आधिकारिक जवाफ होइन। विवरण सम्बन्धित कार्यालयमा पुष्टि गर्नुहोस्।"],
   demoNote:["시연용 프로토타입입니다. 혜택, 고지서, 행사 정보 일부는 예시 데이터입니다.","Prototype. Some benefit, notice and event data are examples.","演示原型，部分福利、税单和活动信息为示例数据。","Bản mẫu thử nghiệm. Một số dữ liệu phúc lợi, giấy báo và sự kiện là ví dụ.","नमुना संस्करण। केही सुविधा, बिल र कार्यक्रमका जानकारी उदाहरण मात्र हुन्।"],
@@ -75,9 +72,7 @@ const UI_BASE = {
   showStaff:["창구 직원에게 보여주기","Show this to the staff","出示给窗口工作人员","Cho nhân viên quầy xem","कर्मचारीलाई देखाउनुहोस्"],
   meaning:["뜻","Meaning","意思","Nghĩa","अर्थ"],
   aSpeakKo:["한국어로 들려주기","Play in Korean","用韩语播放","Phát tiếng Hàn","कोरियालीमा सुनाउनुहोस्"],
-  aFull:["크게 보기","Full screen","全屏显示","Toàn màn hình","पूरा स्क्रिन"],
   fullHint:["직원에게 화면을 보여주세요","Show this screen to the staff","请把屏幕出示给工作人员","Hãy cho nhân viên xem màn hình này","यो स्क्रिन कर्मचारीलाई देखाउनुहोस्"],
-  interpT:["통역이 필요하면","Need an interpreter?","需要翻译？","Cần phiên dịch?","दोभाषे चाहिन्छ?"],
   interpD:["외국인종합안내센터, 평일 09~22시 다국어 상담","Immigration Contact Center, weekdays 9 am to 10 pm, multilingual","外国人综合咨询中心，工作日 9～22 点，多语种","Trung tâm thông tin người nước ngoài, ngày thường 9-22 giờ, đa ngôn ngữ","विदेशी सूचना केन्द्र, कार्यदिन 9-22 बजे, बहुभाषी"],
   call:["전화","Call","拨打","Gọi","फोन"],
   basis:["근거","Source","依据","Căn cứ","आधार"],
@@ -93,7 +88,6 @@ const UI_BASE = {
   btnPhoto:["촬영 / 사진 불러오기","Take a photo / Choose a photo","拍照 / 选择照片","Chụp ảnh / Chọn ảnh","फोटो खिच्नुहोस् / फोटो छान्नुहोस्"],
   confirmTitle:["고지서 내용과 일치하나요?","Does this match your notice?","与税单内容一致吗？","Thông tin có khớp với giấy báo không?","के यो जानकारी बिलसँग मिल्छ?"],
   manualTitle:["고지서 내용 입력","Enter notice details","输入税单内容","Nhập thông tin giấy báo","बिलको विवरण भर्नुहोस्"],
-  confirmLead:["숫자가 다르면 고지서에 적힌 대로 고쳐 주세요.","If anything differs, correct it to match the notice.","如有不同，请按税单内容修改。","Nếu có chỗ khác, hãy sửa theo giấy báo.","फरक भए बिलमा लेखिएअनुसार सच्याउनुहोस्।"],
   manualLead:["고지서에 적힌 그대로 입력해 주세요.","Enter the details exactly as printed on the notice.","请按税单原文输入。","Nhập đúng như in trên giấy báo.","बिलमा लेखिएजस्तै भर्नुहोस्।"],
   previewCap:["가린 고지서 미리보기 (원본은 한국어)","Covered notice preview (the original is in Korean)","已遮挡的税单预览（原件为韩语）","Xem trước giấy báo đã che (bản gốc tiếng Hàn)","छोपिएको बिलको झलक (मूल प्रति कोरियालीमा)"],
   fTax:["세금 종류","Tax type","税种","Loại thuế","करको प्रकार"],
@@ -101,12 +95,10 @@ const UI_BASE = {
   fDue:["납부 기한","Due date","缴纳期限","Hạn nộp","भुक्तानी अन्तिम मिति"],
   fEpay:["전자납부번호","E-payment number","电子缴纳号码","Mã nộp điện tử","इ-भुक्तानी नम्बर"],
   fVacct:["가상계좌","Virtual account","虚拟账户","Tài khoản ảo","भर्चुअल खाता"],
-  fPhone:["담당 부서 전화","Office phone","主管部门电话","Điện thoại cơ quan","कार्यालयको फोन"],
   optional:["선택","optional","选填","không bắt buộc","ऐच्छिक"],
   needFields:["금액과 납부 기한을 입력해 주세요.","Please enter the amount and due date.","请输入金额和缴纳期限。","Vui lòng nhập số tiền và hạn nộp.","रकम र अन्तिम मिति भर्नुहोस्।"],
   btnConfirm:["확인 완료, 납부 방법 보기","Confirmed, show how to pay","确认完成，查看缴纳方法","Xác nhận, xem cách nộp","पुष्टि भयो, भुक्तानी तरिका हेर्नुहोस्"],
   btnManualGo:["할 일 보기","Show what to do","查看待办","Xem việc cần làm","के गर्ने हेर्नुहोस्"],
-  resTitle:["할 일 안내","What to do","待办事项","Việc cần làm","के गर्ने"],
   docIs:["받은 고지서","Your notice","收到的税单","Giấy báo bạn nhận được","तपाईंले पाएको बिल"],
   amountL:["낼 금액","Amount to pay","应缴金额","Số tiền phải nộp","तिर्नुपर्ने रकम"],
   dueL:["납부 기한","Due date","缴纳期限","Hạn nộp","अन्तिम मिति"],
@@ -115,28 +107,12 @@ const UI_BASE = {
   today:["오늘 마감","Due today","今天截止","Hạn chót hôm nay","आज अन्तिम दिन"],
   over:["납부 기한이 지났습니다","The due date has passed","已过缴纳期限","Đã quá hạn nộp","भुक्तानी अन्तिम मिति नाघिसक्यो"],
   aRead:["내 언어로 읽어주기","Read aloud","朗读","Đọc to","पढेर सुनाउनुहोस्"],
-  todoT:["지금 할 일","What to do now","现在要做的事","Việc cần làm ngay","अहिले गर्नुपर्ने"],
-  todo1:["금액과 기한이 고지서와 같은지 확인하세요","Check the amount and date match your notice","核对金额和期限是否与税单一致","Kiểm tra số tiền và hạn nộp khớp với giấy báo","रकम र मिति बिलसँग मिल्छ कि जाँच्नुहोस्"],
-  todo2:["아래 방법 중 하나로 기한 안에 내세요","Pay by the due date using one of the methods below","在期限内用以下任一方式缴纳","Nộp trước hạn bằng một trong các cách dưới đây","तलको कुनै एक तरिकाले म्यादभित्र तिर्नुहोस्"],
-  todo3:["낸 뒤 위택스에서 납부 결과를 확인하세요","After paying, check the result on Wetax","缴纳后在 Wetax 确认结果","Sau khi nộp, kiểm tra kết quả trên Wetax","तिरेपछि Wetax मा नतिजा जाँच्नुहोस्"],
   payT:["납부 방법","How to pay","缴纳方法","Cách nộp","तिर्ने तरिका"],
   easiest:["가장 쉬움","Easiest","最简单","Dễ nhất","सबैभन्दा सजिलो"],
-  pay1T:["위택스 (온라인)","Wetax (online)","Wetax（网上）","Wetax (trực tuyến)","Wetax (अनलाइन)"],
-  pay1D:["전자납부번호로 조회한 뒤 계좌, 카드, 간편결제로 납부 (00:30~23:30)","Search with the e-payment number and pay by account, card or easy pay (00:30-23:30)","用电子缴纳号码查询，可用账户、银行卡或简便支付，00:30～23:30","Tra cứu bằng mã nộp điện tử rồi trả bằng tài khoản, thẻ hoặc ví điện tử (00:30-23:30)","इ-भुक्तानी नम्बरले खोजेर खाता, कार्ड वा इजी-पेबाट (00:30-23:30)"],
-  pay2T:["은행 앱 이체","Bank app transfer","银行 APP 转账","Chuyển khoản qua app ngân hàng","बैंक एपबाट ट्रान्सफर"],
-  pay2D:["고지서의 가상계좌로 금액 그대로 보내기","Send the exact amount to the virtual account on the notice","向税单上的虚拟账户转入相同金额","Chuyển đúng số tiền vào tài khoản ảo trên giấy báo","बिलको भर्चुअल खातामा उही रकम पठाउनुहोस्"],
-  pay3T:["은행 ATM","Bank ATM","银行 ATM","ATM ngân hàng","बैंक ATM"],
-  pay3D:["ATM이나 무인공과금기에서 카드나 통장으로","Card or bankbook at an ATM or bill-payment kiosk","在 ATM 或自助缴费机用银行卡或存折缴纳","Dùng thẻ hoặc sổ tại ATM hoặc máy nộp tiền tự động","ATM वा बिल भुक्तानी मेसिनमा कार्ड वा पासबुकबाट"],
-  pay4T:["전화 ARS 142211","Phone ARS 142211","电话 ARS 142211","Điện thoại ARS 142211","फोन ARS 142211"],
-  pay4D:["안내에 따라 계좌나 카드로 납부 (한국어 안내)","Pay by account or card following the voice guide (Korean only)","按语音提示用账户或银行卡缴纳（仅韩语）","Nộp bằng tài khoản hoặc thẻ theo hướng dẫn giọng nói (chỉ tiếng Hàn)","आवाज निर्देशनअनुसार खाता वा कार्डबाट (कोरियाली मात्र)"],
   copy:["복사","Copy","复制","Sao chép","कपी"],
   copied:["복사했어요","Copied","已复制","Đã sao chép","कपी भयो"],
-  openWetax:["위택스 열기","Open Wetax","打开 Wetax","Mở Wetax","Wetax खोल्नुहोस्"],
   lateT:["기한을 넘기면","If you pay late","如果逾期","Nếu nộp trễ","ढिला तिरेमा"],
-  lateD:["3%가 더해지고, 세액이 45만 원 이상이면 매달 0.66%씩 추가돼요 (최대 60개월).","3% is added. If the tax is ₩450,000 or more, another 0.66% is added every month (up to 60 months).","将加收 3%；税额达 45 万韩元以上的，每月再加收 0.66%（最多 60 个月）。","Bị cộng thêm 3%. Nếu tiền thuế từ 450.000 won trở lên, mỗi tháng cộng thêm 0,66% (tối đa 60 tháng).","3% थपिन्छ। कर ₩450,000 वा बढी भए हरेक महिना 0.66% थपिन्छ (बढीमा 60 महिना)।"],
   lateSrc:["지방세기본법 제55조","Framework Act on Local Taxes, Art. 55","《地方税基本法》第 55 条","Luật cơ bản về thuế địa phương, Điều 55","स्थानीय कर आधारभूत ऐन, धारा 55"],
-  faqT:["자주 묻는 질문","Common questions","常见问题","Câu hỏi thường gặp","धेरै सोधिने प्रश्न"],
-  contactT:["사람과 상담하기","Talk to a person","人工咨询","Nói chuyện với người tư vấn","मानिससँग कुरा गर्नुहोस्"],
   officeL:["고지서의 담당 부서","Office on your notice","税单上的主管部门","Cơ quan ghi trên giấy báo","बिलमा लेखिएको कार्यालय"],
   verNote:["금액과 기한은 고지서 원본이 기준이에요.","The original notice is the final reference for amount and date.","金额和期限以税单原件为准。","Bản gốc giấy báo là căn cứ cuối cùng về số tiền và hạn nộp.","रकम र मितिको अन्तिम आधार मूल बिल हो।"],
   noVoice:["이 기기에는 이 언어 음성이 없어요.","This device has no voice for this language.","此设备没有该语言的语音。","Thiết bị này không có giọng đọc cho ngôn ngữ này.","यो उपकरणमा यो भाषाको आवाज छैन।"],
@@ -147,25 +123,20 @@ const UI_BASE = {
   lifeNote:["일반 안내예요. 동네별 세부 규칙은 행정복지센터에 확인하세요.","General guidance. Check local rules with your community service center.","以上为一般说明，具体规定请向行政福利中心确认。","Đây là hướng dẫn chung. Hãy hỏi trung tâm hành chính về quy định địa phương.","यो सामान्य जानकारी हो। स्थानीय नियम सामुदायिक केन्द्रमा सोध्नुहोस्।"],
   sosNote:["119와 112는 통역 연결이 가능해요. 말이 어려우면 문자 신고(112, 119)도 할 수 있어요.","119 and 112 can connect an interpreter. If speaking is hard, you can also text 112 or 119.","119 和 112 可接通翻译。不方便说话时，也可发短信报警（112、119）。","119 và 112 có thể kết nối phiên dịch. Nếu khó nói, bạn có thể nhắn tin tới 112 hoặc 119.","119 र 112 मा दोभाषे जोड्न सकिन्छ। बोल्न गाह्रो भए 112 वा 119 मा SMS पनि पठाउन सकिन्छ।"],
 
-  welLead:["대상과 단계를 고르면 받을 수 있는 지원을 보여드려요.","Choose who it is for and the stage to see support you may get.","选择对象和阶段，查看可获得的支援。","Chọn đối tượng và giai đoạn để xem hỗ trợ bạn có thể nhận.","को र कुन चरण छान्नुहोस्, पाउन सकिने सहयोग देखिन्छ।"],
   grpLabel:["누구를 위한 혜택인가요?","Who is it for?","面向谁？","Dành cho ai?","कसका लागि?"],
   stageLabel:["지금 어느 단계인가요?","Which stage are you in?","您处于哪个阶段？","Bạn đang ở giai đoạn nào?","तपाईं कुन चरणमा हुनुहुन्छ?"],
   soon:["준비 중","Soon","即将上线","Sắp có","छिट्टै"],
   soonMsg:["이 대상의 혜택은 준비 중이에요. 청년, 신혼, 육아 혜택을 먼저 확인해 보세요.","Benefits for this group are coming soon. Try Youth, Newlyweds or Childcare for now.","该对象的福利信息正在准备中，请先查看青年、新婚、育儿福利。","Phúc lợi cho nhóm này đang được chuẩn bị. Hãy xem nhóm Thanh niên, Tân hôn hoặc Nuôi con trước.","यो समूहका सुविधा तयार हुँदैछन्। अहिलेलाई युवा, नवविवाहित वा बाल हेरचाह हेर्नुहोस्।"],
   frNote:["외국인 주민은 사업마다 자격이 달라요. 외국인등록이나 일정 기간 거주가 필요한 경우가 많아요.","For foreign residents, eligibility differs by program. Many require alien registration or a set period of residence.","外国居民的资格因项目而异，很多项目要求外国人登录或一定居住期限。","Với cư dân nước ngoài, điều kiện khác nhau theo chương trình. Nhiều chương trình yêu cầu đăng ký cư trú hoặc thời gian cư trú nhất định.","विदेशी बासिन्दाका लागि योग्यता कार्यक्रम अनुसार फरक हुन्छ। धेरैमा विदेशी दर्ता वा निश्चित बसोबास अवधि चाहिन्छ।"],
-  nItems:["{n}개","{n} items","{n} 项","{n} mục","{n} वटा"],
   bWhat:["무엇을","What","内容","Nội dung","के"],
   bWho:["누가","Who","对象","Ai","को"],
   bWhen:["언제","When","时间","Khi nào","कहिले"],
-  quizT:["자격 간단 확인","Quick eligibility check","资格快速自测","Kiểm tra nhanh điều kiện","छिटो योग्यता जाँच"],
-  quizHint:["모든 질문에 답하면 결과가 나와요.","Answer every question to see the result.","回答全部问题后显示结果。","Trả lời hết câu hỏi để xem kết quả.","सबै प्रश्नको जवाफ दिएपछि नतिजा देखिन्छ।"],
   yes:["예","Yes","是","Có","हो"],
   no:["아니요","No","否","Không","होइन"],
   unsure:["모름","Not sure","不确定","Không rõ","थाहा छैन"],
   rYes:["신청 가능성이 높아요. 최종 결정은 담당 기관이 해요.","You are likely eligible. The office makes the final decision.","申请可能性较高，最终由主管机关决定。","Bạn có nhiều khả năng đủ điều kiện. Cơ quan phụ trách quyết định cuối cùng.","तपाईं योग्य हुन सक्नुहुन्छ। अन्तिम निर्णय कार्यालयले गर्छ।"],
   rNo:["조건이 맞지 않을 수 있어요. 같은 단계의 다른 지원도 살펴보세요.","This may not fit you. Look at other support in the same stage.","条件可能不符，请查看同阶段的其他支援。","Có thể không phù hợp. Hãy xem các hỗ trợ khác cùng giai đoạn.","यो तपाईंलाई नमिल्न सक्छ। सोही चरणका अरू सहयोग हेर्नुहोस्।"],
   rUn:["모르는 항목은 담당 기관에 확인하세요. 아래 문의 메모를 활용할 수 있어요.","Check the unsure items with the office. You can use the note below.","不确定的项目请向主管机关确认，可使用下方的咨询便条。","Hãy hỏi cơ quan về các mục chưa rõ. Bạn có thể dùng ghi chú bên dưới.","थाहा नभएका कुरा कार्यालयमा सोध्नुहोस्। तलको नोट प्रयोग गर्न सक्नुहुन्छ।"],
-  applyT:["신청 방법","How to apply","申请方法","Cách đăng ký","आवेदन तरिका"],
   online:["온라인 신청","Apply online","网上申请","Đăng ký trực tuyến","अनलाइन आवेदन"],
   visit:["방문 신청","Apply in person","现场申请","Đăng ký trực tiếp","प्रत्यक्ष आवेदन"],
   noteT:["담당자에게 보낼 문의 메모","Inquiry note for the office","发给主管人员的咨询便条","Ghi chú hỏi gửi cơ quan","कार्यालयका लागि सोधपुछ नोट"],
@@ -182,15 +153,12 @@ const UI_BASE = {
   example:["예시","Example","示例","Ví dụ","उदाहरण"],
 
   tabEvents:["행사와 축제","Events","活动","Sự kiện","कार्यक्रम"],
-  tabPlaces:["명소와 맛집","Places","景点","Địa điểm","ठाउँ"],
   tabAbout:["양주 소개","About","简介","Giới thiệu","परिचय"],
   stOn:["진행 중","Now on","进行中","Đang diễn ra","चलिरहेको"],
   stSoon:["예정","Upcoming","即将举行","Sắp diễn ra","आगामी"],
   stDone:["종료","Ended","已结束","Đã kết thúc","सकियो"],
   openMap:["지도에서 보기","View on map","在地图上查看","Xem bản đồ","नक्सामा हेर्नुहोस्"],
-  secPlaces:["가볼 만한 곳","Places to visit","值得一去","Địa điểm nên đến","घुम्न लायक ठाउँ"],
   secFood:["인증 음식점 찾기","Find certified restaurants","查找认证餐厅","Tìm nhà hàng được chứng nhận","प्रमाणित रेस्टुरेन्ट खोज्नुहोस्"],
-  numbersT:["숫자로 보는 양주","Yangju in numbers","数字看杨州","Yangju qua con số","अङ्कमा याङ्जु"],
   popL:["인구","Population","人口","Dân số","जनसंख्या"],
   foreignL:["외국인 주민","Foreign residents","外国居民","Cư dân nước ngoài","विदेशी बासिन्दा"],
   growthL:["인구 증가율","Population growth","人口增长率","Tăng trưởng dân số","जनसंख्या वृद्धि"],
@@ -199,13 +167,10 @@ const UI_BASE = {
   statSrc:["행정안전부 주민등록 통계 기반, 원자료 확인 예정","Based on MOIS resident statistics, to be verified","基于行政安全部居民登记统计、待核实","Theo thống kê cư trú của Bộ Hành chính, cần xác minh","गृह मन्त्रालयको तथ्याङ्कमा आधारित, पुष्टि हुन बाँकी"],
   heritageT:["역사와 문화","History & culture","历史与文化","Lịch sử, văn hóa","इतिहास, संस्कृति"],
   areaT:["동네와 교통","Areas & transport","区域与交通","Khu vực, giao thông","क्षेत्र, यातायात"],
-  colorT:["시 상징색","City color","市象征色","Màu biểu tượng","सहरको रङ"],
-  colorName:["별산담황색","Byeolsan Amber","别山淡黄色","Vàng hổ phách Byeolsan","ब्योल्सान एम्बर"],
-  colorD:["양주별산대놀이 노장탈에서 뽑은 색이에요.","Taken from the old monk mask of the Byeolsandae mask dance.","取自杨州别山台假面剧的老僧面具。","Lấy từ mặt nạ lão tăng của múa mặt nạ Byeolsandae.","ब्योल्सान्दे मुखौटा नृत्यको बूढो भिक्षु मुखौटाबाट लिइएको रङ।"]
 };
 
 /* =========================================================
-   3. Content
+   콘텐츠: 업무·생활 정보·혜택·행사·고지서
    ========================================================= */
 export const ARC = ["외국인등록증","Residence card (ARC)","外国人登录证","Thẻ cư trú (ARC)","विदेशी दर्ता कार्ड (ARC)"];
 export const CENTER = ["행정복지센터","Community service center","行政福利中心","Trung tâm hành chính phúc lợi","सामुदायिक सेवा केन्द्र"];
@@ -513,8 +478,7 @@ export const INTENTS = [
 ];
 
 
-/* 한 화면 레이아웃용 추가 문구 (원본 Object.assign(UI, …)) */
-/* 고지서 행동카드 문구 — 「고지서화면_구현요청_26.10.08」 (ko·vi·ne 는 리서치 번역, en·zh 는 AI 초안. 원어민 검토 전) */
+/* 고지서 행동카드 문구. ko·vi·ne 는 팀 번역, en·zh 는 AI 초안 (원어민 검토 전) */
 const UI_BANK = {
   todoNow:["지금 할 일","What to do now","现在要做的事","Việc cần làm ngay","अहिले गर्नुपर्ने काम"],
   bankT:["은행 앱으로 송금하기 (가장 쉬운 방법)","Transfer with your bank app (easiest way)","用银行 APP 转账（最简单的方法）","Chuyển khoản qua ứng dụng ngân hàng (cách dễ nhất)","बैंक एपबाट रकम पठाउनुहोस् (सबैभन्दा सजिलो तरिका)"],
@@ -550,7 +514,7 @@ const UI_BANK = {
   myRecords:["내 납부 기록","My payment records","我的缴纳记录","Lịch sử nộp của tôi","मेरो भुक्तानी रेकर्ड"],
   paidOn:["납부일","Paid on","缴纳日期","Ngày nộp","तिरेको मिति"],
   deleteAll:["삭제","Delete","删除","Xóa","मेटाउनुहोस्"],
-  // 사진 경로(가리기·읽는 중) 문구. maskLead·maskDone 은 「고지서화면_구현요청」 A표, 나머지는 AI 초안
+  // 사진 경로(가리기·읽는 중)
   maskLead:["이름·주소·납세번호 위를 손가락으로 눌러 드래그하면 검은 상자로 가려집니다. 가린 부분은 전송되지 않습니다.","Press and drag over your name, address and tax number to cover them with black boxes. Covered parts are not sent.","用手指按住并拖过姓名、地址和纳税号码，就会用黑框遮住。遮住的部分不会被发送。","Dùng ngón tay nhấn và kéo qua tên, địa chỉ và mã số thuế để che bằng ô màu đen. Phần đã che sẽ không được gửi đi.","नाम, ठेगाना र कर नम्बरमाथि औंलाले थिचेर तान्नुहोस्, कालो बाकसले छोपिन्छ। छोपिएको भाग पठाइँदैन।"],
   maskCanvas:["고지서 사진. 드래그해서 가리기","Notice photo. Drag to cover","税单照片。拖动以遮挡","Ảnh giấy báo. Kéo để che","बिलको फोटो। छोप्न तान्नुहोस्"],
   maskUndo:["마지막 상자 지우기","Remove last box","删除最后一个框","Xóa ô vừa che","अन्तिम बाकस हटाउनुहोस्"],
@@ -568,7 +532,7 @@ const UI_BANK = {
   day:["일","Day","日","Ngày","दिन"],
   confirmLead:["다른 부분은 직접 수정하세요.","Correct anything that differs.","如有不同，请直接修改。","Nếu có chỗ khác, hãy sửa trực tiếp.","फरक भएको भाग आफैं सच्याउनुहोस्।"],
   noteKoT:["담당자에게 보여 줄 한국어 메모","Korean note to show the officer","给工作人员看的韩语便条","Ghi chú tiếng Hàn để đưa cho nhân viên","कर्मचारीलाई देखाउने कोरियाली नोट"],
-  // 2차 개선점검: 고지서 자유 질문, 혜택 신청 바로가기, 둘러보기 보강, 공식 안내
+  // 고지서 자유 질문, 혜택 신청 바로가기, 둘러보기, 공식 안내
   askPh:["고지서에 대해 궁금한 것을 적어 주세요","Ask anything about this notice","请输入关于税单的问题","Hỏi bất cứ điều gì về giấy báo này","यो बिलबारे केही सोध्नुहोस्"],
   askSend:["질문 보내기","Send question","发送问题","Gửi câu hỏi","प्रश्न पठाउनुहोस्"],
   otherBenefits:["같은 단계의 다른 지원 보기","See other benefits for this stage","查看同阶段的其他支援","Xem hỗ trợ khác cùng giai đoạn","यही चरणका अन्य सुविधा हेर्नुहोस्"],
@@ -578,14 +542,13 @@ const UI_BANK = {
   eventsSrc:["양주시 누리집에서 행사 원문 보기","See the original notice on the Yangju City website","在杨州市官网查看活动原文","Xem thông báo gốc trên trang web thành phố Yangju","याङ्जु सहरको वेबसाइटमा मूल सूचना हेर्नुहोस्"],
   foodAreas:["동네별 맛집 지도","Restaurants by neighborhood (map)","各街区美食地图","Quán ăn theo khu vực (bản đồ)","टोल अनुसार रेस्टुरेन्ट (नक्सा)"],
   officialT:["공식 안내","Official information","官方信息","Thông tin chính thức","आधिकारिक जानकारी"],
-  // 기한 경과 화면 (1012_유진_요청사항). vi 는 유진 님 번역, en·zh·ne 는 AI 초안을 역번역으로 검증
+  // 기한 경과 화면. vi 는 팀 번역, en·zh·ne 는 AI 초안을 역번역으로 검증
   overdueWarn:["납부 기한이 지나 납부지연가산세 3%가 더해졌을 수 있어요","The due date has passed, so a 3% late-payment penalty may have been added","已过缴纳期限，可能已加收 3% 的滞纳金","Đã quá hạn nộp nên có thể đã bị cộng thêm 3% tiền phạt nộp chậm.","भुक्तानी अन्तिम मिति नाघेकाले 3% ढिलो भुक्तानी जरिवाना थपिएको हुन सक्छ"],
   overdueSend:["기한이 지났어요. 가능한 빨리 송금하세요.","The due date has passed. Transfer as soon as possible.","已过期限，请尽快转账。","Đã quá hạn nộp. Hãy chuyển tiền càng sớm càng tốt.","म्याद नाघिसक्यो। सकेसम्म चाँडो रकम पठाउनुहोस्।"],
   overdueCheckT:["위택스에서 지금 낼 금액 확인하기","Check the current amount due on Wetax","在 WeTax 确认现在应缴金额","Kiểm tra số tiền phải nộp hiện tại trên WeTax","WeTax मा अहिले तिर्नुपर्ने रकम जाँच्नुहोस्"],
   overdueCheckD:["기한이 지나면 낼 금액이 고지서와 다를 수 있어요. 위택스에서 지금 낼 금액을 확인한 뒤 송금하세요.","After the due date, the amount due may differ from the notice. Check the current amount on Wetax before you transfer.","过期后应缴金额可能与税单不同。请先在 WeTax 确认现在应缴金额，再转账。","Sau khi quá hạn, số tiền phải nộp có thể khác với giấy báo. Hãy kiểm tra số tiền hiện tại trên WeTax rồi mới chuyển tiền.","म्याद नाघेपछि तिर्नुपर्ने रकम बिलभन्दा फरक हुन सक्छ। WeTax मा अहिलेको रकम जाँचेर मात्र पठाउनुहोस्।"],
   amountBefore:["고지서 금액 (기한 전)","Amount on notice (before due date)","税单金额（逾期前）","Số tiền trên giấy báo (trước hạn)","बिलको रकम (म्याद अघि)"],
-  // 홈 화면 설치 (PWA)
-  // 기능 추가 (10/13): AI 가릴 곳 찾기, 달력 알림, 개인정보 감지
+  // AI 가릴 곳 찾기, 달력 알림, 개인정보 감지
   autoMask:["AI로 가릴 곳 찾기","Find what to cover with AI","用 AI 查找需遮挡处","Dùng AI tìm chỗ cần che","AI ले छोप्ने ठाउँ खोज्नुहोस्"],
   autoMaskBusy:["찾는 중…","Finding…","查找中…","Đang tìm…","खोज्दै…"],
   autoMaskNote:["위치를 찾기 위해 흐린 저해상도 사본만 AI에 보내요. 읽기는 가린 사진으로만 해요.","Only a blurry low-resolution copy is sent to find positions. Reading uses the covered photo only.","仅发送模糊的低分辨率副本用于定位，读取时只使用遮挡后的照片。","Chỉ gửi bản sao mờ độ phân giải thấp để tìm vị trí. Việc đọc chỉ dùng ảnh đã che.","स्थान खोज्न धमिलो कम रिजोल्युसनको प्रति मात्र पठाइन्छ। पढ्दा छोपिएको फोटो मात्र प्रयोग हुन्छ।"],
@@ -600,9 +563,9 @@ const UI_BANK = {
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 
-/* UI_BANK 이후에 덧붙인 문구 (AI 초안) */
+/* 그 뒤에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
-  // 3차 개선제안 (2026-10-13): 홈 버튼, 고지서 QR 바로가기, 앱 설치 배너·안내, PC 시연 패널
+  // 홈 버튼, 고지서 QR 바로가기, 앱 설치 배너·안내, PC 시연 패널
   aHomeBtn:["홈으로","Home","返回首页","Về trang chủ","गृहपृष्ठ"],
   qrHere:["고지서의 QR로 바로 들어왔어요","Opened from the QR on your notice","已通过税单上的二维码直接进入","Đã mở từ mã QR trên giấy báo","बिलको QR बाट सिधै खोलियो"],
   qrLang:["언어를 고르면 '받은 고지서 읽기'로 바로 이동해요.","Choose a language and we'll take you straight to the tax notice guide.","选择语言后将直接进入“看懂收到的税单”。","Chọn ngôn ngữ, bạn sẽ được chuyển ngay đến mục đọc giấy báo thuế.","भाषा छान्नुहोस्, सिधै कर बिल बुझ्ने पृष्ठमा जानुहुन्छ।"],
@@ -630,18 +593,15 @@ const UI_EXTRA = {
   deskQr2:["고지서 QR 예시","Notice QR example","税单二维码示例","Ví dụ mã QR trên giấy báo","बिलको QR उदाहरण"],
   deskQr2D:["찍으면 '받은 고지서 읽기'로 바로 열려요","Opens the tax notice guide directly","扫描后直接打开“看懂收到的税单”","Mở thẳng mục đọc giấy báo thuế","सिधै कर बिल बुझ्ने पृष्ठ खुल्छ"],
   deskNote:["PC에서는 휴대폰 화면 크기로 보여 줘요. 실제 서비스는 휴대폰용이에요.","On a PC this shows at phone size. The service is built for phones.","在电脑上以手机尺寸显示，本服务专为手机设计。","Trên máy tính hiển thị theo kích thước điện thoại. Dịch vụ dành cho điện thoại.","PC मा फोन आकारमा देखिन्छ। सेवा फोनका लागि बनाइएको हो।"],
-  // 혜택 검색 (2026-10-13)
+  // 혜택 검색
   searchBen:["혜택 검색 (예: 월세, 출산, 구직)","Search benefits (e.g. rent, birth, job)","搜索福利（如：房租、生育、求职）","Tìm hỗ trợ (VD: tiền thuê, sinh con, việc làm)","सुविधा खोज्नुहोस् (जस्तै: भाडा, जन्म, काम)"],
   noMatch:["검색 결과가 없어요. 다른 말로 찾아보세요.","No results. Try another word.","没有搜索结果，请换个词试试。","Không có kết quả. Hãy thử từ khác.","नतिजा छैन। अर्को शब्दले खोज्नुहोस्।"],
-  // 업무 목록·상세 (드롭다운식, 2026-10-13)
+  // 업무 목록·상세 (드롭다운식)
   openChecklist:["준비물 체크리스트 열기","Open the checklist","打开准备清单","Mở danh sách chuẩn bị","तयारी सूची खोल्नुहोस्"],
   mySituation:["내 상황 고르기","Choose your situation","选择我的情况","Chọn tình huống của bạn","आफ्नो अवस्था छान्नुहोस्"],
   situationPick:["— 선택 —","— Select —","— 请选择 —","— Chọn —","— छान्नुहोस् —"],
   situationHelp:["상황에 따라 필요한 서류가 달라요. 고르면 준비물에 더해져요.","Required documents differ by situation. Pick one to add them to the list.","所需材料因情况而异，选择后会加入准备清单。","Giấy tờ cần thiết khác nhau theo tình huống. Chọn để thêm vào danh sách.","अवस्था अनुसार कागजात फरक हुन्छ। छानेपछि सूचीमा थपिन्छ।"],
   feeT:["수수료","Fee","手续费","Lệ phí","शुल्क"],
-  payOtherT:["은행 ATM 또는 전화 ARS","Bank ATM or phone (ARS)","银行 ATM 或电话 ARS","ATM ngân hàng hoặc điện thoại ARS","बैंक ATM वा फोन (ARS)"],
-  payOtherD:["ATM은 카드나 통장, 전화는 한국어 음성 안내","ATM: card or bankbook. Phone: Korean voice guide","ATM 用银行卡或存折，电话为韩语语音","ATM dùng thẻ hoặc sổ, điện thoại bằng tiếng Hàn","ATM मा कार्ड वा पासबुक, फोन कोरियाली आवाजमा"],
-  pay1D:["전자납부번호로 조회해서 납부 (00:30~23:30)","Search with the e-payment number and pay (00:30-23:30)","用电子缴纳号码查询后缴纳（00:30～23:30）","Tra cứu bằng mã nộp điện tử rồi nộp (00:30-23:30)","इ-भुक्तानी नम्बरले खोजेर तिर्नुहोस् (00:30-23:30)"],
   pay2D:["고지서의 가상계좌로 금액 그대로 보내기","Send the exact amount to the virtual account","向虚拟账户转入相同金额","Chuyển đúng số tiền vào tài khoản ảo","भर्चुअल खातामा उही रकम पठाउनुहोस्"],
   faqShort:["추가 질문","Questions","更多问题","Hỏi thêm","थप प्रश्न"],
   tabHelp:["상담","Get help","咨询","Hỗ trợ","सहायता"],

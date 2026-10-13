@@ -1,11 +1,11 @@
 // AI 상담(양주무관) 대화 상태. 사용자의 한 문장을 받아 볼 화면을 추천한다.
-//  1. 규칙(INTENTS)에 걸리면 바로 그 화면으로. 안 걸리면 AI 가 공식 문서(knowledge.ts) 안에서 답하고 근거를 붙인다
-//  2. 없거나 실패하면 INTENTS 정규식(5개 언어 키워드)으로 같은 일을 한다 — 키 없이도 동작해야 하므로
+// 규칙(INTENTS, 5개 언어 키워드)에 걸리면 바로 그 화면으로. 안 걸리면 AI 가 공식 문서(knowledge.ts) 안에서만 답하고
+// 근거를 붙인다. AI 가 없거나 실패하면 "조금 더 알려 주세요 + 1345". 키 없이도 규칙만으로 동작해야 한다.
 // 메시지 문구는 전부 UI 사전 키(chatHello/chatFound/chatMiss)라 언어가 바뀌면 그대로 따라온다.
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { INTENTS, LANGS, LIFE, STAGES, VISIT } from '@/data/content';
-import { getAi } from '@/services/ai';
 import { KNOWLEDGE, type KnowledgeDoc } from '@/data/knowledge';
+import { getAi } from '@/services/ai';
 import { groundedPrompt } from '@/services/prompts';
 import type { Screen } from '@/types';
 import { useApp } from './AppContext';
@@ -19,7 +19,7 @@ export interface GuideMessage {
   text?: string;
   /** 추천 화면. 있으면 말풍선 아래 이동 버튼 */
   go?: Screen;
-  /** 근거 문서 (기능 5). 있으면 "근거: 제목" 줄 */
+  /** 근거 문서. 있으면 "근거: 제목" 줄 */
   source?: KnowledgeDoc;
 }
 
@@ -50,11 +50,9 @@ export function GuideProvider({ children }: { children: ReactNode }) {
     const q = raw.trim();
     if (!q) return;
     push({ me: true, text: q });
-    // 1) 규칙 먼저: 5개 언어 키워드로 정해 둔 화면이 가장 정확하고 즉시 답한다 ("이사했어요" → 체류지 변경 신고)
+    // 규칙이 가장 정확하고 즉시 답한다 ("이사했어요" → 체류지 변경 신고)
     const hit = INTENTS.find((i) => i.re.test(q));
     if (hit) { push({ key: 'chatFound', go: hit.go as Screen }); return; }
-    // 2) 규칙에 없으면 AI 가 공식 문서(knowledge.ts) 안에서만 답하고 근거 id 를 돌려준다 (기능 5).
-    //    문서 밖이거나 AI 가 없거나 실패하면 "조금 더 알려 주세요 + 1345"
     const ai = getAi();
     if (!ai) { push({ key: 'chatMiss' }); return; }
     setBusy(true);
@@ -64,7 +62,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
       const r = await ai.json<{ answer?: string; sourceId?: string | null }>(groundedPrompt(q, docs, langName));
       const src = KNOWLEDGE.find((d) => d.id === r.sourceId);
       const answer = (r.answer || '').trim();
-      if (src && answer) push({ text: answer, source: src, go: src.go as Screen | undefined });
+      if (src && answer) push({ text: answer, source: src, go: src.go });
       else push({ key: 'chatMiss' });
     } catch {
       push({ key: 'chatMiss' });

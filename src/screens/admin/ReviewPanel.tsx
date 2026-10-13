@@ -27,7 +27,7 @@ export function ReviewPanel() {
     try { importJson(pasted); setPasted(''); setPasteOpen(false); toast(T('검수 결과를 적용했어요', 'Review applied')); }
     catch { toast(T('형식이 맞지 않아요', 'Invalid format')); }
   };
-  const onReset = () => { if (confirm(T('검수 표시를 모두 지울까요?', 'Clear all review marks?'))) reset(); };
+  const onReset = () => { if (window.confirm(T('검수 표시를 모두 지울까요?', 'Clear all review marks?'))) reset(); };
 
   return (
     <section className="panel">

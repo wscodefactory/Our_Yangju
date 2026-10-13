@@ -1,4 +1,5 @@
-// 혜택 상세: 요약(kv) + 자격/준비물/신청 탭 + 하단 바(저장·문의 메모). 참고용 html 의 SCREENS.benefit.
+// 혜택 상세: 요약(kv) + 자격/준비물/신청 탭 + 하단 바(저장·문의 메모).
+// 퀴즈 답은 화면 안에서만 산다. 다른 혜택으로 바뀌면 ScreenRouter 가 key 로 새로 만든다.
 import { useState } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Checklist, LvBadge, Seg, StBadge } from '@/components/ui/Bits';
@@ -40,7 +41,7 @@ export function BenefitScreen({ id }: { id: string }) {
         ))}
         {done && (vals.includes('no')
           ? <div className="callout warn sm result"><Ic n="alert" cls="sm" /><span>{t('rNo')}<br />
-              {/* 해당 안 됨 → 같은 단계의 다른 지원으로 (2차 개선점검 3.1) */}
+              {/* 해당 안 되면 같은 단계의 다른 지원으로 */}
               <button type="button" className="btn ghost sm" style={{ marginTop: 6, padding: 0 }} onClick={() => go({ k: 'welfare', g: groupOf(b.stage), s: b.stage })}>{t('otherBenefits')}<Ic n="chev" cls="sm" /></button></span></div>
           : vals.includes('unsure')
             ? <div className="callout info sm result"><Ic n="help" cls="sm" /><span>{t('rUn')}</span></div>
@@ -57,7 +58,7 @@ export function BenefitScreen({ id }: { id: string }) {
           <span className={`bdg ${online ? 'blue' : 'green'}`}><Ic n={online ? 'web' : 'building'} cls="sm" />{t(online ? 'online' : 'visit')}</span>
         </div>
         <p style={{ margin: '0 0 8px', fontWeight: 700 }}>{tx(b.ch.where)}</p>
-        {/* 신청 바로가기: 온라인은 신청 사이트, 방문은 행정복지센터 지도·운영 시간 (2차 개선점검 3.1·3.6) */}
+        {/* 신청 바로가기: 온라인은 신청 사이트, 방문은 행정복지센터 지도·운영 시간 */}
         <div className="stack" style={{ gap: 8, margin: '0 0 10px' }}>
           {APPLY_SITES.filter((x) => b.ch.where[0].includes(x.match)).map((x) => (
             <a key={x.href} className="btn secondary sm" href={x.href} target="_blank" rel="noopener">{tx(x.label)}<Ic n="ext" cls="sm" /></a>
@@ -94,7 +95,7 @@ export function BenefitScreen({ id }: { id: string }) {
       <div className="tabpanel">{panel}</div>
       <BottomBar>
         <button type="button" className="btn secondary side" aria-pressed={on} onClick={() => { toggleSaved(b.id); toast(on ? t('unsavedToast') : t('savedToast')); }}>
-          {/* 헤더 북마크(목록 열기)와 구분: 담기 전 '북마크 추가', 담은 뒤 '체크 북마크' (2차 개선점검 3.2) */}
+          {/* 앱 바의 북마크(목록 열기)와 헷갈리지 않게 담기 전엔 '추가', 담은 뒤엔 '체크' 모양 */}
           <Ic n={on ? 'bookmarkCheck' : 'bookmarkPlus'} />{on ? t('savedState') : t('save')}
         </button>
         <button type="button" className="btn primary" onClick={() => openOverlay({ k: 'note', id: b.id })}><Ic n="pencil" cls="sm" />{t('noteBtn')}</button>

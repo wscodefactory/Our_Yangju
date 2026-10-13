@@ -1,5 +1,5 @@
-// 시청과 주민센터 업무 목록 — 드롭다운(아코디언) 카드. 카드를 누르면 배지·어디서·언제가 펼쳐지고, 체크리스트는 상세 화면에서.
-// 디자인 참고: 요청사항/code_artifact 드롭다운식.html. 색·모양은 Yangju DS 토큰 그대로. 업무가 6개뿐이라 검색창은 두지 않는다.
+// 시청과 주민센터 업무 목록 — 아코디언 카드. 카드를 누르면 배지·어디서·언제가 펼쳐지고, 체크리스트는 상세 화면에서.
+// 업무가 6개뿐이라 검색창은 두지 않는다.
 import { useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';

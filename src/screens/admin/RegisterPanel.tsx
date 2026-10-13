@@ -41,6 +41,8 @@ export function RegisterPanel({ state, setState }: Props) {
   const { T, tx, toast, publishBenefit, replaceNav } = useApp();
   const ai = getAi();
   const { text, rule, checks, busy } = state;
+  // AI가 stage id를 엉뚱하게 줄 수도 있어서 못 찾으면 id 문자열이라도 그대로 보여준다
+  const stageName = (stage: string) => tx(STAGES[stage as keyof typeof STAGES]) || stage;
 
   // 규칙을 체크 항목 리스트로 펴고(found = 원문에 quote가 실제로 있는지), 그걸로 원문을 조각낸다.
   // 원문이 길 수 있어서 체크박스 토글마다 다시 계산하지 않도록 memo.
@@ -53,8 +55,8 @@ export function RegisterPanel({ state, setState }: Props) {
   const extract = async () => {
     if (!text.trim()) { toast(T('공고문을 넣어 주세요', 'Paste a notice first')); return; }
     if (!ai) {
-      // AI 없을 땐 예시 공고 한 건만 미리 뽑아둔 SAMPLE_RULE로 대신한다. 깊은 복사: 데이터 상수가 state로 새지 않게
-      if (text.trim() === SAMPLE_NOTICE.trim()) setState({ rule: JSON.parse(JSON.stringify(SAMPLE_RULE)) as ExtractedRule, checks: [] });
+      // AI 없을 땐 예시 공고 한 건만 미리 뽑아둔 SAMPLE_RULE로 대신한다. 복사본: 데이터 상수가 state로 새지 않게
+      if (text.trim() === SAMPLE_NOTICE.trim()) setState({ rule: structuredClone(SAMPLE_RULE) as ExtractedRule, checks: [] });
       else toast(T('AI 연결이 없어 예시 공고만 처리할 수 있어요', 'Without AI only the sample notice works'));
       return;
     }
@@ -72,7 +74,7 @@ export function RegisterPanel({ state, setState }: Props) {
     if (!rule) return;
     const pub = ruleToPublished(rule);
     publishBenefit(pub);
-    const stageLabel = tx(STAGES[pub.stage as keyof typeof STAGES]) || pub.stage;
+    const stageLabel = stageName(pub.stage);
     toast(T(`게시했어요 · ${stageLabel} 단계에 나타나요`, `Published · now under ${stageLabel}`));
     // 게시 직후 시민 화면의 해당 단계로 점프. 스택을 갈아끼워서 뒤로가기가 홈으로 가게 한다
     replaceNav([{ k: 'home' }, { k: 'welfare', g: groupOf(pub.stage), s: pub.stage }]);
@@ -105,13 +107,11 @@ export function RegisterPanel({ state, setState }: Props) {
   }
 
   /* ----- 2단계: 근거 확인 → 게시 ----- */
-  // AI가 stage id를 엉뚱하게 줄 수도 있어서 못 찾으면 id 문자열이라도 그대로 보여준다
-  const stageLabel = tx(STAGES[rule.stage as keyof typeof STAGES]) || rule.stage || '';
   return (
     <div className="stack">
       <section className="panel">
-        <h2>{rule.name || ''}</h2>
-        <div className="badges"><span className="bdg green">{stageLabel}</span>{rule.summary && <span className="bdg gray">{rule.summary}</span>}</div>
+        <h2>{rule.name}</h2>
+        <div className="badges"><span className="bdg green">{stageName(rule.stage)}</span>{rule.summary && <span className="bdg gray">{rule.summary}</span>}</div>
         {/* 원문. 근거 문장은 <mark>로 감싸고 항목 번호를 위첨자로 단다. 아래 체크 목록의 번호와 대응 */}
         <div className="codebox" aria-label={T('원문', 'Original')} style={{ whiteSpace: 'pre-wrap', fontSize: '.875rem', lineHeight: 1.6, marginTop: 12 }}>
           <div>{parts.map((p, i) => p.mark ? <mark key={i}>{p.text}<sup>{p.mark}</sup></mark> : <span key={i}>{p.text}</span>)}</div>

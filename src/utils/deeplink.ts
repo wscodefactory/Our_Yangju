@@ -1,4 +1,4 @@
-// 바로가기 주소 규칙 (3차 개선제안 2장). 고지서·안내문·포스터의 QR 이 서비스 주소 뒤에 붙이는 값:
+// 바로가기 주소 규칙. 고지서·안내문·포스터의 QR 이 서비스 주소 뒤에 붙이는 값:
 //   ?go=doc&from=qr          받은 고지서 읽기 (QR 로 들어왔다는 표시)
 //   ?go=visit&id=reg         시청·주민센터 업무 하나 (move, reg, nhis, kid, drive) — id 가 없거나 틀리면 목록
 //   ?go=welfare              지원 혜택 찾기
@@ -13,7 +13,16 @@ export interface DeepLink { screen: Screen; qr: boolean }
 const TABS = ['events', 'places', 'food', 'about'] as const;
 type Tab = (typeof TABS)[number];
 
+// 주소를 지우고 나면 두 번째 호출은 아무것도 못 읽으므로 첫 결과를 기억한다 (StrictMode 가 초기화 함수를 두 번 부른다)
+let cached: DeepLink | null | undefined;
+
 export function readDeepLink(): DeepLink | null {
+  if (cached !== undefined) return cached;
+  cached = parse();
+  return cached;
+}
+
+function parse(): DeepLink | null {
   let q: URLSearchParams;
   try { q = new URLSearchParams(location.search); } catch { return null; }
   const go = q.get('go');

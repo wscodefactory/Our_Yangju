@@ -1,6 +1,6 @@
-// 받은 고지서 읽기 — 시작 화면. 참고용 html 의 SCREENS.doc 에 사진 경로(mask → reading)를 더한 것.
-// 사진 버튼이 항상 주 버튼. 판독(AI)이 꺼져 있으면 가리기 뒤 ReadingScreen 이 가린 사진을 보며 직접 입력하도록 넘긴다.
-// AI 키 입력은 시민 화면에 두지 않고 담당자 화면(#admin)에 있다 (3차 개선제안 7장).
+// 받은 고지서 읽기 — 시작 화면. 사진 / 샘플 / 직접 입력 세 갈래와, 이 휴대폰에 저장한 납부 기록.
+// 사진 버튼이 항상 주 버튼. 판독(AI)이 꺼져 있으면 가리기 뒤 ReadingScreen 이 직접 입력으로 넘긴다.
+// AI 키 입력은 시민 화면에 두지 않고 담당자 화면(#admin)에 있다.
 import { useRef, useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';
@@ -11,11 +11,17 @@ import { TAX_TYPES } from '@/data/content';
 import { paidStore } from '@/utils/paid';
 import { Stepper } from './Stepper';
 
+// 로컬 날짜 'YYYY-MM-DD'. toISOString 은 UTC 라 한국 아침에 저장한 기록이 전날로 보인다
+const localYmd = (ms: number) => {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export function DocScreen() {
   const { t, tx, fmtWon, fmtDate, go, toast, qrEntry } = useApp();
   const { startSample, startManual, loadFile } = useDoc();
   const fileRef = useRef<HTMLInputElement>(null);
-  // 이 휴대폰에 저장한 납부 기록 (MY). 지우면 바로 사라진다
+  // 이 휴대폰에 저장한 납부 기록. 지우면 바로 사라진다
   const [paid, setPaid] = useState(() => paidStore.load());
 
   const onFile = async (picked: File | undefined) => {
@@ -55,7 +61,7 @@ export function DocScreen() {
             {paid.map((r) => (
               <div key={r.paidAt} className="check" style={{ cursor: 'default' }}>
                 <span style={{ flex: 1 }}><b>{tx(TAX_TYPES[r.type])}</b> · {fmtWon(r.amount)}</span>
-                <span className="muted">{t('paidOn')} {fmtDate(new Date(r.paidAt).toISOString().slice(0, 10), { month: 'short', day: 'numeric' })}</span>
+                <span className="muted">{t('paidOn')} {fmtDate(localYmd(r.paidAt), { month: 'short', day: 'numeric' })}</span>
               </div>
             ))}
           </div>

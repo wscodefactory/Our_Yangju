@@ -1,6 +1,6 @@
-// 아이콘 한 곳. 참고용 html의 ic(name, cls)와 같은 이름을 Lucide 컴포넌트로 연결한다.
-// 크기·선 굵기는 global.css의 .ic / .ic.sm / .ic.lg 가 정한다 (24px, 1.9, 둥근 끝 = 디자인시스템 §5).
-// 장식용이라 전부 aria-hidden. 버튼의 이름은 호출부가 aria-label로 준다.
+// 아이콘 한 곳. 데이터(content.ts)에 적힌 짧은 이름을 Lucide 컴포넌트로 연결한다.
+// 크기·선 굵기는 global.css 의 .ic / .ic.sm / .ic.lg 가 정한다.
+// 장식용이라 전부 aria-hidden. 버튼의 이름은 호출부가 aria-label 로 준다.
 import {
   AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, BookmarkCheck, BookmarkPlus, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
   ChevronRight, CircleHelp, Copy, Cross, Download, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,
@@ -19,7 +19,7 @@ const MAP = {
 
 export type IconName = keyof typeof MAP;
 
-/** <Ic n="globe" /> · n은 참고용 html의 아이콘 이름 그대로. cls는 'sm' | 'lg' | 'filled' 조합 */
+/** <Ic n="globe" cls="sm" />. 데이터에서 오는 이름은 string 이라 모르는 이름이면 물음표 아이콘 */
 export function Ic({ n, cls = '' }: { n: IconName | string; cls?: string }) {
   const C = MAP[n as IconName] || CircleHelp;
   return <C className={`ic ${cls}`.trim()} aria-hidden="true" focusable="false" />;

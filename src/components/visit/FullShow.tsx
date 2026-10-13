@@ -1,4 +1,4 @@
-// 창구 직원에게 보여주는 전체 화면: 한국어 문장 크게 + 내 언어 뜻 + 읽어주기. 참고용 html 의 S.full 블록
+// 창구 직원에게 보여주는 전체 화면: 한국어 문장 크게 + 내 언어 뜻 + 읽어주기.
 import { useEffect, useRef } from 'react';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';

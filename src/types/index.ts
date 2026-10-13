@@ -1,10 +1,6 @@
 // 앱 전체에서 쓰는 공용 타입.
 // 시민 화면의 콘텐츠·문구는 data/content.ts 의 다섯 칸 배열(T5)이 기본 단위이고,
-// 아래 Bi/Text 와 담당자 화면용 타입은 #admin 경로(공고 → 규칙 등록)에서만 쓴다.
-
-/** [한국어, 영어] 쌍. 담당자 화면 전용 */
-export type Bi = readonly [string, string];
-export type Text = Bi | string;
+// 담당자 화면용 타입은 #admin 경로(공고 → 규칙 등록)에서만 쓴다.
 
 /* ---------- 고지서 ---------- */
 
@@ -91,10 +87,7 @@ export interface CheckItem { kind: string; text: string; quote?: string; found: 
 
 /* ---------- 화면(내비게이션 스택) ---------- */
 
-/**
- * 내비게이션 스택의 한 칸. k 가 화면 종류. 참고용 html 의 SCREENS 키와 같고,
- * 사진 읽기 경로(mask → reading)만 React 쪽에 추가로 있다.
- */
+/** 내비게이션 스택의 한 칸. k 가 화면 종류 */
 export type Screen =
   | { k: 'lang' }
   | { k: 'home' }
@@ -116,5 +109,3 @@ export type Screen =
   // 담당자 화면. 시민 홈에서는 안 보이고 #admin 으로만 들어온다
   | { k: 'admin'; tab: 'reg' | 'sig' | 'tr' }
   | { k: 'counter' };
-
-export type ScreenKey = Screen['k'];

@@ -1,4 +1,4 @@
-// 양주 둘러보기. 참고용 html 의 SCREENS.explore. 행사 / 명소 / 맛집 / 소개 탭.
+// 양주 둘러보기: 행사 / 명소 / 맛집 / 소개 탭.
 import { useEffect, useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Seg } from '@/components/ui/Bits';
@@ -16,6 +16,7 @@ const ORDER = { on: 0, soon: 1, done: 2 };
 export function ExploreScreen({ tab: initial = 'events' }: { tab?: Tab }) {
   const { t } = useApp();
   const [tab, setTab] = useState<Tab>(initial);
+  // 둘러보기 화면 위에 다른 탭의 둘러보기를 또 쌓으면 같은 컴포넌트가 재사용되므로 prop 을 따라간다
   useEffect(() => { setTab(initial); }, [initial]);
   return (
     <>
@@ -68,7 +69,6 @@ function Events() {
       })}
       {/* 수집 행사 중 번역이 안 된 것이 있으면 AI 초안 안내 (한국어 화면에선 불필요) */}
       {lang !== 'ko' && list.some((e) => e.draft) && <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('draftNote')}</span></p>}
-      {/* 행사 원문은 양주시 누리집 (2차 개선점검 3.1) */}
       <a className="btn secondary sm" href={EVENTS_URL} target="_blank" rel="noopener">{t('eventsSrc')}<Ic n="ext" cls="sm" /></a>
     </div>
   );
@@ -94,7 +94,6 @@ function Food() {
   const { t, tx } = useApp();
   return (
     <>
-      {/* 동네별 맛집 지도 (2차 개선점검 3.1: 원본에 있던 흐름 복원) */}
       <h2 className="sec-title" style={{ marginTop: 4 }}>{t('foodAreas')}</h2>
       <div className="chips" role="list">
         {FOOD_AREAS.map((a) => <a key={a.q} className="chip" role="listitem" href={mapUrl(a.q)} target="_blank" rel="noopener"><Ic n="pin" cls="sm" />{tx(a.name)}</a>)}
@@ -107,10 +106,11 @@ function Food() {
 
 function About() {
   const { lang, t, tx, fmtNum } = useApp();
-  const L = loc(lang);
-  const pop = lang === 'ko' || lang === 'zh' ? new Intl.NumberFormat(L, { notation: 'compact', maximumSignificantDigits: 3 }).format(298000) : fmtNum(298000);
-  const asOf = new Intl.DateTimeFormat(L, { year: 'numeric', month: 'short' }).format(new Date(2026, 8, 1));
-  const pct = new Intl.NumberFormat(L, { style: 'percent', maximumFractionDigits: 2 }).format(0.0429);
+  const locale = loc(lang);
+  // 한국어·중국어는 '29.8만' 식 단위 표기가 자연스럽고, 나머지는 전체 숫자
+  const pop = lang === 'ko' || lang === 'zh' ? new Intl.NumberFormat(locale, { notation: 'compact', maximumSignificantDigits: 3 }).format(298000) : fmtNum(298000);
+  const asOf = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short' }).format(new Date(2026, 8, 1));
+  const pct = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 2 }).format(0.0429);
   const mini = (icon: string, tone: string, a: T5, b: T5) => (
     <div key={a[0]} className="row"><span className={`ibox ${tone}`}><Ic n={icon} /></span><span className="tx"><span className="t">{tx(a)}</span><span className="d">{tx(b)}</span></span></div>
   );

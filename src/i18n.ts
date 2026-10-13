@@ -1,6 +1,6 @@
-// 5개 언어 문자열·서식 도우미. 원본 참고용 html의 tx/t/fmt* 를 옮긴 것.
-// 언어 코드(ko/en/zh/vi/ne)는 AppContext가 들고 있고, 여기 함수들은 전부 코드를 인자로 받는다.
-// 화면에서는 useApp()의 tx/t/fmt* 바인딩을 쓰면 되고, 컨텍스트 밖(서비스 등)에서는 이 파일을 직접 쓴다.
+// 5개 언어 문자열·서식 도우미.
+// 현재 언어는 AppContext 가 들고 있고, 여기 함수들은 전부 언어 코드를 인자로 받는다.
+// 화면에서는 useApp() 의 tx/t/fmt* 바인딩을 쓰고, 컨텍스트 밖(서비스 등)에서는 이 파일을 직접 쓴다.
 import { LANGS, TODAY, UI, type T5 } from '@/data/content';
 
 export type Lang = 'ko' | 'en' | 'zh' | 'vi' | 'ne';
@@ -11,16 +11,20 @@ const idx = (lang: Lang) => Math.max(0, LANGS.findIndex((l) => l.code === lang))
 /** [ko,en,zh,vi,ne] 배열에서 현재 언어 칸. 비어 있으면 영어로 */
 export const tx = (arr: T5 | undefined, lang: Lang): string => (arr && (arr[idx(lang)] || arr[1])) || '';
 
-/** UI 사전 키 → 문구. {n} 같은 자리표시자는 vars로 치환. 모르는 키는 키 그대로 돌려줘서 화면에서 바로 눈에 띄게 */
-export function t(key: string, lang: Lang, vars?: Record<string, string | number>): string {
-  const arr = (UI as Record<string, T5>)[key];
-  let s = arr ? tx(arr, lang) : key;
+/** {n} 같은 자리표시자를 vars 로 치환 */
+export function fill(s: string, vars?: Record<string, string | number>): string {
   if (vars) for (const v in vars) s = s.replace(`{${v}}`, String(vars[v]));
   return s;
 }
 
-/* 런타임 ICU에 해당 로캘이 없으면 Intl이 브라우저 기본 로캘(예: ko)로 조용히 떨어진다.
-   그래서 지원 여부를 확인하고, 없으면 영어 형식으로 폴백해 한국어가 새지 않게 한다. */
+/** UI 사전 키 → 문구. 모르는 키는 키 그대로 돌려줘서 화면에서 바로 눈에 띄게 */
+export function t(key: string, lang: Lang, vars?: Record<string, string | number>): string {
+  const arr = (UI as Record<string, T5>)[key];
+  return fill(arr ? tx(arr, lang) : key, vars);
+}
+
+// 런타임 ICU 에 해당 로캘이 없으면 Intl 이 브라우저 기본 로캘(예: ko)로 조용히 떨어진다.
+// 그래서 지원 여부를 확인하고, 없으면 영어 형식으로 폴백해 한국어가 새지 않게 한다.
 const LOC_OK: Record<string, boolean> = {};
 export function loc(lang: Lang): string {
   const l = LANGS[idx(lang)].locale;
@@ -35,7 +39,7 @@ export const parseDate = (s: string) => { const [y, m, d] = s.split('-').map(Num
 export const fmtDate = (s: string, lang: Lang, opt: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }) =>
   new Intl.DateTimeFormat(loc(lang), opt).format(parseDate(s));
 
-/** 기간. 같은 날이면 하루만. 범위 구분자는 하이픈으로 통일(디자인시스템 §8).
+/** 기간. 같은 날이면 하루만. 범위 구분자는 하이픈으로 통일.
  *  formatRange 는 브라우저·언어에 따라 서식이 들쭉날쭉해서(중국어에서 숫자형으로 떨어지는 경우가 있었다) 날짜 둘을 그냥 잇는다 */
 export function fmtRange(a: string, b: string, lang: Lang): string {
   const opt: Intl.DateTimeFormatOptions = { year: 'numeric', month: lang === 'zh' ? 'long' : 'short', day: 'numeric' };

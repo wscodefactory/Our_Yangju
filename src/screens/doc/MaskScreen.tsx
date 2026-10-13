@@ -13,10 +13,9 @@ import { Stepper } from './Stepper';
 
 /** 이 크기(캔버스 픽셀) 이하의 상자는 탭 실수로 보고 버린다 */
 const MIN_RECT_PX = 8;
+/** AI 상자 둘레에 두는 여유 (상자 크기 대비). 글자 끝이 삐져나오지 않게 */
+const PAD = 0.04;
 
-/**
- * 드래그 중 상자(cur)는 state 가 아니라 ref — pointermove 마다 리렌더할 이유가 없고, draw() 로 캔버스에 직접 그린다.
- */
 /** AI 가 돌려주는 상자 (0~1000 정규화, [ymin, xmin, ymax, xmax]) */
 interface PiiBox { label?: string; box_2d?: number[] }
 
@@ -26,11 +25,12 @@ export function MaskScreen() {
   const viewRef = useRef<HTMLCanvasElement>(null);
   const [detecting, setDetecting] = useState(false);
   const canDetect = !!getAi()?.supportsImages;
+  // 드래그 중 상자는 state 가 아니라 ref — pointermove 마다 리렌더할 이유가 없고, draw() 가 캔버스에 직접 그린다
+  const dragStart = useRef<[number, number] | null>(null);
+  const cur = useRef<Rect | null>(null);
 
-  /**
-   * AI 가릴 곳 찾기. 긴 변 640px 사본을 보내 위치만 받고(글자 내용은 출력 금지), 캔버스 좌표로 바꿔 상자를 추가한다.
-   * 상자 둘레에 4% 여유를 둬서 글자 끝이 삐져나오지 않게. 사용자가 확인하고 빠진 곳은 직접 가린다.
-   */
+  // AI 가릴 곳 찾기. 긴 변 640px 사본을 보내 위치만 받고(글자 내용은 출력 금지), 캔버스 좌표로 바꿔 상자를 추가한다.
+  // 사용자가 결과를 확인하고 빠진 곳은 직접 가린다.
   const detect = async () => {
     const ai = getAi();
     if (!ai || !canvas) return;
@@ -38,25 +38,24 @@ export function MaskScreen() {
     try {
       const blob = await canvasToBlob(downscale(canvas, 640), 0.7);
       const r = await ai.json<{ boxes?: PiiBox[] }>(DETECT_PII_PROMPT, { image: blob });
-      const boxes = (r.boxes || []).filter((b) => Array.isArray(b.box_2d) && b.box_2d.length === 4);
-      boxes.forEach((b) => {
-        const [y0, x0, y1, x1] = b.box_2d!.map((v) => Math.max(0, Math.min(1000, v)) / 1000);
-        const pad = 0.04;
-        const x = Math.max(0, (x0 - pad * (x1 - x0)) * canvas.width);
-        const y = Math.max(0, (y0 - pad * (y1 - y0)) * canvas.height);
-        const w = Math.min(canvas.width - x, (x1 - x0) * (1 + 2 * pad) * canvas.width);
-        const h = Math.min(canvas.height - y, (y1 - y0) * (1 + 2 * pad) * canvas.height);
+      let found = 0;
+      for (const b of r.boxes ?? []) {
+        if (!Array.isArray(b.box_2d) || b.box_2d.length !== 4) continue;
+        found++;
+        const [y0, x0, y1, x1] = b.box_2d.map((v) => Math.max(0, Math.min(1000, v)) / 1000);
+        const x = Math.max(0, (x0 - PAD * (x1 - x0)) * canvas.width);
+        const y = Math.max(0, (y0 - PAD * (y1 - y0)) * canvas.height);
+        const w = Math.min(canvas.width - x, (x1 - x0) * (1 + 2 * PAD) * canvas.width);
+        const h = Math.min(canvas.height - y, (y1 - y0) * (1 + 2 * PAD) * canvas.height);
         if (w > MIN_RECT_PX && h > MIN_RECT_PX) addRect([x, y, w, h]);
-      });
-      toast(boxes.length ? t('autoMaskFound', { n: boxes.length }) : t('autoMaskNone'));
+      }
+      toast(found ? t('autoMaskFound', { n: found }) : t('autoMaskNone'));
     } catch {
       toast(t('autoMaskFail'));
     } finally {
       setDetecting(false);
     }
   };
-  const dragStart = useRef<[number, number] | null>(null);
-  const cur = useRef<Rect | null>(null);
 
   // 원본 캔버스를 깔고, 확정된 상자 + 드래그 중인 상자를 검게 덮는다
   const draw = () => {
@@ -103,32 +102,32 @@ export function MaskScreen() {
     draw();
   };
 
-  const onUp = () => {
+  // commit=false 는 pointercancel (브라우저가 제스처를 가져간 경우): 그리던 상자를 버린다
+  const endDrag = (commit: boolean) => {
     const finished = cur.current;
-    if (finished && finished[2] > MIN_RECT_PX && finished[3] > MIN_RECT_PX) addRect(finished);
+    if (commit && finished && finished[2] > MIN_RECT_PX && finished[3] > MIN_RECT_PX) addRect(finished);
     cur.current = null;
     dragStart.current = null;
-    draw(); // 버려진 작은 상자는 여기서 지워야 함
+    draw(); // 버려진 상자는 여기서 지워야 한다
   };
 
   return (
     <>
       <Title>{t('st2')}</Title>
       <Stepper step={1} />
-      <p className="lead">
-        {t('maskLead')}
-      </p>
+      <p className="lead">{t('maskLead')}</p>
       <div className="canvaswrap">
         <canvas
           ref={viewRef}
           aria-label={t('maskCanvas')}
           onPointerDown={onDown}
           onPointerMove={onMove}
-          onPointerUp={onUp}
+          onPointerUp={() => endDrag(true)}
+          onPointerCancel={() => endDrag(false)}
         />
       </div>
       <div className="stack" style={{ marginTop: 12 }}>
-        {/* AI 로 가릴 곳 찾기: 저해상도 사본으로 위치만 받고, 전송은 여전히 가린 사진만. 샘플은 이미 가려져 있어 숨김 */}
+        {/* 저해상도 사본으로 위치만 받고, 전송은 여전히 가린 사진만. 샘플은 이미 가려져 있어 숨김 */}
         {canDetect && !doc?.sample && (
           <>
             <button type="button" className="btn secondary" disabled={detecting} onClick={() => void detect()}>

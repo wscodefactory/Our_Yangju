@@ -1,6 +1,5 @@
-// 여러 화면이 같이 쓰는 작은 조각들. 참고용 html 의 seg / checklist / rowBtn / lvBadge / stBadge / callout 에 해당.
-// 모양은 전부 global.css 클래스(.seg .check .row .bdg .callout)가 정한다.
-import { useState, type ReactNode } from 'react';
+// 여러 화면이 같이 쓰는 작은 조각들. 모양은 전부 global.css 클래스(.seg .check .row .bdg .callout)가 정한다.
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { useApp } from '@/context/AppContext';
 import { LV, ST } from '@/data/content';
 import { Ic } from './Ic';
@@ -54,7 +53,7 @@ export function RowBtn({ icon, tone = 'tone-green', title, desc, onClick }: {
   );
 }
 
-/** 공식 안내 줄: 링크·전화·그냥 글. data/links.ts 의 LinkRow[] (2차 개선점검 3.6) */
+/** 공식 안내 줄 목록: 전화는 tel: 링크, 주소는 새 창, 둘 다 없으면 글만. data/links.ts 의 LinkRow[] */
 export function LinkList({ rows, title }: { rows: { label: string[]; href?: string; tel?: string }[]; title: string }) {
   const { tx, t } = useApp();
   if (!rows.length) return null;
@@ -76,7 +75,7 @@ export function LvBadge({ lv }: { lv: 'C' | 'G' | 'Y' }) {
   return <span className={`bdg ${lv === 'Y' ? 'amber' : lv === 'G' ? 'blue' : 'gray'}`}>{tx(LV[lv])}</span>;
 }
 
-/** 가능성 배지: 색 점 대신 글자로 (디자인시스템 §2.3) */
+/** 가능성 배지. 색만으로 구분하지 않게 글자를 같이 쓴다 */
 export function StBadge({ st }: { st: 'high' | 'check' }) {
   const { tx } = useApp();
   return st === 'high'
@@ -86,7 +85,7 @@ export function StBadge({ st }: { st: 'high' | 'check' }) {
 
 /** 안내 상자 info / warn / green */
 export function Callout({ kind, icon, sm, children, style }: {
-  kind: 'info' | 'warn' | 'green'; icon?: string; sm?: boolean; children: ReactNode; style?: React.CSSProperties;
+  kind: 'info' | 'warn' | 'green'; icon?: string; sm?: boolean; children: ReactNode; style?: CSSProperties;
 }) {
   return (
     <div className={`callout ${kind} ${sm ? 'sm' : ''}`.trim()} style={style}>

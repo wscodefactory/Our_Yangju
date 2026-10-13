@@ -1,4 +1,4 @@
-// 생활 정보 목록. 참고용 html 의 SCREENS.life
+// 생활 정보 목록.
 import { Title } from '@/components/layout/Chrome';
 import { RowBtn } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';

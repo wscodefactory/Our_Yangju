@@ -1,4 +1,4 @@
-// 생활 정보 하나: 긴급 전화(rows)는 전화 행 목록, 나머지(tips)는 번호 매긴 안내. 참고용 html 의 SCREENS.lifeItem
+// 생활 정보 하나: 긴급 전화(rows)는 전화 행 목록, 나머지(tips)는 번호 매긴 안내.
 import { Title } from '@/components/layout/Chrome';
 import { Callout, LinkList } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
@@ -13,7 +13,7 @@ export function LifeItemScreen({ id }: { id: string }) {
   return (
     <>
       <Title>{tx(x.name)}</Title>
-      {/* content.ts 가 타입 없이 적혀 rows 가 (string|string[])[][] 로 추론됨 → 자리별로 좁힌다 */}
+      {/* content.ts 가 타입 없이 적혀 rows 가 (string|string[])[][] 로 추론되므로 [번호, 라벨] 로 좁힌다 */}
       {x.rows ? (
         <>
           <div className="list">
@@ -30,7 +30,7 @@ export function LifeItemScreen({ id }: { id: string }) {
       ) : (
         <>
           <section className="panel"><ol className="steps">{x.tips?.map((tip, i) => <li key={i}>{tx(tip)}</li>)}</ol></section>
-          {/* 주제별 안내: 약국·응급실 지도, 똑타 앱, 산재 문의, 배출 요일 (2차 개선점검 3.6) */}
+          {/* 주제별 공식 안내 (약국·응급실 지도, 똑타 앱, 산재 문의, 배출 요일 등) */}
           <div style={{ marginTop: 12 }}><LinkList rows={LIFE_LINKS[x.id] || []} title={t('officialT')} /></div>
           <p className="src"><Ic n="info" cls="sm" /><span>{t('lifeNote')}</span></p>
         </>

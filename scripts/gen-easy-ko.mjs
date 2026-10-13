@@ -1,24 +1,24 @@
-// 쉬운 한국어 문구 생성 (기능 9). UI 사전의 한국어 문장(15자 이상)을 Claude 로 "쉬운 한국어" 로 바꿔 src/data/easy-ko.json 에 저장한다.
+// 쉬운 한국어 문구 생성. UI 사전의 한국어 문장(15자 이상)을 Claude 로 "쉬운 한국어" 로 바꿔 src/data/easy-ko.json 에 저장한다.
 // 어르신·한국어 학습자용: 짧은 문장, 쉬운 단어, 한 문장에 한 가지. 숫자·전화번호·고유명사·{자리표시자}는 그대로.
 // 결과는 AI 초안이다. 다시 돌리면 이미 있는 키는 건너뛴다 (--force 로 전부 다시).
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
-const require = createRequire(import.meta.url);
-const ts = require(path.join(root, 'node_modules/typescript'));
-const env = fs.existsSync(path.join(root, '.env')) ? fs.readFileSync(path.join(root, '.env'), 'utf8') : '';
-const key = process.env.VITE_CLAUDE_API_KEY || env.match(/^VITE_CLAUDE_API_KEY=(.*)$/m)?.[1].trim();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// 로컬에서는 .env 의 VITE_CLAUDE_API_KEY 를 쓴다. 키는 절대 출력하지 않는다.
+try { process.loadEnvFile(path.join(root, '.env')); } catch { /* .env 없음 */ }
+const key = process.env.VITE_CLAUDE_API_KEY;
 if (!key) { console.error('VITE_CLAUDE_API_KEY 가 없어 생성하지 않습니다.'); process.exit(0); }
 const model = process.env.VITE_CLAUDE_MODEL || 'claude-haiku-5-5';
 const client = new Anthropic({ apiKey: key, maxRetries: 3 });
 
-// content.ts 에서 UI 사전 읽기
+// content.ts 에서 UI 사전 읽기 (import 가 없어 transpile 만으로 실행 가능)
 const src = fs.readFileSync(path.join(root, 'src/data/content.ts'), 'utf8');
 const js = ts.transpileModule(src, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
-const m = { exports: {} }; new Function('module', 'exports', 'require', js)(m, m.exports, require);
+const m = { exports: {} }; new Function('module', 'exports', js)(m, m.exports);
 const UI = m.exports.UI;
 
 const outPath = path.join(root, 'src/data/easy-ko.json');
@@ -40,7 +40,7 @@ for (let i = 0; i < targets.length; i += 25) {
       messages: [{ role: 'user', content: prompt }],
     });
     text = res.content.map((p) => (p.type === 'text' ? p.text : '')).join('');
-  } catch (e) { console.error('Claude 오류:', e.status ?? '', e.message); process.exit(1); }
+  } catch (e) { console.error('Claude 오류:', e.status ?? '', e.message); process.exitCode = 1; break; } // 여기까지 된 것만 저장하고 실패로 끝낸다
   const obj = JSON.parse(text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, ''));
   for (const [k, v] of Object.entries(obj)) {
     if (typeof v !== 'string' || !v.trim()) continue;

@@ -1,6 +1,6 @@
 # 고지서 인식 정확도 테스트
 
-`cases.json` 에 적힌 사진을 앱과 **같은 프롬프트**(`src/services/prompts.ts` 의 `READ_NOTICE_PROMPT`)로 Gemini 에 보내, 기대값과 비교해 정답률을 낸다.
+`cases.json` 에 적힌 사진을 앱과 **같은 프롬프트**(`src/services/prompts.ts` 의 `READ_NOTICE_PROMPT`)로 Claude 에 보내, 기대값과 비교해 정답률을 낸다.
 실제 고지서 사진이 쌓일수록 "정답률 n%" 를 근거 있게 말할 수 있다.
 
 ## 사진 추가하기
@@ -43,7 +43,7 @@ npm run eval:notices            # 표만 출력
 npm run eval:notices -- --json  # tests/notices/last-run.json 에도 저장 (깃에 안 올라감)
 ```
 
-`.env` 의 `VITE_GEMINI_API_KEY`, `VITE_GEMINI_MODEL` 을 쓴다. 사진 한 장에 10~20초 걸린다.
+`.env` 의 `VITE_CLAUDE_API_KEY`, `VITE_CLAUDE_MODEL` 을 쓴다. 사진 한 장에 10~20초 걸린다.
 
 ## 결과 읽기
 

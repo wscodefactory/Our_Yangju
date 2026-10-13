@@ -1,8 +1,8 @@
-// 앱 전역 상태의 중심. 참고용 html 의 S(state) 객체와 go/back/home/setLang/toast 를 Provider 하나로 옮겼다.
-//  - 언어는 하나(ko/en/zh/vi/ne). 모든 문구가 다섯 칸 배열이라 AI 번역 없이 즉시 바뀐다 (디자인시스템 §8)
-//  - 내비 스택은 history.pushState 와 같이 움직여서 휴대폰 뒤로가기가 통한다
+// 앱 전역 상태. 언어·큰 글씨·저장 혜택·내비게이션 스택·시트·토스트를 Provider 하나에 모았다.
+//  - 언어는 ko/en/zh/vi/ne 중 하나. 모든 문구가 다섯 칸 배열이라 AI 번역 없이 즉시 바뀐다
+//  - 내비 스택은 history 와 같이 움직여서 휴대폰 뒤로 가기가 통한다
 //  - 시트·전체 화면(overlay)은 한 번에 하나. Esc 로 닫힘
-//  - 큰 글씨·언어·저장 혜택은 localStorage
+//  - 큰 글씨·쉬운 한국어·언어·저장 혜택은 localStorage
 import {
   createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode,
 } from 'react';
@@ -11,7 +11,7 @@ import EASY_KO from '@/data/easy-ko.json';
 import * as i18n from '@/i18n';
 import type { Lang } from '@/i18n';
 import { benefitsStore } from '@/services/benefitsStore';
-import type { PublishedBenefit, Screen, Text } from '@/types';
+import type { PublishedBenefit, Screen } from '@/types';
 import { STORAGE_KEYS, stopSpeaking, storage } from '@/utils/browser';
 import { readDeepLink } from '@/utils/deeplink';
 
@@ -56,6 +56,7 @@ export interface AppState {
   go: (s: Screen) => void;
   back: () => void;
   goHome: () => void;
+  /** 스택을 통째로 바꾼다. 길어지면 history 도 한 칸 늘고, 같은 길이면 맨 위만 바꿔치기 */
   replaceNav: (stack: Screen[]) => void;
   /** 맨 위 화면만 바꿔치기 (history 항목은 그대로). "읽는 중" 처럼 스택에 남으면 안 되는 화면이 결과로 넘어갈 때 */
   replace: (s: Screen) => void;
@@ -82,9 +83,8 @@ export interface AppState {
   toast: (msg: string) => void;
   toastMsg: string | null;
 
-  /* 담당자 화면(#admin) 호환. 문구가 [ko,en] 두 칸이라 ko 가 아니면 영어 */
+  /* 담당자 화면(#admin). 문구가 [ko,en] 두 칸이라 ko 가 아니면 영어 */
   T: (ko: string, en: string) => string;
-  L: (x: Text) => string;
   published: PublishedBenefit[];
   publishBenefit: (b: PublishedBenefit) => void;
 }
@@ -101,23 +101,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const lang: Lang = langState ?? 'ko';
   const tx = useCallback((arr?: T5) => i18n.tx(arr, lang), [lang]);
-  /* ----- 쉬운 한국어 (기능 9) ----- */
-  // 한국어 화면에서만. 켜면 UI 사전의 긴 문장을 AI 가 바꿔 둔 쉬운 문장(easy-ko.json)으로 대체한다
-  const [easy, setEasy] = useState(() => storage.get('hy-easy') === '1');
-  const toggleEasy = useCallback(() => setEasy((v) => { storage.set('hy-easy', v ? '0' : '1'); return !v; }), []);
+
+  /* ----- 쉬운 한국어 ----- */
+  // 한국어 화면에서만. 켜면 UI 사전의 긴 문장을 미리 다듬어 둔 쉬운 문장(easy-ko.json)으로 바꾼다
+  const [easy, setEasy] = useState(() => storage.get(STORAGE_KEYS.easy) === '1');
+  const toggleEasy = useCallback(() => setEasy((v) => { storage.set(STORAGE_KEYS.easy, v ? '0' : '1'); return !v; }), []);
   const t = useCallback((key: string, vars?: Record<string, string | number>) => {
-    if (lang === 'ko' && easy) {
-      const e = (EASY_KO as Record<string, string>)[key];
-      if (e) { let s = e; if (vars) for (const v in vars) s = s.replace(`{${v}}`, String(vars[v])); return s; }
-    }
-    return i18n.t(key, lang, vars);
+    const e = lang === 'ko' && easy ? (EASY_KO as Record<string, string>)[key] : undefined;
+    return e ? i18n.fill(e, vars) : i18n.t(key, lang, vars);
   }, [lang, easy]);
   const fmtDate = useCallback((s: string, opt?: Intl.DateTimeFormatOptions) => i18n.fmtDate(s, lang, opt), [lang]);
   const fmtRange = useCallback((a: string, b: string) => i18n.fmtRange(a, b, lang), [lang]);
   const fmtWon = useCallback((n: number) => i18n.fmtWon(n, lang), [lang]);
   const fmtNum = useCallback((n: number) => i18n.fmtNum(n, lang), [lang]);
   const T = useCallback((ko: string, en: string) => (lang === 'ko' ? ko : en), [lang]);
-  const L = useCallback((x: Text) => (typeof x === 'string' ? x : lang === 'ko' ? x[0] : x[1]), [lang]);
 
   /* ----- 큰 글씨 ----- */
   const [big, setBig] = useState(() => storage.get(STORAGE_KEYS.big) === '1');
@@ -137,12 +134,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   /* ----- 시트 상태 (내비게이션이 참조하므로 먼저 선언) ----- */
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const overlayRef = useRef<Overlay | null>(null);
+  overlayRef.current = overlay;
 
-  /* ----- 내비게이션 (history 와 동기) ----- */
+  /* ----- 내비게이션 ----- */
+  // 불변식: history 항목 수 = nav.length - 1 + (시트가 열려 있으면 1). 시트도 history 한 칸을 차지한다.
   // 바로가기(?go=): 언어가 있으면 '홈, 목적지' 로 쌓아 뒤로 가기가 홈으로 가게 하고, 없으면 언어를 고를 때까지 기억
-  const [deep] = useState(() => readDeepLink());
+  const [deep] = useState(readDeepLink);
   const [pending, setPending] = useState(() => (deep && !langState ? deep : null));
-  const movedRef = useRef(false);
+  const [qrEntry, setQrEntry] = useState(!!deep?.qr);
   const [nav, setNav] = useState<Screen[]>(() => {
     if (location.hash === '#admin') return [{ k: 'admin', tab: 'reg' }];
     if (!langState) return [{ k: 'lang' }];
@@ -151,11 +150,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const navRef = useRef(nav);
   navRef.current = nav;
   const screen = nav[nav.length - 1];
+
   // 시트가 열린 채 화면을 옮기면(AI 상담 → 이동) 시트의 history 칸을 새 화면 칸으로 바꿔 쓴다
   const go = useCallback((s: Screen) => {
-    movedRef.current = true;
+    setQrEntry(false);
     setNav((st) => [...st, s]);
-    if (overlayRef.current) { setOverlay(null); history.replaceState({ d: Date.now() }, ''); } else history.pushState({ d: Date.now() }, '');
+    if (overlayRef.current) { setOverlay(null); history.replaceState(null, ''); } else history.pushState(null, '');
   }, []);
   const back = useCallback(() => {
     if (navRef.current.length > 1) history.back();
@@ -164,7 +164,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // 한 번에 홈으로: 열린 시트의 history 칸까지 같이 되감아 홈에서 뒤로 가기를 눌러도 방금 화면이 다시 안 나온다
   const goHome = useCallback(() => {
     const n = navRef.current.length - 1 + (overlayRef.current ? 1 : 0);
-    movedRef.current = true;
+    setQrEntry(false);
     setOverlay(null);
     setNav([{ k: 'home' }]);
     if (n > 0) history.go(-n);
@@ -173,16 +173,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // 그 조합 대신 이걸 쓴다
   const replace = useCallback((s: Screen) => {
     setNav((st) => [...st.slice(0, -1), s]);
-    history.replaceState({ d: Date.now() }, '');
+    history.replaceState(null, '');
   }, []);
   const replaceNav = useCallback((stack: Screen[]) => {
-    setNav(stack.length ? stack : [{ k: 'home' }]);
-    if (overlayRef.current) { setOverlay(null); history.replaceState({ d: Date.now() }, ''); } else history.pushState({ d: Date.now() }, '');
+    const next = stack.length ? stack : [{ k: 'home' } as Screen];
+    const grew = next.length > navRef.current.length;
+    setNav(next);
+    // 시트가 열려 있으면 그 칸을 새 화면 칸으로 쓴다. 같은 길이(담당자 탭 전환)면 history 칸을 늘리지 않는다
+    if (overlayRef.current) { setOverlay(null); history.replaceState(null, ''); }
+    else if (grew) history.pushState(null, '');
+    else history.replaceState(null, '');
   }, []);
+  const historyReady = useRef(false);
   useEffect(() => {
-    history.replaceState({ d: 1 }, '');
-    // 바로가기로 '홈, 목적지' 두 칸으로 시작했으면 history 도 두 칸
-    if (navRef.current.length > 1) history.pushState({ d: 2 }, '');
+    // StrictMode 는 effect 를 두 번 돌리는데 history 칸이 두 번 쌓이면 안 된다
+    if (!historyReady.current) {
+      historyReady.current = true;
+      history.replaceState(null, '');
+      // 바로가기로 '홈, 목적지' 두 칸으로 시작했으면 history 도 두 칸
+      if (navRef.current.length > 1) history.pushState(null, '');
+    }
     // 뒤로 가기: 시트가 열려 있으면 시트만 닫는다
     const onPop = () => { if (overlayRef.current) { setOverlay(null); return; } setNav((st) => (st.length > 1 ? st.slice(0, -1) : st)); };
     window.addEventListener('popstate', onPop);
@@ -190,12 +200,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* ----- 시트·전체 화면 ----- */
-  overlayRef.current = overlay;
-  // 화면이 바뀌거나 시트가 닫히면 읽어주기를 멈춘다 (뒤로가기 포함). 안 그러면 다음 화면에서도 계속 들린다
+  // 화면이 바뀌거나 시트가 닫히면 읽어주기를 멈춘다 (뒤로 가기 포함). 안 그러면 다음 화면에서도 계속 들린다
   useEffect(() => { stopSpeaking(); }, [nav, overlay]);
-  // 시트는 history 한 칸을 차지한다. 열 때 push, 닫을 때는 back() → popstate 가 닫는다.
-  // 닫기 버튼·Esc·바깥 탭·휴대폰 뒤로 가기가 전부 같은 결과 (2차 개선점검 3.5)
-  const openOverlay = useCallback((o: Overlay) => { setOverlay(o); history.pushState({ d: Date.now(), ov: 1 }, ''); }, []);
+  // 열 때 push, 닫을 때는 history.back() → popstate 가 닫는다. 닫기 버튼·Esc·바깥 탭·휴대폰 뒤로 가기가 전부 같은 길
+  const openOverlay = useCallback((o: Overlay) => { setOverlay(o); history.pushState(null, ''); }, []);
   const closeOverlay = useCallback(() => { if (overlayRef.current) history.back(); }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeOverlay(); };
@@ -203,15 +211,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('keydown', onKey);
   }, [closeOverlay]);
 
-  /** 언어 고르기. 첫 실행이면 홈으로, 아니면 그 자리에서 문구만 바뀜 */
+  /** 언어 고르기. 첫 실행이면 홈(또는 기다리던 QR 목적지)으로, 아니면 그 자리에서 문구만 바뀜 */
   const setLang = useCallback((c: Lang) => {
     const first = !langState;
     storage.set(STORAGE_KEYS.cardLang, c);
     setLangState(c);
     if (overlayRef.current) history.back();
-    if (first) {
-      // QR 바로가기가 기다리고 있었으면 홈을 거치지 않고 목적지로
-      if (pending) { setNav([{ k: 'home' }, pending.screen]); history.pushState({ d: Date.now() }, ''); setPending(null); } else setNav([{ k: 'home' }]);
+    if (!first) return;
+    if (pending) {
+      setNav([{ k: 'home' }, pending.screen]);
+      history.pushState(null, '');
+      setPending(null);
+    } else {
+      setNav([{ k: 'home' }]);
     }
   }, [langState, pending]);
 
@@ -239,11 +251,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     big, toggleBig, easy, toggleEasy,
     saved, isSaved, toggleSaved,
     nav, screen, go, back, goHome, replaceNav, replace,
-    qrEntry: !!deep?.qr && !movedRef.current && screen.k === 'doc', pendingQr: !!pending?.qr,
+    qrEntry, pendingQr: !!pending?.qr,
     overlay, openOverlay, closeOverlay,
     titleEl, setTitleEl, barEl, setBarEl, barUsed, setBarUsed,
     toast, toastMsg,
-    T, L, published, publishBenefit,
+    T, published, publishBenefit,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

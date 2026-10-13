@@ -91,7 +91,7 @@ interface SR {
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
 }
-const w = (typeof window !== 'undefined' ? window : {}) as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR };
+const w = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR };
 const SRCtor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
 
 const langOf = (code: Lang) => LANGS.find((l) => l.code === code) ?? LANGS[0];
@@ -111,6 +111,7 @@ function Interpreter({ cl }: { cl: Lang }) {
   const ai = getAi();
   const res = langOf(cl);
 
+  // 화면을 떠나면 듣고 있던 인식을 끊는다. 안 그러면 마이크가 켜진 채 남는다
   useEffect(() => () => rec.current?.abort(), []);
 
   const handle = (who: Who, src: string) => {
@@ -128,6 +129,7 @@ function Interpreter({ cl }: { cl: Lang }) {
     if (!SRCtor) return;
     rec.current?.abort();
     const r = new SRCtor();
+    // 네팔어 로캘은 숫자 표기 확장(-u-nu-latn)이 붙어 있는데 음성 인식은 순수 언어 태그만 받는다
     r.lang = who === 'officer' ? 'ko-KR' : res.locale.split('-u-')[0];
     r.interimResults = false;
     r.maxAlternatives = 1;
@@ -172,17 +174,18 @@ function Interpreter({ cl }: { cl: Lang }) {
 
       {log.length > 0 && (
         <div className="msgs" style={{ marginBottom: 12 }}>
-          {log.map((x) => {
-            const target: Lang = x.who === 'officer' ? cl : 'ko';
+          {log.map(({ id, who, src, dst, err }) => {
+            const officer = who === 'officer';
+            const target: Lang = officer ? cl : 'ko';
             return (
-              <div key={x.id} className={`msg ${x.who === 'officer' ? 'me' : 'bot'}`}>
-                <div style={{ fontSize: '.75rem', opacity: .8 }}>{x.who === 'officer' ? T(...CS.whoOfficer) : T(...CS.whoResident)}</div>
-                <div lang={x.who === 'officer' ? 'ko' : cl}>{x.src}</div>
+              <div key={id} className={`msg ${officer ? 'me' : 'bot'}`}>
+                <div style={{ fontSize: '.75rem', opacity: .8 }}>{officer ? T(...CS.whoOfficer) : T(...CS.whoResident)}</div>
+                <div lang={officer ? 'ko' : cl}>{src}</div>
                 {ai && (
                   <div lang={target} style={{ fontWeight: 700, marginTop: 6, display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ flex: 1 }}>{x.dst ?? (x.err ? T(...CS.trErr) : T(...CS.translating))}</span>
-                    {x.dst && (
-                      <button type="button" className="icon-btn" aria-label={T(...CS.replay)} onClick={() => { if (!speak(x.dst!, target)) toast(T(...CS.noVoice)); }}>
+                    <span style={{ flex: 1 }}>{dst ?? (err ? T(...CS.trErr) : T(...CS.translating))}</span>
+                    {dst && (
+                      <button type="button" className="icon-btn" aria-label={T(...CS.replay)} onClick={() => { if (!speak(dst, target)) toast(T(...CS.noVoice)); }}>
                         <Ic n="volume" cls="sm" />
                       </button>
                     )}

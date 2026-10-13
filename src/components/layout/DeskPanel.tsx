@@ -1,5 +1,5 @@
-// PC 시연 레이아웃 (3차 개선제안 6장): 화면 폭 960px 이상이면 앱 왼쪽에 서비스 소개와 QR 2개를 둔다.
-// 앱 폭은 휴대폰 그대로 두고 빈 왼쪽만 쓴다. QR 은 한 번만 만들고(주소는 언어와 무관) 소개 문구만 언어를 따라간다.
+// PC 시연 레이아웃: 화면 폭 960px 이상이면 앱 왼쪽 빈 자리에 서비스 소개와 QR 2개를 둔다.
+// QR 은 주소가 언어와 무관하니 처음 넓어졌을 때 한 번만 만들고, 소개 문구만 언어를 따라간다.
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { logoFor } from '@/components/layout/Chrome';
@@ -40,7 +40,7 @@ export function DeskPanel() {
         </ul>
         {qr && (
           <div className="desk-qr">
-            {/* qrcode 가 만든 svg 문자열. 외부 입력이 아니라 우리 주소뿐 */}
+            {/* qrcode 가 만든 svg 문자열. 입력은 우리 주소뿐이라 그대로 넣어도 된다 */}
             <figure><div className="qr" dangerouslySetInnerHTML={{ __html: qr[0] }} /><figcaption><b>{t('deskQr1')}</b><span>{t('deskQr1D')}</span></figcaption></figure>
             <figure><div className="qr" dangerouslySetInnerHTML={{ __html: qr[1] }} /><figcaption><b>{t('deskQr2')}</b><span>{t('deskQr2D')}</span></figcaption></figure>
           </div>

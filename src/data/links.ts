@@ -1,5 +1,5 @@
-// 공식 사이트·전화·지도 안내 (2차 개선점검 3.6 안내 보강). 화면별로 한 줄씩 붙는 바로가기.
-// 번호·주소는 점검 보고서와 공개 누리집에 적힌 것만 쓴다. 모르는 번호는 넣지 않는다.
+// 공식 사이트·전화·지도 바로가기. 화면별로 한 줄씩 붙는다.
+// 번호·주소는 공개 누리집에 적힌 것만 쓴다. 모르는 번호는 넣지 않는다.
 import type { T5 } from './content';
 import { mapUrl } from '@/utils/events';
 
@@ -46,7 +46,7 @@ export const APPLY_SITES: { match: string; label: T5; href: string }[] = [
   { match: '주택도시기금', label: ['주택도시기금 바로가기', 'Open Housing & Urban Fund', '打开住宅城市基金', 'Mở Quỹ Nhà ở và Đô thị', 'आवास तथा सहरी कोष खोल्नुहोस्'], href: 'https://nhuf.molit.go.kr' },
 ];
 
-/** 은행 이름 영문 병기 (1012 요청). 고지서의 한글 은행명 앞부분이 키와 일치하면 "농협 (NongHyup)" 처럼 보여 준다 */
+/** 은행 이름 영문 병기. 고지서의 한글 은행명 앞부분이 키와 일치하면 "농협 (NongHyup)" 처럼 보여 준다 */
 export const BANK_EN: Record<string, string> = {
   농협: 'NongHyup (NH)', 신한: 'Shinhan', 국민: 'KB Kookmin', KB: 'KB Kookmin', 우리: 'Woori', 하나: 'Hana', 기업: 'IBK',
   카카오뱅크: 'KakaoBank', 토스뱅크: 'Toss Bank', 케이뱅크: 'Kbank', 새마을금고: 'MG Community Credit', 우체국: 'Korea Post',

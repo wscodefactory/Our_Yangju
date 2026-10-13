@@ -1,4 +1,4 @@
-// 행사 상태·지도 링크. 참고용 html 의 eventStatus / anyEventOn / mapUrl.
+// 행사 상태·네이버 지도 검색 링크.
 import { EVENTS } from '@/data/events';
 import { daysUntil } from '@/i18n';
 

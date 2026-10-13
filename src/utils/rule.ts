@@ -1,8 +1,6 @@
+// 담당자 화면(공고 → 규칙 → 게시) 데이터 변환. 공고문에서 뽑은 ExtractedRule 을 담당자가 체크할 목록으로 펼치고,
+// 원문 하이라이트 조각으로 자르고, 게시용 PublishedBenefit 으로 바꾼다. 전부 순수 함수. RegisterPanel 이 부른다.
 import type { CheckItem, ExtractedRule, PublishedBenefit } from '@/types';
-
-// 담당자 화면(공고 → 규칙 → 게시) 데이터 변환.
-// 공고문에서 뽑은 ExtractedRule 을 (1) 담당자가 체크할 목록으로 펼치고, (2) 원문 하이라이트 조각으로 자르고,
-// (3) 게시용 PublishedBenefit 으로 바꾼다. 전부 순수 함수. RegisterPanel 이 부른다.
 
 /**
  * 추출 결과를 "조건 / 지원 / 기간 / 신청 / 서류" 순서의 확인 항목 목록으로 펼친다.
@@ -25,29 +23,28 @@ export type HighlightPart = { text: string; mark?: number };
 
 /**
  * 공고 원문을 [일반 텍스트, 하이라이트, 일반 텍스트, ...] 조각으로 나눈다.
- * found 인 항목만 대상으로, 각 quote 가 원문에서 처음 나오는 위치를 찾아 시작 위치순으로 정렬한 뒤
- * 앞에서부터 잘라 나간다. 겹치는 구간(s < cursor)은 뒤에 온 쪽을 버린다 — 중첩 mark 는 그리기 복잡하고
+ * found 인 항목만 대상으로, 각 quote 가 원문에서 처음 나오는 위치순으로 앞에서부터 잘라 나간다.
+ * 겹치는 구간은 뒤에 온 쪽을 버린다 — 중첩 mark 는 그리기 복잡하고
  * 어차피 같은 문장을 두 항목이 근거로 쓰는 경우라 하나만 표시해도 충분.
  * mark 번호는 items 의 인덱스 + 1 이라 체크 목록의 번호와 일치한다.
  */
 export function highlightParts(text: string, items: CheckItem[]): HighlightPart[] {
-  // [시작, 끝, 항목 인덱스]
-  const ranges: [number, number, number][] = [];
+  const ranges: { start: number; end: number; mark: number }[] = [];
   items.forEach((item, i) => {
     if (!item.found || !item.quote) return;
     const start = text.indexOf(item.quote);
-    ranges.push([start, start + item.quote.length, i]);
+    if (start >= 0) ranges.push({ start, end: start + item.quote.length, mark: i + 1 });
   });
-  ranges.sort((a, b) => a[0] - b[0]);
+  ranges.sort((a, b) => a.start - b.start);
 
   const parts: HighlightPart[] = [];
   let cursor = 0;
-  ranges.forEach(([start, end, i]) => {
-    if (start < cursor) return; // 앞 구간과 겹침 → 건너뜀
+  for (const { start, end, mark } of ranges) {
+    if (start < cursor) continue;
     if (start > cursor) parts.push({ text: text.slice(cursor, start) });
-    parts.push({ text: text.slice(start, end), mark: i + 1 });
+    parts.push({ text: text.slice(start, end), mark });
     cursor = end;
-  });
+  }
   if (cursor < text.length) parts.push({ text: text.slice(cursor) });
   return parts;
 }
