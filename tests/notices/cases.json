@@ -1,0 +1,7 @@
+[
+  {
+    "file": "sample-auto-143000.png",
+    "note": "앱 내장 가상 자동차세 고지서(가리기 전). 실제 고지서 사진을 추가할 때는 이름·주소를 가린 뒤 넣고 expected 를 적는다.",
+    "expected": { "tax_type": "auto", "amount_won": 143000, "due_date": "2026-12-31", "epay_no": "1163-0202-6120-0043-21", "vacct_digits": "790-9999-1234-567" }
+  }
+]

@@ -3,7 +3,12 @@
 
 const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 const ymd = (s: string) => s.replace(/-/g, '');
-const nextDay = (s: string) => { const d = new Date(`${s}T00:00:00`); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); };
+// 종일 일정의 DTEND 는 다음날(배타). toISOString 은 UTC 라 한국 시간대에서 하루가 밀리므로 로컬 날짜 조각으로 만든다
+const nextDay = (s: string) => {
+  const [y, m, d] = s.split('-').map(Number);
+  const dt = new Date(y, m - 1, d + 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+};
 
 export function buildIcs(title: string, due: string, description: string): string {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
