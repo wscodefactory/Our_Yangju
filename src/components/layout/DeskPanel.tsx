@@ -9,6 +9,18 @@ import { UI } from '@/data/content';
 import { appBase } from '@/utils/deeplink';
 
 const MQ = '(min-width:960px)';
+
+/**
+ * PC 에서는 창 크기에 맞춰 앱 전체를 확대한다 (1280×800 기준 1배, 1920×1080 약 1.3배, 2560×1440 약 1.8배).
+ * CSS zoom 아래에서 vw·vh 는 줄어들지 않아 가운데 정렬이 틀어지므로, 확대 뒤 뷰포트 크기를 --vw/--vh 로 넘긴다.
+ */
+function fitDesktop(on: boolean) {
+  const root = document.documentElement;
+  const z = on ? Math.min(2, Math.max(1, Math.min(innerWidth / 1180, innerHeight / 820))) : 1;
+  root.style.setProperty('zoom', z === 1 ? '' : String(z));
+  root.style.setProperty('--vw', on ? `${innerWidth / z}px` : '');
+  root.style.setProperty('--vh', on ? `${innerHeight / z}px` : '');
+}
 const OPT = { type: 'svg' as const, errorCorrectionLevel: 'M' as const, margin: 0, color: { dark: '#1B1F19', light: '#FFFFFF' } };
 
 export function DeskPanel() {
@@ -17,9 +29,11 @@ export function DeskPanel() {
   const [qr, setQr] = useState<[string, string] | null>(null);
   useEffect(() => {
     const m = matchMedia(MQ);
-    const f = () => setOn(m.matches);
+    const f = () => { setOn(m.matches); fitDesktop(m.matches); };
+    f();
     m.addEventListener('change', f);
-    return () => m.removeEventListener('change', f);
+    window.addEventListener('resize', f);
+    return () => { m.removeEventListener('change', f); window.removeEventListener('resize', f); fitDesktop(false); };
   }, []);
   useEffect(() => {
     if (!on || qr) return;

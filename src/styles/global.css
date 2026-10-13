@@ -379,7 +379,7 @@ details.faq p{margin:0 0 14px 0;color:var(--text-2);font-size:.9375rem}
 .scrim{position:fixed;inset:0;background:var(--overlay);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
 @keyframes fade{from{opacity:0}}
 .sheet{
-  width:100%;max-width:var(--app-w);max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;background:var(--surface);
+  width:100%;max-width:var(--app-w);max-height:calc(var(--vh, 100dvh) * .92);display:flex;flex-direction:column;background:var(--surface);
   border-radius:24px 24px 0 0;box-shadow:var(--shadow-lg);animation:up .2s ease-out;padding-bottom:env(safe-area-inset-bottom);
 }
 @keyframes up{from{transform:translateY(24px);opacity:.6}}
@@ -526,9 +526,10 @@ body.has-install .fab{display:none}
    ========================================================= */
 #desk{display:none}
 @media (min-width:960px){
-  :root{--app-x:calc(50vw - 36px)}
+  /* --vw/--vh 는 DeskPanel 이 넣는 '확대 뒤' 뷰포트 크기. 브라우저 zoom 아래에서는 vw 가 그대로라 직접 계산한다 */
+  :root{--app-x:calc(var(--vw, 100vw) / 2 - 36px)}
   body{margin-left:var(--app-x);margin-right:0}
-  #desk{display:flex;position:fixed;top:0;bottom:0;left:calc(50vw - 444px);width:360px;align-items:center}
+  #desk{display:flex;position:fixed;top:0;bottom:0;left:calc(var(--vw, 100vw) / 2 - 444px);width:360px;align-items:center}
   .desk-in{display:flex;flex-direction:column;gap:14px}
   .desk-logo{height:56px;width:auto;align-self:flex-start}
   #desk h2{margin:0;font-size:1.75rem;line-height:1.3;letter-spacing:-.02em}
