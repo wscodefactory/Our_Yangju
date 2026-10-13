@@ -12,6 +12,12 @@ export const READ_NOTICE_PROMPT =
   'Reply with only JSON:\n' +
   '{"doc_type":"tax_notice|welfare_notice|other","tax_type":"auto (자동차세)|resident (주민세)|property (재산세)|income (지방소득세)|other","tax_name":{"ko":"tax name as printed, Korean"},"amount_won":number or null,"due_date":"YYYY-MM-DD" or null,"phone_on_doc":"office phone number printed on the notice, or null","epay_no":"전자납부번호 exactly as printed, or null","vacct":"bank name and virtual account number exactly as printed, or null","amount_quote":"the amount exactly as printed","due_quote":"the due date exactly as printed","confidence":"high|low"}';
 
+/** 가릴 곳 찾기: 저해상도 사진에서 개인정보 칸의 위치만 받는다 (내용은 절대 출력하지 않게).
+ *  좌표는 Gemini 관례대로 0~1000 정규화 [ymin, xmin, ymax, xmax]. MaskScreen 이 캔버스 픽셀로 바꿔 검은 상자를 제안한다. */
+export const DETECT_PII_PROMPT =
+  'This is a photo of a Korean local-government document. Find the regions that contain PERSONAL data: the taxpayer name, home address, resident/alien registration number, taxpayer number (납세번호), vehicle plate number. Do NOT include the amount, due date, e-payment number (전자납부번호), virtual account (가상계좌), office phone or any general text.\n' +
+  'Never output the text itself. Reply with only JSON: {"boxes":[{"label":"name|address|id_number|tax_number|plate","box_2d":[ymin,xmin,ymax,xmax]}]} with coordinates normalized to 0-1000 of the image. Each box should cover the printed VALUE (not the label) with a little margin. If nothing is found, reply {"boxes":[]}.';
+
 // 세금 질문 화면: 외국인 주민이 모국어로 적은 질문을 담당자가 읽을 한국어 메모로
 export const toKoreanPrompt = (text: string) =>
   `Translate into natural, polite Korean for a city tax officer. Output only the translation.\n\n${text}`;

@@ -590,6 +590,18 @@ const UI_BANK = {
   installLead:["홈 화면에 앱으로 넣어 두면 바로 열 수 있어요.","Add it to your home screen to open it like an app.","添加到主屏幕后可像应用一样直接打开。","Thêm vào màn hình chính để mở nhanh như ứng dụng.","होम स्क्रिनमा राखे एप जस्तै तुरुन्तै खोल्न सकिन्छ।"],
   installApp:["앱으로 설치","Install as an app","安装为应用","Cài đặt như ứng dụng","एपको रूपमा इन्स्टल गर्नुहोस्"],
   installIos:["아이폰: 공유 버튼 → \"홈 화면에 추가\"로 앱처럼 쓸 수 있어요.","iPhone: tap Share → \"Add to Home Screen\" to use this as an app.","iPhone：点击分享 → \"添加到主屏幕\"即可像应用一样使用。","iPhone: nhấn Chia sẻ → \"Thêm vào Màn hình chính\" để dùng như ứng dụng.","iPhone: सेयर → \"Add to Home Screen\" थिचेर एप जस्तै चलाउनुहोस्।"],
+  // 기능 추가 (10/13): AI 가릴 곳 찾기, 달력 알림, 개인정보 감지
+  autoMask:["AI로 가릴 곳 찾기","Find what to cover with AI","用 AI 查找需遮挡处","Dùng AI tìm chỗ cần che","AI ले छोप्ने ठाउँ खोज्नुहोस्"],
+  autoMaskBusy:["찾는 중…","Finding…","查找中…","Đang tìm…","खोज्दै…"],
+  autoMaskNote:["위치를 찾기 위해 흐린 저해상도 사본만 AI에 보내요. 읽기는 가린 사진으로만 해요.","Only a blurry low-resolution copy is sent to find positions. Reading uses the covered photo only.","仅发送模糊的低分辨率副本用于定位，读取时只使用遮挡后的照片。","Chỉ gửi bản sao mờ độ phân giải thấp để tìm vị trí. Việc đọc chỉ dùng ảnh đã che.","स्थान खोज्न धमिलो कम रिजोल्युसनको प्रति मात्र पठाइन्छ। पढ्दा छोपिएको फोटो मात्र प्रयोग हुन्छ।"],
+  autoMaskFound:["{n}곳을 찾았어요. 확인하고 빠진 곳은 직접 가리세요.","Found {n} spot(s). Check them and cover anything missed.","找到 {n} 处。请确认并手动遮挡遗漏部分。","Đã tìm thấy {n} chỗ. Hãy kiểm tra và che thêm chỗ còn sót.","{n} ठाउँ भेटियो। जाँचेर छुटेको ठाउँ आफैं छोप्नुहोस्।"],
+  autoMaskNone:["가릴 곳을 찾지 못했어요. 직접 가려 주세요.","Nothing found to cover. Please cover it yourself.","未找到需遮挡处，请手动遮挡。","Không tìm thấy chỗ cần che. Hãy tự che.","छोप्ने ठाउँ भेटिएन। आफैं छोप्नुहोस्।"],
+  autoMaskFail:["AI 찾기에 실패했어요. 직접 가려 주세요.","AI search failed. Please cover it yourself.","AI 查找失败，请手动遮挡。","AI tìm thất bại. Hãy tự che.","AI खोज असफल भयो। आफैं छोप्नुहोस्।"],
+  addCal:["달력에 넣기 (3일 전 알림)","Add to calendar (reminder 3 days before)","加入日历（提前 3 天提醒）","Thêm vào lịch (nhắc trước 3 ngày)","क्यालेन्डरमा राख्नुहोस् (3 दिन अघि सम्झाउने)"],
+  calEvent:["{tax} 납부 기한","{tax} due date","{tax} 缴纳期限","Hạn nộp {tax}","{tax} तिर्ने अन्तिम मिति"],
+  calDesc:["한눈에 양주 앱에서 납부 방법을 확인하세요.","Open the Our Yangju app to see how to pay.","请在“一览杨州”应用中查看缴纳方法。","Mở ứng dụng Yangju trong tầm tay để xem cách nộp.","भुक्तानी तरिका हेर्न याङ्जु एप खोल्नुहोस्।"],
+  calAdded:["달력 파일을 내려받았어요. 열어서 추가하세요.","Calendar file downloaded. Open it to add the event.","已下载日历文件，请打开并添加。","Đã tải tệp lịch. Hãy mở để thêm.","क्यालेन्डर फाइल डाउनलोड भयो। खोलेर थप्नुहोस्।"],
+  piiBlocked:["주민등록번호·외국인등록번호는 보낼 수 없어요. 번호를 지우고 다시 보내 주세요.","Resident or alien registration numbers cannot be sent. Remove the number and try again.","无法发送居民登录号或外国人登录号，请删除号码后重试。","Không thể gửi số đăng ký cư trú hoặc số đăng ký người nước ngoài. Hãy xóa số rồi gửi lại.","बासिन्दा वा विदेशी दर्ता नम्बर पठाउन सकिँदैन। नम्बर हटाएर फेरि पठाउनुहोस्।"],
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 

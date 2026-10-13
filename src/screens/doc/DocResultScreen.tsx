@@ -12,7 +12,9 @@ import { FAQ, TAX_TYPES } from '@/data/content';
 import { bankWithEn } from '@/data/links';
 import { daysUntil } from '@/i18n';
 import { copyText, speak } from '@/utils/browser';
+import { buildIcs, downloadIcs } from '@/utils/calendar';
 import { paidStore } from '@/utils/paid';
+import { hasPii } from '@/utils/pii';
 import { Stepper } from './Stepper';
 
 type Tab = 'pay' | 'faq' | 'help';
@@ -152,6 +154,7 @@ export function DocResultScreen() {
     e.preventDefault();
     const q = question.trim();
     if (!q) return;
+    if (hasPii(q)) { toast(t('piiBlocked')); return; }
     const hit = FAQ.find((f) => f.k.test(q));
     setAsked(hit ? hit.id : 'none');
     setQuestion('');
@@ -215,6 +218,13 @@ export function DocResultScreen() {
         </div>
         {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{overdue ? t('overdueWarn') : t('lateShort')}</span></div>}
       </section>
+      {/* 기한을 휴대폰 달력에: 종일 일정 + 3일 전 알림 (.ics). 기한이 지났으면 의미 없으니 숨김 */}
+      {tab === 'pay' && !overdue && (
+        <button type="button" className="btn secondary sm" style={{ marginTop: 10 }}
+          onClick={() => { downloadIcs(`yangju-tax-${d.due}.ics`, buildIcs(t('calEvent', { tax: taxName }), d.due, `${amount} · ${t('calDesc')}`)); toast(t('calAdded')); }}>
+          <Ic n="calendar" cls="sm" />{t('addCal')}
+        </button>
+      )}
 
       {askSave && (
         <section className="panel" style={{ marginTop: 10 }} role="dialog" aria-label={t('paidQ')}>

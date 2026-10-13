@@ -4,11 +4,12 @@ import { Sheet } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { useGuide } from '@/context/GuideContext';
+import { hasPii } from '@/utils/pii';
 
 const SUGS = ['sug1', 'sug2', 'sug3', 'sug4'];
 
 export function ChatSheet() {
-  const { t, go, closeOverlay } = useApp();
+  const { t, go, closeOverlay, toast } = useApp();
   const { messages, showSuggestions, busy, ask, routeTitle } = useGuide();
   const input = useRef<HTMLInputElement>(null);
 
@@ -21,6 +22,8 @@ export function ChatSheet() {
     e.preventDefault();
     const el = input.current;
     if (!el) return;
+    // 주민등록번호·외국인등록번호 모양이 들어 있으면 보내지 않는다 (안전장치, AI 비용 0)
+    if (hasPii(el.value)) { toast(t('piiBlocked')); return; }
     void ask(el.value);
     el.value = '';
   };

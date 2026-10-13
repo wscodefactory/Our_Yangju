@@ -73,6 +73,15 @@ export function maskCanvas(src: HTMLCanvasElement, rects: Rect[]): HTMLCanvasEle
   return canvas;
 }
 
+/** 긴 변 max 픽셀로 줄인 복사본. 가릴 곳 찾기(AI)에 보내는 저해상도 썸네일용 — 글자를 읽기엔 흐리고 위치만 잡힌다 */
+export function downscale(src: HTMLCanvasElement, max: number): HTMLCanvasElement {
+  const scale = Math.min(1, max / Math.max(src.width, src.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(src.width * scale); c.height = Math.round(src.height * scale);
+  c.getContext('2d')!.drawImage(src, 0, 0, c.width, c.height);
+  return c;
+}
+
 /** 캔버스 → JPEG Blob. 전송용이라 품질 0.9 기본. toBlob 이 null 을 주면(메모리 부족 등) reject */
 export const canvasToBlob = (canvas: HTMLCanvasElement, quality = 0.8) =>
   new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('toBlob failed'))), 'image/jpeg', quality));
