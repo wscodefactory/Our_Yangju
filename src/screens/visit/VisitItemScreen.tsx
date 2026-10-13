@@ -8,10 +8,14 @@ import { useApp } from '@/context/AppContext';
 import { VISIT } from '@/data/content';
 import { VISIT_LINKS } from '@/data/links';
 import { VISIT_DETAIL } from '@/data/visit-detail';
+import { defaultType, isRural, loadProfile } from '@/utils/profile';
 
 export function VisitItemScreen({ id }: { id: string }) {
-  const { t, tx, openOverlay } = useApp();
-  const [typeId, setTypeId] = useState('');
+  const { t, tx, go, openOverlay } = useApp();
+  // 내 정보가 있으면 상황을 미리 고른다. 사용자가 바꾸면 그대로 둔다
+  const [profile] = useState(loadProfile);
+  const [typeId, setTypeId] = useState(() => defaultType(id, profile));
+  const fromProfile = !!typeId && typeId === defaultType(id, profile);
   const v = VISIT.find((x) => x.id === id);
   if (!v) return null;
   const d = VISIT_DETAIL[id];
@@ -38,7 +42,7 @@ export function VisitItemScreen({ id }: { id: string }) {
                 <option value="">{t('situationPick')}</option>
                 {d.types.map((ty) => <option key={ty.id} value={ty.id}>{tx(ty.name)}</option>)}
               </select>
-              <p className="help">{t('situationHelp')}</p>
+              <p className="help">{fromProfile ? <>{t('pfApplied')} <a href="#" onClick={(e) => { e.preventDefault(); go({ k: 'profile' }); }}>{t('pfEdit')}</a></> : t('situationHelp')}</p>
             </div>
             {type?.note && <Callout kind="info" icon="info" sm style={{ marginTop: 10 }}>{tx(type.note)}</Callout>}
           </section>
@@ -48,6 +52,7 @@ export function VisitItemScreen({ id }: { id: string }) {
           {/* 언어나 상황이 바뀌면 체크 상태를 새로 시작 */}
           <Checklist key={`${tx(v.name)}|${typeId}`} docs={docs} />
         </section>
+        {id === 'nhis' && isRural(profile.area) && <Callout kind="green" icon="check" sm>{t('pfRural')}</Callout>}
         {d?.tips.map((tip, i) => <Callout key={i} kind="warn" icon="alert" sm>{tx(tip)}</Callout>)}
         <p className="hint-line"><Ic n="users" cls="sm" /><span>{t('tapToShow')}</span></p>
         {v.src && <p className="src"><Ic n="info" cls="sm" /><span>{t('basis')}: {tx(v.src)}</span></p>}

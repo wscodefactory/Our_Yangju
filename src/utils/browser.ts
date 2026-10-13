@@ -19,6 +19,9 @@ export const storage = {
   setJSON(key: string, value: unknown) {
     this.set(key, JSON.stringify(value));
   },
+  remove(key: string) {
+    try { localStorage.removeItem(key); } catch { /* 무시 */ }
+  },
 };
 
 /**
@@ -42,6 +45,8 @@ export const STORAGE_KEYS = {
   paid: 'hy-paid',
   /** 번역 검수 상태 (JSON, utils/review.ts) */
   review: 'hy-review',
+  /** 내 정보 (JSON, utils/profile.ts) */
+  profile: 'hy-profile',
 } as const;
 
 export const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;

@@ -60,7 +60,8 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 5. **지원 혜택 찾기** — 대상 칩 → 단계 탭 → 혜택 카드(북마크) → 상세 탭(자격 확인 / 준비물 / 신청 방법) + 하단 [저장] [문의 메모]
 6. **생활 정보** — 긴급 전화(tel: 링크), 쓰레기, 아플 때, 교통, 일터
 7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Claude 있으면 AI, 없으면 5개 언어 키워드 규칙)
-8. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드 / 번역 검수 / 시연 기기 AI 키 입력)
+8. **내 정보** — 홈 맨 아래. 비자·사는 곳(읍·면·동)·거주 형태·가족 동거를 휴대폰에만 저장(`hy-profile`). 업무 상세의 "내 상황 고르기"가 자동으로 채워지고, 읍·면 거주자에게는 건강보험 22% 경감 안내가 뜬다. 이름·번호는 받지 않는다. 같은 화면의 "데이터 초기화"에서 내 정보만 지우거나 앱이 저장한 전부(저장 혜택·납부 기록·검수 상태·설정, 언어 제외)를 지울 수 있다
+9. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드 / 번역 검수 / 시연 기기 AI 키 입력)
 
 하위 화면 앱 바에는 집 모양 홈 버튼이 있어 어디서든 한 번에 홈으로 간다(열린 시트까지 닫고 방문 기록도 정리). 화면을 바꿀 때는 그리기 전에 맨 위로 스크롤하고(useLayoutEffect), 스크롤바 자리를 항상 비워 PC 에서 앱이 좌우로 흔들리지 않게 한다.
 
@@ -84,9 +85,9 @@ src/
 ├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면 · 홈 화면 추가 안내(InstallSheet)
 ├─ components/layout/DeskPanel.tsx PC(960px 이상) 왼쪽 소개·QR 패널 (qrcode)
 ├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
-├─ screens/                     Home · Lang · Explore · Saved · visit/ · life/ · doc/ · welfare/ · admin/
+├─ screens/                     Home · Lang · Explore · Saved · Profile(내 정보·데이터 초기화) · visit/ · life/ · doc/ · welfare/ · admin/
 ├─ services/ai.ts, prompts.ts   Claude 호출 (@anthropic-ai/sdk) (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
-└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · deeplink(?go= 바로가기) · rule(담당자)
+└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · deeplink(?go= 바로가기) · profile(내 정보·초기화) · rule(담당자)
 scripts/                        fetch-events(행사 수집, 배포 때 매일 06:00 실행) · gen-easy-ko · eval-notices(고지서 인식 정확도, tests/notices)
 legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
 요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)

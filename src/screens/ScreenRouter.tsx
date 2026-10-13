@@ -5,6 +5,7 @@ import type { Screen } from '@/types';
 import { ExploreScreen } from './ExploreScreen';
 import { HomeScreen } from './HomeScreen';
 import { LangScreen } from './LangScreen';
+import { ProfileScreen } from './ProfileScreen';
 import { SavedScreen } from './SavedScreen';
 import { AdminScreen } from './admin/AdminScreen';
 import { CounterScreen } from './admin/CounterScreen';
@@ -40,6 +41,7 @@ function render(s: Screen) {
     case 'explore': return <ExploreScreen tab={s.tab} />;
     case 'admin': return <AdminScreen tab={s.tab} />;
     case 'counter': return <CounterScreen />;
+    case 'profile': return <ProfileScreen />;
   }
 }
 

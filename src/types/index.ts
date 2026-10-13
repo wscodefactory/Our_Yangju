@@ -108,4 +108,5 @@ export type Screen =
   | { k: 'explore'; tab?: 'events' | 'places' | 'food' | 'about' }
   // 담당자 화면. 시민 홈에서는 안 보이고 #admin 으로만 들어온다
   | { k: 'admin'; tab: 'reg' | 'sig' | 'tr' }
-  | { k: 'counter' };
+  | { k: 'counter' }
+  | { k: 'profile' };

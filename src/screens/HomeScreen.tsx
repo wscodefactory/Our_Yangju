@@ -43,6 +43,14 @@ export function HomeScreen() {
           <span className="ibox tone-blue"><Ic n="info" /></span>{t('exAbout')}
         </button>
       </div>
+      {/* 내 정보: 비자·사는 곳을 기기에만 저장해 업무 상세의 상황 선택을 미리 채운다 */}
+      <div className="list" style={{ marginTop: 20 }}>
+        <button type="button" className="row" onClick={() => go({ k: 'profile' })}>
+          <span className="ibox tone-gray"><Ic n="user" /></span>
+          <span className="tx"><span className="t">{t('profileT')}</span><span className="d">{t('homeProfileD')}</span></span>
+          <Ic n="chev" cls="sm" />
+        </button>
+      </div>
     </>
   );
 }

@@ -140,6 +140,7 @@ main{max-width:var(--app-w);margin:0 auto;padding:6px 16px 32px}
 .tone-amber{background:var(--heritage-tint);color:var(--heritage-text)}
 .tone-blue{background:var(--info-tint);color:var(--info-text)}
 .tone-red{background:var(--danger-tint);color:var(--danger)}
+.tone-gray{background:var(--surface-2);color:var(--text-2)}
 
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .tile{

@@ -79,7 +79,7 @@ export function BarHost() {
 
 // FAB 를 숨기는 화면: 하단 바가 있거나 전용 연락 수단이 있는 화면.
 // lifeItem 은 다른 연락 수단이 없는 주제(쓰레기·교통·일)가 있어 FAB 를 남긴다
-const NO_FAB = new Set(['lang', 'visitItem', 'doc', 'mask', 'reading', 'docConfirm', 'docResult', 'benefit', 'admin', 'counter']);
+const NO_FAB = new Set(['lang', 'visitItem', 'doc', 'mask', 'reading', 'docConfirm', 'docResult', 'benefit', 'admin', 'counter', 'profile']);
 
 /** 오른쪽 아래 "AI 상담" 플로팅 버튼. 한 화면에 AI 진입점은 이것 하나 */
 export function Fab() {

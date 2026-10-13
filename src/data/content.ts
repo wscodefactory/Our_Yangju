@@ -565,6 +565,27 @@ const UI_BANK = {
 
 /* 그 뒤에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
+  // 내 정보 (기기에만 저장) · 데이터 초기화
+  profileT:["내 정보","My info","我的信息","Thông tin của tôi","मेरो जानकारी"],
+  homeProfileD:["비자·사는 곳을 넣어 두면 준비물이 내 상황에 맞춰 나와요 (휴대폰에만 저장)","Set your visa and area to get documents for your situation (stored on this phone only)","填写签证、居住地后，所需材料会按您的情况显示（仅保存在本机）","Nhập visa, nơi ở để xem giấy tờ đúng tình huống (chỉ lưu trên điện thoại)","भिसा र ठेगाना राखे कागजात तपाईंको अवस्था अनुसार देखिन्छ (फोनमा मात्र)"],
+  profileLead:["고르는 대로 저장돼요. 업무 준비물과 안내를 내 상황에 맞춰 보여 주는 데만 써요.","Saved as you choose. Used only to tailor documents and tips to your situation.","选择后即保存，仅用于按您的情况显示材料和提示。","Lưu ngay khi chọn. Chỉ dùng để hiển thị giấy tờ và hướng dẫn theo tình huống của bạn.","छान्नासाथ सेभ हुन्छ। कागजात र सुझाव तपाईंको अवस्था अनुसार देखाउन मात्र प्रयोग हुन्छ।"],
+  pfPrivacy:["이 정보는 휴대폰에만 저장되고 서버로 보내지 않아요. 이름이나 번호는 받지 않아요.","Stored on this phone only, never sent to a server. No name or ID number is collected.","仅保存在本机，不发送到服务器。不收集姓名或号码。","Chỉ lưu trên điện thoại, không gửi lên máy chủ. Không thu thập tên hay số định danh.","फोनमा मात्र सेभ हुन्छ, सर्भरमा पठाइँदैन। नाम वा नम्बर लिइँदैन।"],
+  pfVisa:["체류자격 (비자)","Visa type","滞留资格（签证）","Loại visa","भिसा प्रकार"],
+  pfArea:["사는 곳 (읍·면·동)","Where you live (eup/myeon/dong)","居住地（邑、面、洞）","Nơi ở (eup/myeon/dong)","बस्ने ठाउँ (उप/म्योन/दोङ)"],
+  pfHousing:["거주 형태","Housing","居住形态","Hình thức cư trú","बसोबासको प्रकार"],
+  pfFamily:["배우자·자녀와 함께 살아요","I live with my spouse or children","与配偶、子女同住","Tôi sống cùng vợ/chồng hoặc con","पति/पत्नी वा बच्चासँग बस्छु"],
+  pfNone:["선택 안 함","Not set","未选择","Chưa chọn","छानिएको छैन"],
+  pfSaved:["저장했어요","Saved","已保存","Đã lưu","सेभ भयो"],
+  pfUse:["업무 상세의 '내 상황 고르기'가 자동으로 채워져요. 언제든 그 자리에서 바꿀 수 있어요.","'Choose your situation' on each task is filled in automatically. You can change it there any time.","各项业务的“选择我的情况”会自动填写，随时可在该处更改。","'Chọn tình huống' ở mỗi thủ tục sẽ tự điền. Bạn có thể đổi ngay tại đó.","हरेक कामको 'आफ्नो अवस्था छान्नुहोस्' स्वतः भरिन्छ। त्यहीँ जहिले पनि बदल्न सकिन्छ।"],
+  pfApplied:["내 정보에 맞춰 골랐어요.","Chosen from your info.","已按您的信息选择。","Đã chọn theo thông tin của bạn.","तपाईंको जानकारी अनुसार छानियो।"],
+  pfEdit:["내 정보 바꾸기","Edit my info","修改我的信息","Sửa thông tin","जानकारी बदल्नुहोस्"],
+  pfRural:["읍·면 거주자는 건강보험 지역가입 보험료 농어촌 22% 경감 대상이에요. 고지서에 적용됐는지 확인하세요.","Residents of eup/myeon areas get a 22% rural reduction on regional health insurance premiums. Check that your bill applies it.","邑、面地区居民可享健康保险地区参保费农渔村22%减免，请确认账单是否已适用。","Cư dân vùng eup/myeon được giảm 22% phí BHYT khu vực (nông thôn). Hãy kiểm tra hóa đơn.","उप/म्योन क्षेत्रका बासिन्दालाई क्षेत्रीय स्वास्थ्य बीमा शुल्कमा ग्रामीण 22% छुट छ। बिलमा लागू भएको जाँच्नुहोस्।"],
+  pfResetT:["데이터 초기화","Reset data","数据初始化","Đặt lại dữ liệu","डेटा रिसेट"],
+  pfResetD:["내 정보만 지우거나, 이 앱이 휴대폰에 저장한 것(저장한 혜택, 납부 기록, 검수 상태, 설정)을 전부 지울 수 있어요. 언어는 남아요.","Clear just my info, or everything this app stored on the phone (saved benefits, payment records, review status, settings). Language is kept.","可仅清除我的信息，或清除本应用保存在本机的全部内容（收藏的福利、缴纳记录、审核状态、设置）。语言设置保留。","Xóa riêng thông tin của tôi, hoặc toàn bộ dữ liệu ứng dụng lưu trên điện thoại (hỗ trợ đã lưu, lịch sử nộp, trạng thái duyệt, cài đặt). Ngôn ngữ được giữ.","मेरो जानकारी मात्र वा यो एपले फोनमा सेभ गरेको सबै (सेभ गरिएका सुविधा, भुक्तानी रेकर्ड, समीक्षा, सेटिङ) मेटाउन सकिन्छ। भाषा रहन्छ।"],
+  pfClear:["내 정보 지우기","Clear my info","清除我的信息","Xóa thông tin của tôi","मेरो जानकारी मेटाउनुहोस्"],
+  pfCleared:["내 정보를 지웠어요","Your info was cleared","已清除我的信息","Đã xóa thông tin của bạn","जानकारी मेटाइयो"],
+  pfResetAll:["앱 데이터 모두 지우기","Clear all app data","清除全部应用数据","Xóa toàn bộ dữ liệu ứng dụng","सबै एप डेटा मेटाउनुहोस्"],
+  pfResetConfirm:["이 앱이 휴대폰에 저장한 데이터를 모두 지울까요? 되돌릴 수 없어요.","Clear everything this app stored on the phone? This cannot be undone.","要清除本应用保存在本机的全部数据吗？无法恢复。","Xóa toàn bộ dữ liệu ứng dụng lưu trên điện thoại? Không thể hoàn tác.","यो एपले फोनमा सेभ गरेको सबै डेटा मेटाउने? यो फिर्ता हुँदैन।"],
   // 홈 버튼, 고지서 QR 바로가기, 앱 설치 배너·안내, PC 시연 패널
   aHomeBtn:["홈으로","Home","返回首页","Về trang chủ","गृहपृष्ठ"],
   qrHere:["고지서의 QR로 바로 들어왔어요","Opened from the QR on your notice","已通过税单上的二维码直接进入","Đã mở từ mã QR trên giấy báo","बिलको QR बाट सिधै खोलियो"],
