@@ -608,8 +608,6 @@ const UI_BANK = {
 /* UI_BANK 이후에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
   // 업무 목록·상세 (드롭다운식, 2026-10-13)
-  searchTasks:["업무 검색 (예: 이사, 면허, 등록)","Search tasks (e.g. move, license, registration)","搜索事项（如：搬家、驾照、登录）","Tìm thủ tục (VD: chuyển nhà, bằng lái, đăng ký)","काम खोज्नुहोस् (जस्तै: सर्ने, लाइसेन्स, दर्ता)"],
-  noMatch:["검색 결과가 없어요. 다른 말로 찾아보세요.","No results. Try another word.","没有搜索结果，请换个词试试。","Không có kết quả. Hãy thử từ khác.","नतिजा छैन। अर्को शब्दले खोज्नुहोस्।"],
   openChecklist:["준비물 체크리스트 열기","Open the checklist","打开准备清单","Mở danh sách chuẩn bị","तयारी सूची खोल्नुहोस्"],
   mySituation:["내 상황 고르기","Choose your situation","选择我的情况","Chọn tình huống của bạn","आफ्नो अवस्था छान्नुहोस्"],
   situationPick:["— 선택 —","— Select —","— 请选择 —","— Chọn —","— छान्नुहोस् —"],

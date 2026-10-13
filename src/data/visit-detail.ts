@@ -12,8 +12,6 @@ export interface VisitDetail {
   /** 내 상황 고르기 → 공통 준비물에 더해지는 서류 */
   types: VisitType[];
   tips: T5[];
-  /** 목록 검색용 (한국어·영어 키워드) */
-  keywords: string;
 }
 
 const PASSPORT_COPY: T5 = ['여권 사본 1부', 'Copy of passport (1)', '护照复印件1份', 'Bản sao hộ chiếu (1)', 'राहदानीको प्रतिलिपि (1)'];
@@ -53,7 +51,6 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
       ['기한이 지났으면 행정복지센터에서는 받지 않아요. 양주출입국·외국인사무소(고읍동)로 바로 가세요.', 'If the deadline has passed, community centers cannot accept it. Go directly to the Yangju Immigration Office (Goeup-dong).', '逾期后行政福利中心不受理，请直接前往杨州出入境、外国人事务所（高邑洞）。', 'Quá hạn thì trung tâm hành chính không nhận. Hãy đến thẳng Văn phòng Xuất nhập cảnh Yangju (Goeup-dong).', 'म्याद नाघेपछि सामुदायिक केन्द्रले लिँदैन। सिधै याङ्जु अध्यागमन कार्यालय (गोउप-दोङ) जानुहोस्।'],
       ["신고서 이름: 행정복지센터는 '체류지변경 신고서', 출입국사무소는 '통합신청서'. 창구에 있어요.", "Form names: 'Report of change of residence' at community centers, 'Integrated application form' at immigration. Available at the counter.", '表格名称：行政福利中心为“居留地变更申报书”，出入境为“综合申请书”，窗口提供。', "Tên mẫu: 'Tờ khai đổi nơi cư trú' ở trung tâm hành chính, 'Đơn tổng hợp' ở xuất nhập cảnh. Có sẵn tại quầy.", "फारम: सामुदायिक केन्द्रमा 'ठेगाना परिवर्तन सूचना फारम', अध्यागमनमा 'एकीकृत आवेदन'। काउन्टरमा पाइन्छ।"],
     ],
-    keywords: '이사 체류지 변경 주소 전입 거소 기숙사 moving move address residence',
   },
 
   reg: {
@@ -96,7 +93,6 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
     tips: [
       ['예약 없이 가면 그날 접수가 안 돼요. 하이코리아에서 방문 예약을 먼저 하세요.', 'Without a reservation you will not be accepted that day. Reserve on HiKorea first.', '未预约当天不受理，请先在HiKorea预约。', 'Không đặt lịch sẽ không được tiếp nhận trong ngày. Hãy đặt lịch trên HiKorea trước.', 'बुकिङ बिना त्यस दिन लिइँदैन। पहिले HiKorea मा बुकिङ गर्नुहोस्।'],
     ],
-    keywords: '외국인등록 등록증 비자 처음 입국 재발급 분실 registration ARC card visa new lost',
   },
 
   nhis: {
@@ -132,7 +128,6 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
       ['체납되면 병원비를 전액 내야 하고 비자 연장이 제한될 수 있어요', 'If in arrears, you pay 100% of hospital bills and visa extension may be restricted', '欠费后医疗费需全额自付，且签证延期可能受限', 'Nợ phí thì phải trả 100% viện phí và có thể bị hạn chế gia hạn visa', 'बक्यौता भए अस्पताल खर्च पूरै आफैं तिर्नुपर्छ, भिसा नवीकरणमा रोक लाग्न सक्छ'],
       ['은현면·남면·광적면·백석읍에 사는 지역가입자는 농어촌 22% 경감 대상이에요. 고지서에 적용됐는지 확인하세요', 'Regional subscribers living in Eunhyeon, Nam-myeon, Gwangjeok or Baekseok get a 22% rural reduction. Check that your bill applies it', '居住在银现面、南面、广积面、白石邑的地区参保者可享农渔村22%减免，请确认账单是否已适用', 'Người tham gia khu vực ở Eunhyeon, Nam-myeon, Gwangjeok, Baekseok được giảm 22% (nông thôn). Hãy kiểm tra hóa đơn', 'युनह्योन, नाम-म्योन, ग्वाङजोक, बेकसोकमा बस्ने क्षेत्रीय सदस्यलाई ग्रामीण 22% छुट छ। बिलमा लागू भएको जाँच्नुहोस्'],
     ],
-    keywords: '건강보험 보험료 공단 피부양자 합가 자동이체 health insurance nhis premium dependent',
   },
 
   kid: {
@@ -161,7 +156,6 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
     tips: [
       ['부모의 체류자격과 관계없이 초·중학교 의무교육은 보장돼요. 학교는 출입국에 알리지 않아요', "Elementary and middle school education is guaranteed regardless of the parents' status. Schools do not report to immigration", '无论父母滞留资格如何，小学、初中义务教育均有保障。学校不会通报出入境', 'Giáo dục tiểu học và THCS được bảo đảm bất kể tư cách cư trú của cha mẹ. Trường không báo cho xuất nhập cảnh', 'अभिभावकको हैसियत जे भए पनि प्राथमिक र माध्यमिक शिक्षा सुनिश्चित छ। विद्यालयले अध्यागमनलाई जानकारी दिँदैन'],
     ],
-    keywords: '자녀 아이 학교 어린이집 입학 전학 편입 유치원 school daycare child kid enroll',
   },
 
   drive: {
@@ -192,6 +186,5 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
     tips: [
       ['교환할 때 본국 면허증은 시험장이 보관해요. 나중에 출국할 때 비행기 탑승권을 보여주면 돌려받아요', 'When exchanging, the test center keeps your home license. You get it back by showing your boarding pass when leaving Korea', '换证时本国驾照由考场保管，日后出境时出示登机牌即可取回', 'Khi đổi, trung tâm giữ bằng lái nước bạn. Khi xuất cảnh, đưa thẻ lên máy bay để nhận lại', 'साट्दा स्वदेशी लाइसेन्स केन्द्रले राख्छ। पछि देश छोड्दा बोर्डिङ पास देखाएर फिर्ता लिन सकिन्छ'],
     ],
-    keywords: '운전면허 면허 교환 시험장 운전 재발급 license driver driving exchange',
   },
 };

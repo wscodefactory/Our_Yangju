@@ -1,5 +1,5 @@
 // 시청과 주민센터 업무 목록 — 드롭다운(아코디언) 카드. 카드를 누르면 배지·어디서·언제가 펼쳐지고, 체크리스트는 상세 화면에서.
-// 디자인 참고: 요청사항/code_artifact 드롭다운식.html (검색창 + 펼치는 카드). 색·모양은 Yangju DS 토큰 그대로.
+// 디자인 참고: 요청사항/code_artifact 드롭다운식.html. 색·모양은 Yangju DS 토큰 그대로. 업무가 6개뿐이라 검색창은 두지 않는다.
 import { useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
@@ -9,22 +9,13 @@ import { VISIT_DETAIL } from '@/data/visit-detail';
 
 export function VisitScreen() {
   const { t, tx, lang, go } = useApp();
-  const [q, setQ] = useState('');
   const [open, setOpen] = useState<string | null>(null);
-  const term = q.trim().toLowerCase();
-  // 5개 언어 이름 + 한국어·영어 키워드로 거른다
-  const items = VISIT.filter((v) => !term || v.name.join(' ').toLowerCase().includes(term) || (VISIT_DETAIL[v.id]?.keywords ?? '').includes(term));
   return (
     <>
       <Title>{t('visitT')}</Title>
       <p className="lead">{t('visitLead')}</p>
-      <div className="search">
-        <Ic n="search" cls="sm" />
-        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('searchTasks')} aria-label={t('searchTasks')} />
-        {q && <button type="button" className="icon-btn x" onClick={() => setQ('')} aria-label={t('aClose')}><Ic n="close" cls="sm" /></button>}
-      </div>
       <div className="stack">
-        {items.map((v) => {
+        {VISIT.map((v) => {
           const d = VISIT_DETAIL[v.id];
           const isOpen = open === v.id;
           return (
@@ -51,7 +42,6 @@ export function VisitScreen() {
             </article>
           );
         })}
-        {!items.length && <p className="muted">{t('noMatch')}</p>}
       </div>
     </>
   );
