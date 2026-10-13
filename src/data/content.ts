@@ -91,7 +91,6 @@ const UI_BASE = {
   btnSample:["샘플 고지서로 해보기","Try a sample notice","用示例税单试试","Thử với giấy báo mẫu","नमुना बिलबाट प्रयास गर्नुहोस्"],
   btnManual:["직접 입력","Enter manually","手动输入","Nhập thủ công","आफैं लेख्नुहोस्"],
   btnPhoto:["촬영 / 사진 불러오기","Take a photo / Choose a photo","拍照 / 选择照片","Chụp ảnh / Chọn ảnh","फोटो खिच्नुहोस् / फोटो छान्नुहोस्"],
-  photoOff:["AI 키가 없어 사진 읽기를 쓸 수 없어 샘플과 직접 입력만 보여요.","Photo reading needs an AI key, so only the sample and manual entry are shown.","没有 AI 密钥，无法读取照片，只显示示例和手动输入。","Không có khóa AI nên không đọc được ảnh; chỉ hiện mẫu và nhập thủ công.","AI कुञ्जी नभएकाले फोटो पढ्न सकिँदैन; नमुना र आफैं लेख्ने मात्र देखिन्छ।"],
   confirmTitle:["고지서 내용과 일치하나요?","Does this match your notice?","与税单内容一致吗？","Thông tin có khớp với giấy báo không?","के यो जानकारी बिलसँग मिल्छ?"],
   manualTitle:["고지서 내용 입력","Enter notice details","输入税单内容","Nhập thông tin giấy báo","बिलको विवरण भर्नुहोस्"],
   confirmLead:["숫자가 다르면 고지서에 적힌 대로 고쳐 주세요.","If anything differs, correct it to match the notice.","如有不同，请按税单内容修改。","Nếu có chỗ khác, hãy sửa theo giấy báo.","फरक भए बिलमा लेखिएअनुसार सच्याउनुहोस्।"],
@@ -562,7 +561,6 @@ const UI_BANK = {
   welfareLetter:["복지 안내문이에요. 복지 혜택으로 이동해요.","This is a welfare letter. Opening Welfare.","这是福利通知，正在打开福利页面。","Đây là thông báo phúc lợi. Đang mở mục Phúc lợi.","यो कल्याण सूचना हो। सुविधा पृष्ठ खुल्दैछ।"],
   lowConf:["AI가 확실하지 않대요. 고지서와 꼭 비교해 주세요.","The AI is not sure. Please compare carefully with your notice.","AI 不太确定，请务必与税单核对。","AI chưa chắc chắn. Hãy đối chiếu kỹ với giấy báo.","AI निश्चित छैन। बिलसँग राम्ररी मिलाउनुहोस्।"],
   photoFail:["이 사진을 열 수 없어요","Cannot open this photo","无法打开这张照片","Không mở được ảnh này","यो फोटो खोल्न सकिएन"],
-  keyBtn:["AI 키 넣고 사진 읽기 켜기","Enter an AI key to turn on photo reading","输入 AI 密钥以开启照片读取","Nhập khóa AI để bật đọc ảnh","फोटो पढ्न AI कुञ्जी हाल्नुहोस्"],
   keyPrompt:["Claude API 키를 붙여 넣으세요 (이 기기에만 저장돼요)","Paste your Claude API key (stored on this device only)","请粘贴 Claude API 密钥（仅保存在本设备）","Dán khóa Claude API (chỉ lưu trên thiết bị này)","Claude API कुञ्जी टाँस्नुहोस् (यो उपकरणमा मात्र राखिन्छ)"],
   // 연·월·일 입력 칸 (DateFields)
   year:["연도","Year","年","Năm","वर्ष"],
@@ -587,9 +585,6 @@ const UI_BANK = {
   overdueCheckD:["기한이 지나면 낼 금액이 고지서와 다를 수 있어요. 위택스에서 지금 낼 금액을 확인한 뒤 송금하세요.","After the due date, the amount due may differ from the notice. Check the current amount on Wetax before you transfer.","过期后应缴金额可能与税单不同。请先在 WeTax 确认现在应缴金额，再转账。","Sau khi quá hạn, số tiền phải nộp có thể khác với giấy báo. Hãy kiểm tra số tiền hiện tại trên WeTax rồi mới chuyển tiền.","म्याद नाघेपछि तिर्नुपर्ने रकम बिलभन्दा फरक हुन सक्छ। WeTax मा अहिलेको रकम जाँचेर मात्र पठाउनुहोस्।"],
   amountBefore:["고지서 금액 (기한 전)","Amount on notice (before due date)","税单金额（逾期前）","Số tiền trên giấy báo (trước hạn)","बिलको रकम (म्याद अघि)"],
   // 홈 화면 설치 (PWA)
-  installLead:["홈 화면에 앱으로 넣어 두면 바로 열 수 있어요.","Add it to your home screen to open it like an app.","添加到主屏幕后可像应用一样直接打开。","Thêm vào màn hình chính để mở nhanh như ứng dụng.","होम स्क्रिनमा राखे एप जस्तै तुरुन्तै खोल्न सकिन्छ।"],
-  installApp:["앱으로 설치","Install as an app","安装为应用","Cài đặt như ứng dụng","एपको रूपमा इन्स्टल गर्नुहोस्"],
-  installIos:["아이폰: 공유 버튼 → \"홈 화면에 추가\"로 앱처럼 쓸 수 있어요.","iPhone: tap Share → \"Add to Home Screen\" to use this as an app.","iPhone：点击分享 → \"添加到主屏幕\"即可像应用一样使用。","iPhone: nhấn Chia sẻ → \"Thêm vào Màn hình chính\" để dùng như ứng dụng.","iPhone: सेयर → \"Add to Home Screen\" थिचेर एप जस्तै चलाउनुहोस्।"],
   // 기능 추가 (10/13): AI 가릴 곳 찾기, 달력 알림, 개인정보 감지
   autoMask:["AI로 가릴 곳 찾기","Find what to cover with AI","用 AI 查找需遮挡处","Dùng AI tìm chỗ cần che","AI ले छोप्ने ठाउँ खोज्नुहोस्"],
   autoMaskBusy:["찾는 중…","Finding…","查找中…","Đang tìm…","खोज्दै…"],
@@ -607,6 +602,34 @@ const UI_BANK = {
 
 /* UI_BANK 이후에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
+  // 3차 개선제안 (2026-10-13): 홈 버튼, 고지서 QR 바로가기, 앱 설치 배너·안내, PC 시연 패널
+  aHomeBtn:["홈으로","Home","返回首页","Về trang chủ","गृहपृष्ठ"],
+  qrHere:["고지서의 QR로 바로 들어왔어요","Opened from the QR on your notice","已通过税单上的二维码直接进入","Đã mở từ mã QR trên giấy báo","बिलको QR बाट सिधै खोलियो"],
+  qrLang:["언어를 고르면 '받은 고지서 읽기'로 바로 이동해요.","Choose a language and we'll take you straight to the tax notice guide.","选择语言后将直接进入“看懂收到的税单”。","Chọn ngôn ngữ, bạn sẽ được chuyển ngay đến mục đọc giấy báo thuế.","भाषा छान्नुहोस्, सिधै कर बिल बुझ्ने पृष्ठमा जानुहुन्छ।"],
+  installT:["홈 화면에 앱으로 추가","Add to your home screen","添加到主屏幕","Thêm vào màn hình chính","होम स्क्रिनमा थप्नुहोस्"],
+  installD:["아이콘으로 바로 열려요","Open it with one tap","点击图标直接打开","Mở nhanh bằng biểu tượng","आइकनबाट सिधै खोल्नुहोस्"],
+  installBtn:["설치","Install","安装","Cài","इन्स्टल"],
+  footInstall:["앱으로 설치","Install as an app","安装为应用","Cài như ứng dụng","एपको रूपमा इन्स्टल"],
+  later:["나중에 보기","Not now","以后再说","Để sau","अहिले होइन"],
+  installedToast:["홈 화면에 추가했어요","Added to your home screen","已添加到主屏幕","Đã thêm vào màn hình chính","होम स्क्रिनमा थपियो"],
+  guideT:["홈 화면에 추가하기","Add to home screen","添加到主屏幕","Thêm vào màn hình chính","होम स्क्रिनमा थप्नुहोस्"],
+  guideLead:["쓰고 있는 휴대폰을 고르고 순서대로 따라 하세요. 두 번만 누르면 홈 화면에 아이콘이 생겨요.","Pick your phone and follow the steps. Two taps put the icon on your home screen.","选择您的手机，按步骤操作。点两下即可把图标放到主屏幕。","Chọn loại điện thoại và làm theo các bước. Chỉ hai lần chạm là có biểu tượng trên màn hình chính.","आफ्नो फोन छान्नुहोस् र चरण पछ्याउनुहोस्। दुई पटक थिचेपछि होम स्क्रिनमा आइकन आउँछ।"],
+  iosA:["Safari 화면 맨 아래 공유 버튼을 누르세요","Tap the Share button at the bottom of Safari","点击 Safari 底部的“分享”按钮","Nhấn nút Chia sẻ ở cuối Safari","Safari को तलको Share बटन थिच्नुहोस्"],
+  iosB:["'홈 화면에 추가'를 누르세요","Tap 'Add to Home Screen'","点击“添加到主屏幕”","Nhấn 'Thêm vào MH chính'","'Add to Home Screen' थिच्नुहोस्"],
+  iosC:["오른쪽 위 '추가'를 누르면 끝이에요","Then tap 'Add' at the top right","最后点击右上角的“添加”","Cuối cùng nhấn 'Thêm' ở góc trên bên phải","अन्त्यमा माथि दायाँ 'Add' थिच्नुहोस्"],
+  andA:["Chrome 오른쪽 위 점 3개 메뉴를 누르세요","Tap the three-dot menu at the top right of Chrome","点击 Chrome 右上角的三点菜单","Nhấn menu ba chấm ở góc trên bên phải Chrome","Chrome को माथि दायाँ तीन थोप्ले मेनु थिच्नुहोस्"],
+  andB:["'앱 설치' 또는 '홈 화면에 추가'를 누르세요","Tap 'Install app' or 'Add to Home screen'","点击“安装应用”或“添加到主屏幕”","Nhấn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'","'Install app' वा 'Add to Home screen' थिच्नुहोस्"],
+  andC:["'설치'를 누르면 홈 화면에 아이콘이 생겨요","Tap 'Install' and the icon appears on your home screen","点击“安装”，主屏幕上会出现图标","Nhấn 'Cài đặt', biểu tượng sẽ có trên màn hình chính","'Install' थिच्नुहोस्, होम स्क्रिनमा आइकन देखिन्छ"],
+  andInApp:["카카오톡이나 네이버 앱 안에서 열었다면, 먼저 'Chrome으로 열기'를 고른 뒤 따라 하세요.","If you opened this inside KakaoTalk or the Naver app, choose 'Open in Chrome' first.","如果是在 KakaoTalk 或 Naver 应用中打开的，请先选择“在 Chrome 中打开”。","Nếu mở trong KakaoTalk hoặc ứng dụng Naver, hãy chọn 'Mở bằng Chrome' trước.","KakaoTalk वा Naver एपभित्र खोल्नुभएको भए पहिले 'Open in Chrome' छान्नुहोस्।"],
+  deskLead:["양주시에 사는 외국인 주민과 시민을 위한 모바일 생활 안내 서비스","A mobile living guide for residents and newcomers in Yangju","面向杨州外国居民与市民的移动生活指南","Dịch vụ hướng dẫn đời sống trên di động cho cư dân Yangju","याङ्जुका बासिन्दाका लागि मोबाइल जीवन गाइड"],
+  deskF1:["5개 언어로 민원 준비물과 장소 안내","City office tasks in 5 languages","5 种语言的办事指南","Thủ tục hành chính bằng 5 ngôn ngữ","5 भाषामा कार्यालयका काम"],
+  deskF2:["받은 고지서를 찍으면 할 일과 납부 방법","Photograph a notice to see what to do","拍下税单，查看待办与缴纳方法","Chụp giấy báo để biết việc cần làm","बिलको फोटो खिचेर के गर्ने थाहा पाउनुहोस्"],
+  deskF3:["상황에 맞는 지원 혜택과 신청 방법","Benefits for your situation and how to apply","适合您的福利与申请方法","Phúc lợi phù hợp và cách đăng ký","तपाईंलाई मिल्ने सुविधा र आवेदन"],
+  deskQr1:["휴대폰으로 열기","Open on your phone","用手机打开","Mở trên điện thoại","फोनमा खोल्नुहोस्"],
+  deskQr1D:["카메라로 찍으면 이 화면이 휴대폰에서 열려요","Scan with your camera to open this on your phone","用相机扫描即可在手机上打开","Quét bằng camera để mở trên điện thoại","क्यामेराले स्क्यान गरेर फोनमा खोल्नुहोस्"],
+  deskQr2:["고지서 QR 예시","Notice QR example","税单二维码示例","Ví dụ mã QR trên giấy báo","बिलको QR उदाहरण"],
+  deskQr2D:["찍으면 '받은 고지서 읽기'로 바로 열려요","Opens the tax notice guide directly","扫描后直接打开“看懂收到的税单”","Mở thẳng mục đọc giấy báo thuế","सिधै कर बिल बुझ्ने पृष्ठ खुल्छ"],
+  deskNote:["PC에서는 휴대폰 화면 크기로 보여 줘요. 실제 서비스는 휴대폰용이에요.","On a PC this shows at phone size. The service is built for phones.","在电脑上以手机尺寸显示，本服务专为手机设计。","Trên máy tính hiển thị theo kích thước điện thoại. Dịch vụ dành cho điện thoại.","PC मा फोन आकारमा देखिन्छ। सेवा फोनका लागि बनाइएको हो।"],
   // 혜택 검색 (2026-10-13)
   searchBen:["혜택 검색 (예: 월세, 출산, 구직)","Search benefits (e.g. rent, birth, job)","搜索福利（如：房租、生育、求职）","Tìm hỗ trợ (VD: tiền thuê, sinh con, việc làm)","सुविधा खोज्नुहोस् (जस्तै: भाडा, जन्म, काम)"],
   noMatch:["검색 결과가 없어요. 다른 말로 찾아보세요.","No results. Try another word.","没有搜索结果，请换个词试试。","Không có kết quả. Hãy thử từ khác.","नतिजा छैन। अर्को शब्दले खोज्नुहोस्।"],

@@ -35,6 +35,8 @@
 /* ---------- Base ---------- */
 *{box-sizing:border-box}
 html{font-size:100%;-webkit-text-size-adjust:100%}
+/* 스크롤바가 생겼다 사라져도 가운데 앱이 좌우로 안 움직이게 자리를 항상 비워 둔다 (3차 개선제안 5장) */
+html{scrollbar-gutter:stable both-edges}
 html.big{font-size:118.75%}
 body{
   margin:0;background:var(--bg);color:var(--text);
@@ -245,11 +247,13 @@ main{max-width:var(--app-w);margin:0 auto;padding:0 16px 32px}
 .search input::-webkit-search-cancel-button{display:none}
 .search .x{position:absolute;right:4px;top:50%;transform:translateY(-50%)}
 
-/* 업무 목록: 드롭다운(아코디언) 카드 */
+/* 업무 목록: 드롭다운(아코디언) 카드. 390×740 한 화면에 6개가 들어오게 간격을 좁힌다 (3차 개선제안 7장) */
+.tcards{gap:8px}
+.tcards .bdg{height:22px;font-size:.6875rem}
 .tcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .tcard.open{border-color:var(--primary)}
-.tcard-h{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:transparent;border:0;text-align:left;color:var(--text)}
-.tcard-h .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.tcard-h{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;background:transparent;border:0;text-align:left;color:var(--text)}
+.tcard-h .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .tcard-h .t{font-weight:700;font-size:1.0625rem;line-height:1.35}
 .tcard-h .d{font-size:.8125rem;color:var(--text-2)}
 .tcard-h .chev{color:var(--text-2);transition:transform .2s;flex:none}
@@ -447,6 +451,8 @@ details.faq p{margin:0 0 14px 0;color:var(--text-2);font-size:.9375rem}
    ========================================================= */
 .appbar-in.sub{padding-left:4px;gap:2px}
 .bar-title{flex:1;min-width:0;margin:0;font-size:1.0625rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* 긴 제목: 아이콘이 4개여도 잘리지 않게 글자를 줄이고 3줄까지 */
+.bar-title.long{font-size:.875rem;line-height:1.25;-webkit-line-clamp:3}
 .bar-title:focus{outline:none;box-shadow:none}
 /* 제목에 포커스를 옮길 때(화면 전환) 초록 테두리는 그리지 않는다. 스크린리더 낭독만 (2차 개선점검 3.2) */
 main h1:focus,main h1:focus-visible{outline:none;box-shadow:none}
@@ -456,11 +462,18 @@ main h1:focus,main h1:focus-visible{outline:none;box-shadow:none}
 /* 송금 상자: 라벨(베트남어 "고지서 금액 (기한 전)" 등)이 길면 줄바꿈하고, 계좌번호·금액은 한 줄 유지 */
 .bankbox dt{white-space:normal}
 .bankbox .codebox code{white-space:nowrap}
-/* 홈 상단 "앱으로 설치" 배너 (PWA). 앱 바 바로 아래 한 줄 */
-.install{max-width:var(--app-w);margin:8px auto 0;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:10px;background:var(--primary-tint);border:1px solid var(--primary-tint-2);border-radius:var(--radius-sm);color:var(--text);font-size:.875rem}
-.install .tx{flex:1;min-width:0}
-.install .btn.sm{min-height:36px;padding:0 12px}
-@media (max-width:519px){.install{margin:8px 16px 0}}
+/* "홈 화면에 앱으로 추가" 배너 (PWA): 홈 화면 아래에 떠 있는 카드. 콘텐츠를 밀지 않고 엄지가 닿는 자리 (3차 개선제안 4장) */
+.install{position:fixed;z-index:25;left:max(16px,calc((100vw - var(--app-w))/2 + 16px));right:max(16px,calc((100vw - var(--app-w))/2 + 16px));bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;padding:10px 4px 10px 12px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-lg);font-size:.875rem;animation:up .2s ease-out}
+.install .app-ic{width:48px;height:48px;flex:none;border-radius:13px;background:#fff;border:1px solid var(--border);display:grid;place-items:center;overflow:hidden}
+.install .app-ic img{width:42px;height:42px}
+.install .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.install .tx b{font-size:.875rem}
+.install .tx span{font-size:.75rem;color:var(--text-2);margin-top:2px}
+.install .btn.sm{flex:none;min-height:38px;padding:0 12px;font-size:.8125rem;gap:4px}
+.install .later{width:32px;height:32px;flex:none;color:var(--text-2)}
+body.has-install .fab{display:none}
+/* 고지서 QR 로 들어왔다는 표시 */
+.qr-badge{display:inline-flex;align-items:center;gap:6px;margin:2px 0 8px;padding:4px 10px;border-radius:999px;background:var(--primary-tint);color:var(--primary);font-size:.8125rem;font-weight:700}
 /* 홈 푸터가 FAB 에 가리지 않게 (3.2) */
 .foot{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 main{padding-top:8px}
@@ -588,3 +601,33 @@ main{padding-top:6px}
 .thinking i{width:18px;height:18px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--primary);animation:spin 1s linear infinite;flex:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .thumb{max-width:100%;border-radius:12px;border:1px solid var(--border)}
+
+/* =========================================================
+   PC 시연 레이아웃 (960px 이상, 3차 개선제안 6장): 왼쪽 소개·QR, 오른쪽 휴대폰 폭 앱.
+   앱은 그대로 두고 빈 왼쪽만 쓴다. 고정 요소(하단 바·시트·배너·FAB·토스트)는 앱 폭 안에 맞춘다.
+   ========================================================= */
+#desk{display:none}
+@media (min-width:960px){
+  :root{--app-x:calc(50vw - 36px)}
+  body{margin-left:var(--app-x);margin-right:0}
+  #desk{display:flex;position:fixed;top:0;bottom:0;left:calc(50vw - 444px);width:360px;align-items:center}
+  .desk-in{display:flex;flex-direction:column;gap:14px}
+  .desk-logo{height:56px;width:auto;align-self:flex-start}
+  #desk h2{margin:0;font-size:1.75rem;line-height:1.3;letter-spacing:-.02em}
+  .desk-lead{margin:0;color:var(--text-2);line-height:1.6}
+  .desk-f{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .desk-f li{display:flex;gap:8px;align-items:flex-start;font-weight:600}
+  .desk-f .ic{color:var(--primary);margin-top:3px}
+  .desk-qr{display:flex;gap:14px;margin-top:10px}
+  .desk-qr figure{margin:0;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
+  .desk-qr .qr{width:112px;height:112px}
+  .desk-qr .qr svg{width:112px;height:112px;display:block}
+  .desk-qr figcaption{display:flex;flex-direction:column;gap:2px;font-size:.8125rem;line-height:1.4}
+  .desk-qr figcaption span{color:var(--text-2);font-size:.75rem}
+  .desk-note{display:flex;gap:6px;align-items:flex-start;margin:6px 0 0;color:var(--text-2);font-size:.75rem}
+  .bbar,.show{left:var(--app-x);right:auto;margin:0;width:var(--app-w);max-width:var(--app-w)}
+  .fab{right:auto;left:calc(var(--app-x) + var(--app-w) - 16px);transform:translateX(-100%)}
+  .install{left:calc(var(--app-x) + 16px);right:auto;width:calc(var(--app-w) - 32px)}
+  .scrim{justify-content:flex-start;padding-left:var(--app-x)}
+  .toast{left:calc(var(--app-x) + var(--app-w) / 2)}
+}

@@ -13,8 +13,8 @@ export function VisitScreen() {
   return (
     <>
       <Title>{t('visitT')}</Title>
-      <p className="lead">{t('visitLead')}</p>
-      <div className="stack">
+      <p className="lead" style={{ marginBottom: 10 }}>{t('visitLead')}</p>
+      <div className="stack tcards">
         {VISIT.map((v) => {
           const d = VISIT_DETAIL[v.id];
           const isOpen = open === v.id;

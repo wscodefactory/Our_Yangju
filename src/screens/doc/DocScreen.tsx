@@ -1,5 +1,6 @@
 // 받은 고지서 읽기 — 시작 화면. 참고용 html 의 SCREENS.doc 에 사진 경로(mask → reading)를 더한 것.
-// 사진 버튼은 이미지 입력이 되는 AI 가 있을 때만 살아 있고, 없으면 키를 넣어 켜는 우회로를 준다.
+// 사진 버튼이 항상 주 버튼. 판독(AI)이 꺼져 있으면 가리기 뒤 ReadingScreen 이 가린 사진을 보며 직접 입력하도록 넘긴다.
+// AI 키 입력은 시민 화면에 두지 않고 담당자 화면(#admin)에 있다 (3차 개선제안 7장).
 import { useRef, useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';
@@ -7,26 +8,15 @@ import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { useDoc } from '@/context/DocContext';
 import { TAX_TYPES } from '@/data/content';
-import { getAi } from '@/services/ai';
-import { STORAGE_KEYS, storage } from '@/utils/browser';
 import { paidStore } from '@/utils/paid';
 import { Stepper } from './Stepper';
 
 export function DocScreen() {
-  const { t, tx, fmtWon, fmtDate, go, toast } = useApp();
+  const { t, tx, fmtWon, fmtDate, go, toast, qrEntry } = useApp();
   const { startSample, startManual, loadFile } = useDoc();
   const fileRef = useRef<HTMLInputElement>(null);
-  const imgOk = !!getAi()?.supportsImages;
   // 이 휴대폰에 저장한 납부 기록 (MY). 지우면 바로 사라진다
   const [paid, setPaid] = useState(() => paidStore.load());
-
-  // 배포 번들에 키가 없을 때의 우회로: 기기 localStorage 에만 저장. getAi() 가 모듈 캐시라 새로고침이 가장 짧다
-  const enterKey = () => {
-    const k = window.prompt(t('keyPrompt'))?.trim();
-    if (!k) return;
-    storage.set(STORAGE_KEYS.aiKey, k);
-    location.reload();
-  };
 
   const onFile = async (picked: File | undefined) => {
     if (!picked) return;
@@ -41,24 +31,15 @@ export function DocScreen() {
   return (
     <>
       <Title>{t('docT')}</Title>
+      {qrEntry && <p className="qr-badge"><Ic n="check" cls="sm" />{t('qrHere')}</p>}
       <Stepper step={0} />
       <p className="lead">{t('docLead')}</p>
       <Callout kind="green" icon="shield" style={{ marginBottom: 16 }}>{t('privacyDoc')}</Callout>
-      {/* 개편 전(v1) 방식: 키가 있으면 사진 버튼, 없으면 사진 버튼 대신 안내 + 키 입력 버튼. 참고용 html 의 "비활성 사진 버튼"은 쓰지 않는다 */}
       <div className="stack">
-        {imgOk ? (
-          <button type="button" className="btn primary" onClick={() => fileRef.current?.click()}>
-            <Ic n="camera" cls="sm" />{t('btnPhoto')}
-          </button>
-        ) : (
-          <>
-            <p className="muted" style={{ margin: 0 }}>{t('photoOff')}</p>
-            <button type="button" className="btn secondary" onClick={enterKey}>
-              <Ic n="camera" cls="sm" />{t('keyBtn')}
-            </button>
-          </>
-        )}
-        <button type="button" className={`btn ${imgOk ? 'secondary' : 'primary'}`} onClick={() => { void startSample().then(() => go({ k: 'mask' })); }}>
+        <button type="button" className="btn primary" onClick={() => fileRef.current?.click()}>
+          <Ic n="camera" cls="sm" />{t('btnPhoto')}
+        </button>
+        <button type="button" className="btn secondary" onClick={() => { void startSample().then(() => go({ k: 'mask' })); }}>
           <Ic n="sample" cls="sm" />{t('btnSample')}
         </button>
         <button type="button" className="btn secondary" onClick={() => { startManual(); go({ k: 'docConfirm', manual: true }); }}>

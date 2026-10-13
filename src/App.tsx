@@ -1,4 +1,5 @@
 import { AppBar, BarHost, Fab, Footer, InstallBanner, SkipLink, Toast } from '@/components/layout/Chrome';
+import { DeskPanel } from '@/components/layout/DeskPanel';
 import { Overlays } from '@/components/layout/Overlays';
 import { AppProvider } from '@/context/AppContext';
 import { DocProvider } from '@/context/DocContext';
@@ -7,7 +8,7 @@ import { ScreenRouter } from '@/screens/ScreenRouter';
 
 /**
  * 앱 뼈대 (참고용 html 의 body 구조 그대로):
- *   본문 바로가기 → 앱 바 → <main> → 푸터(홈만) → 하단 고정 바 → FAB·시트 → 토스트
+ *   본문 바로가기 → 앱 바 → <main> → 푸터(홈만) → 하단 고정 바 → FAB·시트 → 토스트 → PC 소개 패널
  * Provider 순서: App(언어·내비·저장) → Doc(고지서) → Guide(AI 상담, useApp 을 쓰므로 안쪽)
  */
 export default function App() {
@@ -24,6 +25,8 @@ export default function App() {
           <Fab />
           <Overlays />
           <Toast />
+          {/* PC(960px 이상)에서만 왼쪽에 소개·QR */}
+          <DeskPanel />
         </GuideProvider>
       </DocProvider>
     </AppProvider>

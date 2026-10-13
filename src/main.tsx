@@ -12,6 +12,8 @@ if (import.meta.env.DEV) {
   auditTranslations({ UI, VISIT, LIFE, GROUPS, STAGES, LV, ST, BEN, EVENTS, PLACES, CERTS, HERITAGE, AREAS, TAX_TYPES, FAQ });
 }
 if ('speechSynthesis' in window) speechSynthesis.getVoices();
+// 뒤로 가기 때 브라우저가 스크롤을 스스로 되돌리지 않게. 화면 전환 스크롤은 ScreenRouter 가 맡는다
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 // StrictMode 는 개발 중 effect 를 두 번 돌린다. AI 호출처럼 두 번 돌면 안 되는 effect 는
 // ReadingScreen 처럼 ref 로 막아 두었으니, 새 effect 를 추가할 때 같은 점을 신경 쓸 것.

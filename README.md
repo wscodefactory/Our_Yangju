@@ -25,10 +25,28 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 
 홈 화면 설치형 웹앱이다. `vite-plugin-pwa` 가 manifest 와 service worker 를 만들어 화면·글꼴을 기기에 캐시하고, 새 버전을 올리면 다음 실행 때 자동 갱신된다. 사진 읽기·AI 상담만 네트워크가 필요하다.
 
-- 안드로이드 크롬: 접속하면 "앱 설치" 배너 → 설치. 또는 메뉴(⋮) → 홈 화면에 추가
-- 아이폰 사파리: 공유 버튼 → 홈 화면에 추가
+- 홈 화면 아래에 떠 있는 "홈 화면에 앱으로 추가" 배너 → [설치]. 안드로이드 크롬은 휴대폰 설치창이 바로 뜨고, 아이폰·그 밖의 브라우저는 기기별 2~3단계 안내 시트가 열린다
+- 배너를 닫으면 14일 동안 안 보이고, 홈 푸터의 "앱으로 설치" 링크로 언제든 다시 연다. 설치를 마치면 다시 나오지 않는다
 - 설치 후 홈 화면 아이콘으로 열면 주소창 없이 전체 화면으로 실행된다
 - 아이콘은 `public/icon-*.png` (양주시 CI 심벌), 설정은 `vite.config.ts` 의 `VitePWA(...)`
+
+## 바로가기 주소 (QR·안내문·문자용)
+
+서비스 주소 뒤에 붙인다. 언어를 이미 고른 사람은 그 화면이 바로 열리고, 처음 쓰는 사람은 언어를 고른 뒤 이어서 열린다. 방문 기록은 "홈 → 목적지"로 쌓여 뒤로 가기가 홈으로 간다. 읽은 뒤 주소창의 `?go=` 는 지운다.
+
+| 주소 | 열리는 화면 |
+|---|---|
+| `?go=doc&from=qr` | 받은 고지서 읽기 ("고지서의 QR로 바로 들어왔어요" 표시) |
+| `?go=visit&id=reg` | 시청·주민센터 업무 하나 (move, reg, nhis, kid, drive) |
+| `?go=welfare` | 지원 혜택 찾기 |
+| `?go=life&id=trash` | 생활 정보 하나 (sos, trash, med, bus, work) |
+| `?go=explore&tab=events` | 양주 둘러보기 (events, places, food, about) |
+
+고지서 인쇄 권장: QR 오류 복원 M 이상, 2cm 이상, 옆에 "휴대폰 카메라로 찍으면 내 언어로 고지서를 읽어 드려요"를 5개 언어로 한 줄씩. 규칙은 `src/utils/deeplink.ts`.
+
+## PC 화면 (960px 이상)
+
+앱은 휴대폰 폭(480px) 그대로 오른쪽에 두고, 왼쪽에 서비스 소개·핵심 기능 3개·QR 2개("휴대폰으로 열기", "고지서 QR 예시")를 보여 준다 (`components/layout/DeskPanel.tsx`). 하단 바·시트·설치 배너·AI 상담 버튼·토스트는 앱 폭 안에 맞춰 열린다. 태블릿·휴대폰에서는 앱만 보인다.
 
 ## 화면 구성 (2026-10-08 디자인시스템 개편)
 
@@ -42,7 +60,9 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 5. **지원 혜택 찾기** — 대상 칩 → 단계 탭 → 혜택 카드(북마크) → 상세 탭(자격 확인 / 준비물 / 신청 방법) + 하단 [저장] [문의 메모]
 6. **생활 정보** — 긴급 전화(tel: 링크), 쓰레기, 아플 때, 교통, 일터
 7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Claude 있으면 AI, 없으면 5개 언어 키워드 규칙)
-8. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드)
+8. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드 / 번역 검수 / 시연 기기 AI 키 입력)
+
+하위 화면 앱 바에는 집 모양 홈 버튼이 있어 어디서든 한 번에 홈으로 간다(열린 시트까지 닫고 방문 기록도 정리). 화면을 바꿀 때는 그리기 전에 맨 위로 스크롤하고(useLayoutEffect), 스크롤바 자리를 항상 비워 PC 에서 앱이 좌우로 흔들리지 않게 한다.
 
 ## 코드 구조
 
@@ -61,11 +81,12 @@ src/
 ├─ context/DocContext.tsx       고지서 흐름 상태 (캔버스·가림·DocInfo)
 ├─ context/GuideContext.tsx     AI 상담 대화 (INTENTS 규칙 → knowledge.ts 근거 문서로만 답하는 Claude → 모르면 1345 안내)
 ├─ components/layout/Chrome.tsx AppBar · Title · BottomBar · Fab · Footer · Sheet · Toast
-├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면
+├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면 · 홈 화면 추가 안내(InstallSheet)
+├─ components/layout/DeskPanel.tsx PC(960px 이상) 왼쪽 소개·QR 패널 (qrcode)
 ├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
 ├─ screens/                     Home · Lang · Explore · Saved · visit/ · life/ · doc/ · welfare/ · admin/
 ├─ services/ai.ts, prompts.ts   Claude 호출 (@anthropic-ai/sdk) (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
-└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · rule(담당자)
+└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · deeplink(?go= 바로가기) · rule(담당자)
 scripts/                        fetch-events(행사 수집, 배포 때 매일 06:00 실행) · gen-easy-ko · eval-notices(고지서 인식 정확도, tests/notices)
 legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
 요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)

@@ -3,14 +3,14 @@
 // 장식용이라 전부 aria-hidden. 버튼의 이름은 호출부가 aria-label로 준다.
 import {
   AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, BookmarkCheck, BookmarkPlus, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
-  ChevronRight, CircleHelp, Copy, Cross, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,
+  ChevronRight, CircleHelp, Copy, Cross, Download, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,
   Landmark, MapPin, Maximize, MessageCircle, Mountain, Palette, Pencil, Phone, Search, Send, ShieldCheck, Siren, Smile, TrainFront,
   Trash2, User, Users, Utensils, Volume2, X, type LucideIcon,
 } from 'lucide-react';
 
 const MAP = {
   globe: Globe, textsize: ALargeSmall, bookmark: Bookmark, bookmarkPlus: BookmarkPlus, bookmarkCheck: BookmarkCheck, back: ArrowLeft, chev: ChevronRight, close: X, chat: MessageCircle,
-  send: Send, phone: Phone, copy: Copy, ext: ExternalLink, volume: Volume2, expand: Maximize, check: Check, landmark: Landmark,
+  send: Send, phone: Phone, copy: Copy, download: Download, ext: ExternalLink, volume: Volume2, expand: Maximize, check: Check, landmark: Landmark,
   file: FileText, heart: Heart, house: House, idcard: IdCard, medical: Cross, smile: Smile, car: Car, help: CircleHelp,
   siren: Siren, trash: Trash2, bus: Bus, train: TrainFront, briefcase: Briefcase, calendar: Calendar, pin: MapPin, info: Info,
   alert: AlertTriangle, shield: ShieldCheck, camera: Camera, pencil: Pencil, sample: FlaskConical, mountain: Mountain,

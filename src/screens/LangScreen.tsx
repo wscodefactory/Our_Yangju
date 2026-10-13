@@ -1,11 +1,21 @@
 // 첫 실행 언어 선택. 참고용 html 의 SCREENS.lang. 앱 바 제목 없음.
+import { Callout } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
 import { LangOptions } from '@/components/ui/LangOptions';
-import { HELLO, LANGS } from '@/data/content';
+import { useApp } from '@/context/AppContext';
+import { HELLO, LANGS, UI } from '@/data/content';
 
 export function LangScreen() {
+  const { pendingQr } = useApp();
   return (
     <>
+      {/* 고지서 QR 로 들어온 사람: 왜 언어부터 고르는지 한국어·영어로 (3차 개선제안 2.1) */}
+      {pendingQr && (
+        <Callout kind="green" icon="file" sm style={{ margin: '8px 0 0' }}>
+          <b lang="ko">{UI.qrHere[0]}</b> <span lang="ko">{UI.qrLang[0]}</span><br />
+          <span lang="en">{UI.qrHere[1]}. {UI.qrLang[1]}</span>
+        </Callout>
+      )}
       <section className="welcome">
         <p className="hello">
           {HELLO.map((h, i) => (

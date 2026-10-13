@@ -13,13 +13,15 @@ import type { Lang } from '@/i18n';
 import { benefitsStore } from '@/services/benefitsStore';
 import type { PublishedBenefit, Screen, Text } from '@/types';
 import { STORAGE_KEYS, stopSpeaking, storage } from '@/utils/browser';
+import { readDeepLink } from '@/utils/deeplink';
 
 export type Overlay =
   | { k: 'lang' }
   | { k: 'chat' }
   | { k: 'notice' }
   | { k: 'note'; id: string }
-  | { k: 'full'; id: string };
+  | { k: 'full'; id: string }
+  | { k: 'install' };
 
 export interface AppState {
   /* 언어 */
@@ -57,6 +59,10 @@ export interface AppState {
   replaceNav: (stack: Screen[]) => void;
   /** 맨 위 화면만 바꿔치기 (history 항목은 그대로). "읽는 중" 처럼 스택에 남으면 안 되는 화면이 결과로 넘어갈 때 */
   replace: (s: Screen) => void;
+  /** 고지서 QR(?go=doc&from=qr) 로 들어와 아직 다른 화면으로 안 옮긴 상태 — 고지서 첫 화면에 표시 */
+  qrEntry: boolean;
+  /** 언어를 고르기 전인데 QR 바로가기가 기다리는 중 — 언어 선택 화면 안내 */
+  pendingQr: boolean;
 
   /* 시트·전체 화면 */
   overlay: Overlay | null;
@@ -133,15 +139,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const overlayRef = useRef<Overlay | null>(null);
 
   /* ----- 내비게이션 (history 와 동기) ----- */
+  // 바로가기(?go=): 언어가 있으면 '홈, 목적지' 로 쌓아 뒤로 가기가 홈으로 가게 하고, 없으면 언어를 고를 때까지 기억
+  const [deep] = useState(() => readDeepLink());
+  const [pending, setPending] = useState(() => (deep && !langState ? deep : null));
+  const movedRef = useRef(false);
   const [nav, setNav] = useState<Screen[]>(() => {
     if (location.hash === '#admin') return [{ k: 'admin', tab: 'reg' }];
-    return langState ? [{ k: 'home' }] : [{ k: 'lang' }];
+    if (!langState) return [{ k: 'lang' }];
+    return deep ? [{ k: 'home' }, deep.screen] : [{ k: 'home' }];
   });
   const navRef = useRef(nav);
   navRef.current = nav;
   const screen = nav[nav.length - 1];
   // 시트가 열린 채 화면을 옮기면(AI 상담 → 이동) 시트의 history 칸을 새 화면 칸으로 바꿔 쓴다
   const go = useCallback((s: Screen) => {
+    movedRef.current = true;
     setNav((st) => [...st, s]);
     if (overlayRef.current) { setOverlay(null); history.replaceState({ d: Date.now() }, ''); } else history.pushState({ d: Date.now() }, '');
   }, []);
@@ -149,8 +161,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (navRef.current.length > 1) history.back();
     else setNav([{ k: 'home' }]);
   }, []);
+  // 한 번에 홈으로: 열린 시트의 history 칸까지 같이 되감아 홈에서 뒤로 가기를 눌러도 방금 화면이 다시 안 나온다
   const goHome = useCallback(() => {
-    const n = navRef.current.length - 1;
+    const n = navRef.current.length - 1 + (overlayRef.current ? 1 : 0);
+    movedRef.current = true;
+    setOverlay(null);
     setNav([{ k: 'home' }]);
     if (n > 0) history.go(-n);
   }, []);
@@ -166,6 +181,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     history.replaceState({ d: 1 }, '');
+    // 바로가기로 '홈, 목적지' 두 칸으로 시작했으면 history 도 두 칸
+    if (navRef.current.length > 1) history.pushState({ d: 2 }, '');
     // 뒤로 가기: 시트가 열려 있으면 시트만 닫는다
     const onPop = () => { if (overlayRef.current) { setOverlay(null); return; } setNav((st) => (st.length > 1 ? st.slice(0, -1) : st)); };
     window.addEventListener('popstate', onPop);
@@ -192,8 +209,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     storage.set(STORAGE_KEYS.cardLang, c);
     setLangState(c);
     if (overlayRef.current) history.back();
-    if (first) setNav([{ k: 'home' }]);
-  }, [langState]);
+    if (first) {
+      // QR 바로가기가 기다리고 있었으면 홈을 거치지 않고 목적지로
+      if (pending) { setNav([{ k: 'home' }, pending.screen]); history.pushState({ d: Date.now() }, ''); setPending(null); } else setNav([{ k: 'home' }]);
+    }
+  }, [langState, pending]);
 
   /* ----- 앱 바 제목 · 하단 바 포털 ----- */
   const [titleEl, setTitleEl] = useState<HTMLElement | null>(null);
@@ -219,6 +239,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     big, toggleBig, easy, toggleEasy,
     saved, isSaved, toggleSaved,
     nav, screen, go, back, goHome, replaceNav, replace,
+    qrEntry: !!deep?.qr && !movedRef.current && screen.k === 'doc', pendingQr: !!pending?.qr,
     overlay, openOverlay, closeOverlay,
     titleEl, setTitleEl, barEl, setBarEl, barUsed, setBarUsed,
     toast, toastMsg,

@@ -5,6 +5,8 @@ import { Title } from '@/components/layout/Chrome';
 import { Callout, Seg } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';
 import { GAP_SIGNALS } from '@/data/admin';
+import { getAi } from '@/services/ai';
+import { STORAGE_KEYS, storage } from '@/utils/browser';
 import { RegisterPanel, initialRegisterState, type RegisterState } from './RegisterPanel';
 import { ReviewPanel } from './ReviewPanel';
 
@@ -18,7 +20,14 @@ type Tab = 'reg' | 'sig' | 'tr';
  * AI 추출(20~60초)을 또 기다려야 해서 상위에 올려둔 것.
  */
 export function AdminScreen({ tab }: { tab: Tab }) {
-  const { T, go, goHome, replaceNav, nav } = useApp();
+  const { T, t, go, goHome, replaceNav, nav } = useApp();
+  // 시연 기기의 AI 키 (시민 화면에서는 뺐다, 3차 개선제안 7장). 기기 localStorage 에만 저장, getAi() 가 모듈 캐시라 새로고침
+  const enterKey = () => {
+    const k = window.prompt(t('keyPrompt'))?.trim();
+    if (!k) return;
+    storage.set(STORAGE_KEYS.aiKey, k);
+    location.reload();
+  };
   const [reg, setReg] = useState<RegisterState>(initialRegisterState);
   const patch = (p: Partial<RegisterState>) => setReg((s) => ({ ...s, ...p }));
   // 탭 전환은 push가 아니라 현재 스택 꼭대기만 교체 — 뒤로가기가 탭 이력을 되감지 않게
@@ -31,6 +40,7 @@ export function AdminScreen({ tab }: { tab: Tab }) {
       {tab === 'sig' ? <SignalsPanel /> : tab === 'tr' ? <ReviewPanel /> : <RegisterPanel state={reg} setState={patch} />}
       <div className="btn-row">
         <button type="button" className="btn secondary sm" onClick={() => go({ k: 'counter' })}>{T('창구 모드 열기', 'Open counter mode')}</button>
+        <button type="button" className="btn secondary sm" onClick={enterKey}>{getAi() ? T('AI 키 바꾸기', 'Change AI key') : T('AI 키 넣기 (사진 읽기 켜기)', 'Enter AI key (enable photo reading)')}</button>
         <button type="button" className="btn ghost sm" onClick={goHome}>{T('시민 화면으로', 'Citizen view')}</button>
       </div>
     </div>

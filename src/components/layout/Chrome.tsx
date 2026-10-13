@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Ic } from '@/components/ui/Ic';
-import { useApp } from '@/context/AppContext';
+import { useApp, type Overlay } from '@/context/AppContext';
 import { LANGS } from '@/data/content';
+import { storage } from '@/utils/browser';
 
 // 로고: 한국어는 국문 시그니처(심벌 + '양주시'), 다른 언어는 심벌마크(YangJu)만. 외국어 화면에 한글이 남지 않게 (2차 개선점검 3.4)
 const LOGO_KO = `${import.meta.env.BASE_URL}yangju-ci.png`;
 const LOGO_SYMBOL = `${import.meta.env.BASE_URL}yangju-symbol.png`;
-const logoFor = (lang: string, chosen: boolean) => (lang === 'ko' || !chosen ? LOGO_KO : LOGO_SYMBOL);
+export const logoFor = (lang: string, chosen: boolean) => (lang === 'ko' || !chosen ? LOGO_KO : LOGO_SYMBOL);
 
 /**
  * 앱 바. 홈·언어 화면은 양주시 CI + 서비스명, 하위 화면은 뒤로 버튼 + 제목(<Title> 이 포털로 채움).
@@ -42,6 +43,8 @@ export function AppBar() {
         )}
         {screen.k !== 'lang' && (
           <nav className="tools" aria-label="tools">
+            {/* 홈 버튼: 하위 화면에서만. QR·공유 링크로 깊은 화면에 들어온 사람이 한 번에 처음으로 (3차 개선제안 3장) */}
+            {!root && <button type="button" className="icon-btn tip" onClick={goHome} aria-label={t('aHomeBtn')} data-tip={t('aHomeBtn')}><Ic n="house" /></button>}
             <button type="button" className="icon-btn tip" onClick={() => openOverlay({ k: 'lang' })} aria-haspopup="dialog" aria-label={`${t('aLang')} (${native})`} data-tip={t('aLang')}><Ic n="globe" /></button>
             <button type="button" className="icon-btn tip" onClick={toggleBig} aria-pressed={big} aria-label={t('aText')} data-tip={t('aText')}><Ic n="textsize" /></button>
             <button type="button" className="icon-btn tip" onClick={() => { if (screen.k !== 'saved') go({ k: 'saved' }); }} aria-current={screen.k === 'saved' ? 'page' : undefined} aria-label={`${t('aSaved')}${n ? ` (${n})` : ''}`} data-tip={t('aSaved')}>
@@ -58,6 +61,8 @@ export function AppBar() {
 export function Title({ children }: { children: string }) {
   const { titleEl, t } = useApp();
   useEffect(() => { document.title = `${children} | ${t('appName')}`; }, [children, t]);
+  // 아이콘 4개 옆에서 30자 넘는 제목(베트남어 혜택 이름 등)이 잘리지 않게 글자를 줄이고 3줄까지
+  useEffect(() => { titleEl?.classList.toggle('long', children.length > 30); }, [titleEl, children]);
   return titleEl ? createPortal(children, titleEl) : null;
 }
 
@@ -90,45 +95,62 @@ export function Fab() {
 }
 
 /** 푸터: 면책·시연 안내는 홈에서 한 번만 */
+/* ----- 앱 설치 (PWA, 3차 개선제안 4장) ----- */
 /** 크롬의 설치 신호(beforeinstallprompt). 이벤트 객체를 들고 있다가 버튼에서 prompt() 를 부른다 */
 interface InstallPromptEvent extends Event { prompt: () => Promise<void> }
+let installEvt: InstallPromptEvent | null = null;
+const installSubs = new Set<() => void>();
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e as InstallPromptEvent; installSubs.forEach((f) => f()); });
+window.addEventListener('appinstalled', () => { installEvt = null; storage.set('hy-installed', '1'); installSubs.forEach((f) => f()); });
 // 이미 홈 화면 앱으로 열렸으면 설치 안내가 필요 없다
 const standalone = () => window.matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true;
-const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !(window as { MSStream?: unknown }).MSStream;
+export const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const LATER_MS = 14 * 864e5;
+
+/** 설치됐거나(또는 앱으로 열렸거나) 아니면 안내 가능. 배너는 '나중에' 누른 뒤 14일 동안 숨긴다 */
+function useInstall() {
+  const [, tick] = useState(0);
+  useEffect(() => { const f = () => tick((n) => n + 1); installSubs.add(f); return () => { installSubs.delete(f); }; }, []);
+  const hidden = standalone() || storage.get('hy-installed') === '1';
+  const later = Number(storage.get('hy-install-later') || 0);
+  return { hidden, bannerOk: !hidden && Date.now() - later > LATER_MS };
+}
+/** 안드로이드 크롬은 휴대폰 설치창을 바로, 아이폰·설치창 없는 브라우저는 기기별 안내 시트 */
+function installNow(open: (o: Overlay) => void) {
+  if (installEvt) void installEvt.prompt();
+  else open({ k: 'install' });
+}
 
 /**
- * "앱으로 설치" 버튼. 안드로이드 크롬은 설치 창을 바로 띄우고, 아이폰은 배너가 없으므로 공유 → 홈 화면에 추가 안내를 보여 준다.
- * 크롬의 자동 배너는 체류 시간 등 자체 조건이라 타이밍을 믿을 수 없어서 버튼을 둔다.
+ * 홈 화면 아래에 떠 있는 설치 배너. 홈에서만, 시트가 없을 때만. 떠 있는 동안은 AI 상담 버튼을 숨겨 겹치지 않게 (body.has-install).
+ * 크롬의 자동 배너는 체류 시간 등 자체 조건이라 타이밍을 믿을 수 없어서 직접 둔다.
  */
 export function InstallBanner() {
-  const { screen, t } = useApp();
-  const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
-  const [done, setDone] = useState(() => standalone());
-  // 닫으면 이 세션에서는 다시 안 띄운다 (설치는 홈 푸터 없이도 크롬 메뉴로 가능)
-  const [closed, setClosed] = useState(() => sessionStorage.getItem('hy-install-closed') === '1');
+  const { screen, overlay, t, openOverlay, toast } = useApp();
+  const { bannerOk } = useInstall();
+  const [closed, setClosed] = useState(false);
+  const show = screen.k === 'home' && !overlay && bannerOk && !closed;
+  useEffect(() => { document.body.classList.toggle('has-install', show); return () => document.body.classList.remove('has-install'); }, [show]);
   useEffect(() => {
-    const onPrompt = (e: Event) => { e.preventDefault(); setPrompt(e as InstallPromptEvent); };
-    const onInstalled = () => { setDone(true); setPrompt(null); };
-    window.addEventListener('beforeinstallprompt', onPrompt);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => { window.removeEventListener('beforeinstallprompt', onPrompt); window.removeEventListener('appinstalled', onInstalled); };
-  }, []);
-  if (screen.k !== 'home' || done || closed) return null;
-  const close = () => { setClosed(true); try { sessionStorage.setItem('hy-install-closed', '1'); } catch { /* 무시 */ } };
-  if (!prompt && !isIos()) return null;
+    const f = () => toast(t('installedToast'));
+    window.addEventListener('appinstalled', f);
+    return () => window.removeEventListener('appinstalled', f);
+  }, [toast, t]);
+  if (!show) return null;
+  const later = () => { storage.set('hy-install-later', String(Date.now())); setClosed(true); };
   return (
-    <div className="install" role="region" aria-label={t('installApp')}>
-      <Ic n="house" cls="sm" />
-      {prompt
-        ? <><span className="tx">{t('installLead')}</span><button type="button" className="btn primary sm" onClick={() => { void prompt.prompt(); }}>{t('installApp')}</button></>
-        : <span className="tx">{t('installIos')}</span>}
-      <button type="button" className="icon-btn" onClick={close} aria-label={t('aClose')}><Ic n="close" cls="sm" /></button>
-    </div>
+    <section className="install" role="region" aria-label={t('installT')}>
+      <span className="app-ic" aria-hidden="true"><img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="" width={42} height={42} /></span>
+      <span className="tx"><b>{t('installT')}</b><span>{t('installD')}</span></span>
+      <button type="button" className="btn primary sm" onClick={() => installNow(openOverlay)}><Ic n="download" cls="sm" />{t('installBtn')}</button>
+      <button type="button" className="icon-btn later" onClick={later} aria-label={t('later')}><Ic n="close" cls="sm" /></button>
+    </section>
   );
 }
 
 export function Footer() {
-  const { screen, lang, langChosen, t } = useApp();
+  const { screen, lang, langChosen, t, openOverlay } = useApp();
+  const { hidden } = useInstall();
   if (screen.k !== 'home') return null;
   return (
     <footer className="foot">
@@ -138,6 +160,8 @@ export function Footer() {
       <div className="links">
         <a href="https://www.yangju.go.kr" target="_blank" rel="noopener">{t('cityLink')}<Ic n="ext" cls="sm" /></a>
         <a href="tel:1345"><Ic n="phone" cls="sm" />{t('helpline')}</a>
+        {/* 배너를 닫은 뒤에도 설치 안내를 다시 열 수 있는 자리 */}
+        {!hidden && <a href="#" onClick={(e) => { e.preventDefault(); installNow(openOverlay); }}><Ic n="download" cls="sm" />{t('footInstall')}</a>}
       </div>
     </footer>
   );

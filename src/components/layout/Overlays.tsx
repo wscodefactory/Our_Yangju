@@ -1,5 +1,6 @@
 // 시트·전체 화면 라우터. AppContext.overlay 하나를 보고 알맞은 시트를 띄운다 (한 번에 하나).
 import { Sheet } from '@/components/layout/Chrome';
+import { InstallSheet } from '@/components/layout/InstallSheet';
 import { ChatSheet } from '@/components/guide/ChatSheet';
 import { NoticeSheet } from '@/components/doc/NoticeSheet';
 import { LangOptions } from '@/components/ui/LangOptions';
@@ -29,5 +30,6 @@ export function Overlays() {
     case 'notice': return <NoticeSheet />;
     case 'note': return <NoteSheet id={overlay.id} />;
     case 'full': return <FullShow id={overlay.id} />;
+    case 'install': return <InstallSheet />;
   }
 }
