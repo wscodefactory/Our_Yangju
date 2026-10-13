@@ -607,6 +607,9 @@ const UI_BANK = {
 
 /* UI_BANK 이후에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
+  // 혜택 검색 (2026-10-13)
+  searchBen:["혜택 검색 (예: 월세, 출산, 구직)","Search benefits (e.g. rent, birth, job)","搜索福利（如：房租、生育、求职）","Tìm hỗ trợ (VD: tiền thuê, sinh con, việc làm)","सुविधा खोज्नुहोस् (जस्तै: भाडा, जन्म, काम)"],
+  noMatch:["검색 결과가 없어요. 다른 말로 찾아보세요.","No results. Try another word.","没有搜索结果，请换个词试试。","Không có kết quả. Hãy thử từ khác.","नतिजा छैन। अर्को शब्दले खोज्नुहोस्।"],
   // 업무 목록·상세 (드롭다운식, 2026-10-13)
   openChecklist:["준비물 체크리스트 열기","Open the checklist","打开准备清单","Mở danh sách chuẩn bị","तयारी सूची खोल्नुहोस्"],
   mySituation:["내 상황 고르기","Choose your situation","选择我的情况","Chọn tình huống của bạn","आफ्नो अवस्था छान्नुहोस्"],

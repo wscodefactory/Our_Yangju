@@ -4,7 +4,7 @@
 import {
   AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, BookmarkCheck, BookmarkPlus, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
   ChevronRight, CircleHelp, Copy, Cross, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,
-  Landmark, MapPin, Maximize, MessageCircle, Mountain, Palette, Pencil, Phone, Send, ShieldCheck, Siren, Smile, TrainFront,
+  Landmark, MapPin, Maximize, MessageCircle, Mountain, Palette, Pencil, Phone, Search, Send, ShieldCheck, Siren, Smile, TrainFront,
   Trash2, User, Users, Utensils, Volume2, X, type LucideIcon,
 } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const MAP = {
   file: FileText, heart: Heart, house: House, idcard: IdCard, medical: Cross, smile: Smile, car: Car, help: CircleHelp,
   siren: Siren, trash: Trash2, bus: Bus, train: TrainFront, briefcase: Briefcase, calendar: Calendar, pin: MapPin, info: Info,
   alert: AlertTriangle, shield: ShieldCheck, camera: Camera, pencil: Pencil, sample: FlaskConical, mountain: Mountain,
-  flower: Flower2, palette: Palette, utensils: Utensils, user: User, users: Users, building: Building2, web: AppWindow,
+  flower: Flower2, palette: Palette, search: Search, utensils: Utensils, user: User, users: Users, building: Building2, web: AppWindow,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof MAP;
