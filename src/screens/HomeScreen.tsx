@@ -3,6 +3,7 @@ import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import type { Screen } from '@/types';
 import { anyEventOn } from '@/utils/events';
+import { hasProfile, loadProfile } from '@/utils/profile';
 
 /** [화면, 아이콘, 색, 제목 키, 설명 키] */
 const TASKS: [Screen, string, string, string, string][] = [
@@ -15,12 +16,21 @@ const TASKS: [Screen, string, string, string, string][] = [
 export function HomeScreen() {
   const { t, go } = useApp();
   const on = anyEventOn();
+  const noProfile = !hasProfile(loadProfile());
   return (
     <>
       <section className="hero">
         <h1 tabIndex={-1}>{t('heroTitle')}</h1>
         <p className="desc">{t('heroDesc')}</p>
       </section>
+      {/* 내 정보가 없을 때만. 넣고 나면 앱 바의 사람 아이콘으로 */}
+      {noProfile && (
+        <button type="button" className="promo" onClick={() => go({ k: 'profile' })}>
+          <span className="ibox tone-green"><Ic n="user" /></span>
+          <span className="tx"><span className="t">{t('pfPromoT')}</span><span className="d">{t('pfPromoD')}</span></span>
+          <span className="bdg green">{t('pfPromoTime')}</span>
+        </button>
+      )}
       <h2 className="sec-title">{t('secTasks')}</h2>
       <div className="tasks">
         {TASKS.map(([s, icon, tone, title, desc]) => (
@@ -41,14 +51,6 @@ export function HomeScreen() {
         </button>
         <button type="button" className="tile" onClick={() => go({ k: 'explore', tab: 'about' })}>
           <span className="ibox tone-blue"><Ic n="info" /></span>{t('exAbout')}
-        </button>
-      </div>
-      {/* 내 정보: 비자·사는 곳을 기기에만 저장해 업무 상세의 상황 선택을 미리 채운다 */}
-      <div className="list" style={{ marginTop: 20 }}>
-        <button type="button" className="row" onClick={() => go({ k: 'profile' })}>
-          <span className="ibox tone-gray"><Ic n="user" /></span>
-          <span className="tx"><span className="t">{t('profileT')}</span><span className="d">{t('homeProfileD')}</span></span>
-          <Ic n="chev" cls="sm" />
         </button>
       </div>
     </>

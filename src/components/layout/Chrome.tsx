@@ -45,6 +45,7 @@ export function AppBar() {
             <button type="button" className="icon-btn tip" onClick={() => { if (screen.k !== 'saved') go({ k: 'saved' }); }} aria-current={screen.k === 'saved' ? 'page' : undefined} aria-label={`${t('aSaved')}${n ? ` (${n})` : ''}`} data-tip={t('aSaved')}>
               <Ic n="bookmark" />{n > 0 && <span className="badge" aria-hidden="true">{n}</span>}
             </button>
+            <button type="button" className="icon-btn tip" onClick={() => { if (screen.k !== 'profile') go({ k: 'profile' }); }} aria-current={screen.k === 'profile' ? 'page' : undefined} aria-label={t('profileT')} data-tip={t('profileT')}><Ic n="user" /></button>
           </nav>
         )}
       </div>

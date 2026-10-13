@@ -13,6 +13,7 @@ import { copyText, speak } from '@/utils/browser';
 import { buildIcs, downloadIcs } from '@/utils/calendar';
 import { paidStore } from '@/utils/paid';
 import { hasPii } from '@/utils/pii';
+import { bankLabel, loadProfile } from '@/utils/profile';
 import { allReviewed, useReview } from '@/utils/review';
 import { Stepper } from './Stepper';
 
@@ -46,6 +47,8 @@ export function DocResultScreen() {
   const readText = [`${t('docIs')}: ${taxName}`, `${t('amountL')}: ${amount}`, `${t('dueL')}: ${fmtDate(d.due)}`, t('lateShort')].join('. ');
   const copy = (text: string) => { void copyText(text); toast(t('copied')); };
   const foreign = lang !== 'ko';
+  const profile = loadProfile();
+  const myBank = profile.bank ? bankLabel(profile.bank, foreign) : '';
   const { bank, acct } = splitVacct(d.vacct || '');
   // 외국어 화면에서는 은행 앱에서 찾기 쉽게 은행명에 영문 병기
   const bankShown = foreign ? bankWithEn(bank) : bank;
@@ -88,7 +91,7 @@ export function DocResultScreen() {
               {wetaxLookup}
             </div>
           )}
-          <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{t('bankT')}</p>
+          <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{myBank ? <>{t('bankAppT', { bank: myBank })} <span className="bdg green">{t('bankMine')}</span></> : t('bankT')}</p>
           <p className="muted" style={{ margin: '0 0 10px', ...(overdue ? { color: 'var(--danger)', fontWeight: 600 } : {}) }}>{overdue ? t('overdueSend') : t('bankBy', { d: dueShort })}</p>
           <dl className="kv bankbox" style={{ marginBottom: 12 }}>
             <dt>{t('bankName')}</dt><dd lang="ko">{bankShown}</dd>
@@ -140,6 +143,9 @@ export function DocResultScreen() {
         </details>
       </section>
 
+      {/* 내 정보에서 고른 것만: 건강보험료를 직접 내는 사람, 차가 있는 사람 */}
+      {profile.nhisSelf && <Callout kind="info" icon="heart" sm>{t('nhisRemind')}</Callout>}
+      {profile.car && d.type !== 'auto' && <p className="hint-line" style={{ margin: 0 }}><Ic n="car" cls="sm" /><span>{t('carNote')}</span></p>}
       <Callout kind="warn" icon="alert">
         <b>{t('lateT')}</b><br />{t('lateE1')} {t('lateE2')} {t('lateE3')}<br />
         <span style={{ opacity: .85, fontSize: '.75rem' }}>{t('basis')}: {t('lateSrc')}</span>
