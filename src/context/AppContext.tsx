@@ -7,6 +7,7 @@ import {
   createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode,
 } from 'react';
 import { type T5 } from '@/data/content';
+import EASY_KO from '@/data/easy-ko.json';
 import * as i18n from '@/i18n';
 import type { Lang } from '@/i18n';
 import { benefitsStore } from '@/services/benefitsStore';
@@ -38,6 +39,9 @@ export interface AppState {
   /* 큰 글씨 */
   big: boolean;
   toggleBig: () => void;
+  /** 쉬운 한국어 (한국어 화면 전용). 켜면 t() 가 easy-ko.json 문장을 우선 쓴다 */
+  easy: boolean;
+  toggleEasy: () => void;
 
   /* 저장한 혜택 (BEN id 목록) */
   saved: string[];
@@ -91,7 +95,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const lang: Lang = langState ?? 'ko';
   const tx = useCallback((arr?: T5) => i18n.tx(arr, lang), [lang]);
-  const t = useCallback((key: string, vars?: Record<string, string | number>) => i18n.t(key, lang, vars), [lang]);
+  /* ----- 쉬운 한국어 (기능 9) ----- */
+  // 한국어 화면에서만. 켜면 UI 사전의 긴 문장을 AI 가 바꿔 둔 쉬운 문장(easy-ko.json)으로 대체한다
+  const [easy, setEasy] = useState(() => storage.get('hy-easy') === '1');
+  const toggleEasy = useCallback(() => setEasy((v) => { storage.set('hy-easy', v ? '0' : '1'); return !v; }), []);
+  const t = useCallback((key: string, vars?: Record<string, string | number>) => {
+    if (lang === 'ko' && easy) {
+      const e = (EASY_KO as Record<string, string>)[key];
+      if (e) { let s = e; if (vars) for (const v in vars) s = s.replace(`{${v}}`, String(vars[v])); return s; }
+    }
+    return i18n.t(key, lang, vars);
+  }, [lang, easy]);
   const fmtDate = useCallback((s: string, opt?: Intl.DateTimeFormatOptions) => i18n.fmtDate(s, lang, opt), [lang]);
   const fmtRange = useCallback((a: string, b: string) => i18n.fmtRange(a, b, lang), [lang]);
   const fmtWon = useCallback((n: number) => i18n.fmtWon(n, lang), [lang]);
@@ -202,7 +216,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value: AppState = {
     lang, langChosen: !!langState, setLang, tx, t, fmtDate, fmtRange, fmtWon, fmtNum,
-    big, toggleBig,
+    big, toggleBig, easy, toggleEasy,
     saved, isSaved, toggleSaved,
     nav, screen, go, back, goHome, replaceNav, replace,
     overlay, openOverlay, closeOverlay,

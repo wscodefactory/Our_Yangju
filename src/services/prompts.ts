@@ -39,6 +39,16 @@ export const guidePrompt = (sentence: string) =>
   'You help residents of Yangju, Korea. From the resident\'s sentence, extract only what they actually said. Youth life stages: job=구직(looking for work), work=취업(employed), indep=독립(renting/living alone/housing), marry=결혼(marriage), birth=임신·출산(pregnancy/birth), care=육아(childcare). Reply with only JSON: {"stages":["most relevant stage id first, at most 2"],"facts":[{"ko":"short Korean chip","en":"short English chip"}],"moving":true|false,"tax_notice":true|false}. tax_notice is true if they talk about a tax bill or notice they received.\n\n' +
   `Sentence: """${sentence.slice(0, 600)}"""`;
 
+/**
+ * 근거 문서 기반 답변 (기능 5). 규칙에 안 걸린 질문에, data/knowledge.ts 문서 전체를 주고
+ * "이 문서들 안에서만" 답하게 한다. 어느 문서를 썼는지 sourceId 로 돌려받아 화면에 "근거: …" 로 표시.
+ * 문서 밖 질문이면 answer 를 비우고 sourceId 를 null 로 — 그러면 "조금 더 알려 주세요 + 1345" 로 떨어진다.
+ */
+export const groundedPrompt = (question: string, docs: { id: string; title: string; text: string }[], langName: string) =>
+  `You answer questions from foreign residents of Yangju, Korea, using ONLY the official documents below. Rules: if the documents cover the question, answer in ${langName} in 1-3 short sentences and cite the single most relevant document id. If they do not cover it, set "answer" to "" and "sourceId" to null. Never invent amounts, dates, phone numbers or eligibility; never give legal or tax judgments beyond the text. Reply with only JSON: {"answer":"...","sourceId":"id or null"}.\n\nDocuments:\n` +
+  docs.map((d) => `[${d.id}] ${d.title}\n${d.text}`).join('\n\n') +
+  `\n\nQuestion: """${question.slice(0, 600)}"""`;
+
 /** guidePrompt 응답. 모델이 필드를 빼먹을 수 있어 전부 optional */
 export interface GuideResult {
   stages?: string[];
@@ -46,3 +56,8 @@ export interface GuideResult {
   moving?: boolean;
   tax_notice?: boolean;
 }
+
+/** 창구 대화 통역: 한 발화를 상대 언어로. target 은 LANGS[].en 같은 영어 언어명 ('Vietnamese', 'Korean' …).
+ *  숫자·이름은 그대로 두게 해서 금액·서류명이 바뀌지 않도록 한다. */
+export const translateToPrompt = (text: string, target: string) =>
+  `Translate the following spoken sentence into ${target}, as a natural, polite sentence a city office counter interpreter would say. Keep numbers, dates, amounts and proper names exactly as they are. Output only the translation, nothing else.\n\n${text.slice(0, 1000)}`;

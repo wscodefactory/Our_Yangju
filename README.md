@@ -53,16 +53,20 @@ src/
 ├─ i18n.ts                      tx/t(5개 언어 문구), Intl 날짜·금액 서식, 로캘 폴백, 누락 번역 점검
 ├─ data/content.ts              모든 문구와 콘텐츠 (UI 사전, VISIT, LIFE, BEN, EVENTS, PLACES, FAQ, INTENTS, SAMPLE …)
 ├─ data/admin.ts                담당자 화면 시연 데이터
+├─ data/knowledge.ts            AI 상담 근거 문서 18건 (출처 링크·이동 화면 포함)
+├─ data/events.ts, events.json  행사·공고. json 은 scripts/fetch-events.mjs 가 시청 게시판에서 자동 수집·번역(없으면 content.ts 의 정적 목록)
+├─ data/easy-ko.json            쉬운 한국어 문구 (scripts/gen-easy-ko.mjs 가 생성한 AI 초안)
 ├─ types/index.ts               DocInfo · Screen(내비게이션 스택 유니온) · 담당자 화면 타입
 ├─ context/AppContext.tsx       언어 · 큰 글씨 · 저장 혜택 · 내비 스택(history 연동) · 시트 · 토스트
 ├─ context/DocContext.tsx       고지서 흐름 상태 (캔버스·가림·DocInfo)
-├─ context/GuideContext.tsx     AI 상담 대화 (Gemini → INTENTS 규칙 폴백)
+├─ context/GuideContext.tsx     AI 상담 대화 (INTENTS 규칙 → knowledge.ts 근거 문서로만 답하는 Gemini → 모르면 1345 안내)
 ├─ components/layout/Chrome.tsx AppBar · Title · BottomBar · Fab · Footer · Sheet · Toast
 ├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면
 ├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
 ├─ screens/                     Home · Lang · Explore · Saved · visit/ · life/ · doc/ · welfare/ · admin/
-├─ services/ai.ts, prompts.ts   Gemini 호출 (고지서 읽기 · 공고 규칙 추출 · 상담 분류)
-└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · rule(담당자)
+├─ services/ai.ts, prompts.ts   Gemini 호출 (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
+└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · rule(담당자)
+scripts/                        fetch-events(행사 수집, 배포 때 매일 06:00 실행) · gen-easy-ko · eval-notices(고지서 인식 정확도, tests/notices)
 legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
 요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)
 ```
@@ -77,7 +81,8 @@ legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드�
 ## 다음 개발
 
 - [ ] 흐림·불확실 값 재촬영 안내, 기한 경과·복수 금액 상담 전환, 확인 전 납부 연결 보류
-- [ ] 실제 고지서 3~5장 인식 테스트(정답률 기록)
-- [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [ ] 원어민 검수 반영
+- [x] 고지서 인식 테스트셋 `npm run eval:notices` (2026-10-13, 샘플 1장) · [ ] 실제 고지서 3~5장 추가
+- [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [x] 담당자 화면 "번역 검수" 탭 (2026-10-13) · [ ] 원어민 검수 반영
+- [x] AI 상담 근거 답변(2026-10-13) · [ ] 근거 문서를 시청 공고로 확장
 - [ ] 담당자 게시 혜택 공유 저장소(서버) 연결
 - [ ] Gemini 호출 서버 프록시화

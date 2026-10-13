@@ -605,7 +605,8 @@ const UI_BANK = {
   draftNote:["번역은 AI 초안이며, 원어민 검토 전입니다.","This translation is an AI draft, not yet reviewed by a native speaker.","译文为 AI 初稿，尚未经母语者审核。","Bản dịch là bản nháp do AI tạo, chưa được người bản ngữ kiểm tra.","अनुवाद AI को मस्यौदा हो, नेपाली भाषीले अझै जाँचेको छैन।"]
 };
 
-export const UI = { ...UI_BASE, ...UI_BANK,
+/* UI_BANK 이후에 덧붙인 문구 (AI 초안) */
+const UI_EXTRA = {
   payOtherT:["은행 ATM 또는 전화 ARS","Bank ATM or phone (ARS)","银行 ATM 或电话 ARS","ATM ngân hàng hoặc điện thoại ARS","बैंक ATM वा फोन (ARS)"],
   payOtherD:["ATM은 카드나 통장, 전화는 한국어 음성 안내","ATM: card or bankbook. Phone: Korean voice guide","ATM 用银行卡或存折，电话为韩语语音","ATM dùng thẻ hoặc sổ, điện thoại bằng tiếng Hàn","ATM मा कार्ड वा पासबुक, फोन कोरियाली आवाजमा"],
   pay1D:["전자납부번호로 조회해서 납부 (00:30~23:30)","Search with the e-payment number and pay (00:30-23:30)","用电子缴纳号码查询后缴纳（00:30～23:30）","Tra cứu bằng mã nộp điện tử rồi nộp (00:30-23:30)","इ-भुक्तानी नम्बरले खोजेर तिर्नुहोस् (00:30-23:30)"],
@@ -628,3 +629,7 @@ export const UI = { ...UI_BASE, ...UI_BANK,
   noDocs:["따로 챙길 서류가 없어요","Nothing to bring","无需准备材料","Không cần giấy tờ","केही लैजानु पर्दैन"],
   tapToShow:["아래 버튼을 누르면 창구 직원에게 보여줄 한국어 문장이 크게 나와요.","Tap the button below to show a Korean sentence to the staff.","点击下方按钮，会放大显示给工作人员看的韩语句子。","Nhấn nút bên dưới để hiện câu tiếng Hàn cho nhân viên xem.","तलको बटन थिच्नुहोस्, कर्मचारीलाई देखाउने कोरियाली वाक्य ठूलो देखिन्छ।"]
 };
+
+export const UI = { ...UI_BASE, ...UI_BANK, ...UI_EXTRA };
+/** AI 초안 번역 키 (번역 검수 대상). UI_BASE 이후에 추가된 것 전부 */
+export const UI_DRAFT_KEYS: string[] = [...Object.keys(UI_BANK), ...Object.keys(UI_EXTRA)];

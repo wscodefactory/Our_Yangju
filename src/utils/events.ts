@@ -1,5 +1,5 @@
 // 행사 상태·지도 링크. 참고용 html 의 eventStatus / anyEventOn / mapUrl.
-import { EVENTS } from '@/data/content';
+import { EVENTS } from '@/data/events';
 import { daysUntil } from '@/i18n';
 
 export type EventStatus = 'on' | 'soon' | 'done';

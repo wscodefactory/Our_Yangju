@@ -8,13 +8,20 @@ import { NoteSheet } from '@/components/welfare/NoteSheet';
 import { useApp } from '@/context/AppContext';
 
 export function Overlays() {
-  const { overlay, closeOverlay, t } = useApp();
+  const { overlay, closeOverlay, t, lang, easy, toggleEasy } = useApp();
   if (!overlay) return null;
   switch (overlay.k) {
     case 'lang':
       return (
         <Sheet id="lang-h" title={t('chooseLang')} icon="globe" onClose={closeOverlay}>
           <LangOptions />
+          {/* 쉬운 한국어 (기능 9): 한국어 화면에서만. 문장은 AI 초안 */}
+          {lang === 'ko' && (
+            <button type="button" className="opt" role="switch" aria-checked={easy} onClick={toggleEasy} style={{ marginTop: 12 }}>
+              <span className="tx"><span className="t">쉬운 한국어</span><span className="d">짧고 쉬운 문장으로 보여줘요 (AI가 바꾼 초안)</span></span>
+              <span className="radio" aria-hidden="true" />
+            </button>
+          )}
           <p className="muted" style={{ margin: '14px 2px 0' }}>{t('langNote')}</p>
         </Sheet>
       );

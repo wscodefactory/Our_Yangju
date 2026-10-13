@@ -6,8 +6,9 @@ import { Callout, Seg } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';
 import { GAP_SIGNALS } from '@/data/admin';
 import { RegisterPanel, initialRegisterState, type RegisterState } from './RegisterPanel';
+import { ReviewPanel } from './ReviewPanel';
 
-type Tab = 'reg' | 'sig';
+type Tab = 'reg' | 'sig' | 'tr';
 
 /**
  * 담당자 화면 (시연): 혜택 등록 / 사각지대 신호 (+ 창구 모드 버튼).
@@ -26,8 +27,8 @@ export function AdminScreen({ tab }: { tab: Tab }) {
   return (
     <div className="stack">
       <Title>{T('담당자 화면', 'Officer console')}</Title>
-      <Seg<Tab> items={[['reg', T('혜택 등록', 'Register')], ['sig', T('사각지대 신호', 'Gap signals')]]} value={tab} onChange={setTab} />
-      {tab === 'sig' ? <SignalsPanel /> : <RegisterPanel state={reg} setState={patch} />}
+      <Seg<Tab> items={[['reg', T('혜택 등록', 'Register')], ['sig', T('사각지대 신호', 'Gap signals')], ['tr', T('번역 검수', 'Translation review')]]} value={tab} onChange={setTab} />
+      {tab === 'sig' ? <SignalsPanel /> : tab === 'tr' ? <ReviewPanel /> : <RegisterPanel state={reg} setState={patch} />}
       <div className="btn-row">
         <button type="button" className="btn secondary sm" onClick={() => go({ k: 'counter' })}>{T('창구 모드 열기', 'Open counter mode')}</button>
         <button type="button" className="btn ghost sm" onClick={goHome}>{T('시민 화면으로', 'Citizen view')}</button>

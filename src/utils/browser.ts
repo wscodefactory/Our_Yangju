@@ -46,6 +46,8 @@ export const STORAGE_KEYS = {
   saved: 'hy-saved',
   /** 납부 기록 (JSON, utils/paid.ts) */
   paid: 'hy-paid',
+  /** 번역 검수 상태 (JSON, utils/review.ts) */
+  review: 'hy-review',
 } as const;
 
 /** 음성 합성 지원 여부. SSR 은 안 하지만 혹시 몰라 window 체크를 넣어둠 */

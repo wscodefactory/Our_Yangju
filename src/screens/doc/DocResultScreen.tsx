@@ -15,6 +15,7 @@ import { copyText, speak } from '@/utils/browser';
 import { buildIcs, downloadIcs } from '@/utils/calendar';
 import { paidStore } from '@/utils/paid';
 import { hasPii } from '@/utils/pii';
+import { allReviewed, useReview } from '@/utils/review';
 import { Stepper } from './Stepper';
 
 type Tab = 'pay' | 'faq' | 'help';
@@ -28,6 +29,7 @@ function splitVacct(v: string) {
 export function DocResultScreen() {
   const { lang, t, tx, fmtDate, fmtWon, toast, goHome } = useApp();
   const { doc: d } = useDoc();
+  const { state: review } = useReview();
   const [tab, setTab] = useState<Tab>('pay');
   // [납부 완료] 뒤 "기록을 저장할까요?" 질문 표시
   const [askSave, setAskSave] = useState(false);
@@ -145,7 +147,7 @@ export function DocResultScreen() {
         <b>{t('lateT')}</b><br />{t('lateE1')} {t('lateE2')} {t('lateE3')}<br />
         <span style={{ opacity: .85, fontSize: '.75rem' }}>{t('basis')}: {t('lateSrc')}</span>
       </Callout>
-      {foreign && <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('draftNote')}</span></p>}
+      {foreign && !allReviewed(lang, review) && <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('draftNote')}</span></p>}
     </div>
   );
 

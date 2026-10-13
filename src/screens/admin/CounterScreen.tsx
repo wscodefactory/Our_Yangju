@@ -1,11 +1,17 @@
 // 담당자 창구 모드. 창구에서 공무원이 자기 기기로 띄워놓고 쓰는 화면이라
 // 위는 주민 모국어, 아래는 한국어가 같은 내용으로 나란히 선다.
-// 데이터는 시청·주민센터 화면과 같은 VISIT(다섯 언어 배열)을 쓴다. AI 번역 없음.
-import { useState } from 'react';
+// 데이터는 시청·주민센터 화면과 같은 VISIT(다섯 언어 배열)을 쓴다. 고정 안내는 AI 번역 없음.
+// 아래 Interpreter 는 자유 대화용: 브라우저 음성 인식(Web Speech API) → Gemini 번역 → 음성 합성.
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Title } from '@/components/layout/Chrome';
+import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { LANGS, VISIT } from '@/data/content';
+import { CS } from '@/data/strings-counter';
 import { tx, type Lang } from '@/i18n';
+import { getAi } from '@/services/ai';
+import { translateToPrompt } from '@/services/prompts';
+import { speak } from '@/utils/browser';
 
 // 한국어 주민이면 창구 모드가 필요 없으니 선택지에서 뺀다
 const RES_LANGS = LANGS.filter((l) => l.code !== 'ko');
@@ -66,6 +72,140 @@ export function CounterScreen() {
         </dl>
         {task.src && <p className="src">{task.src[0]}</p>}
       </section>
+
+      <Interpreter cl={cl} />
     </div>
+  );
+}
+
+/* ---------- 대화 통역 ---------- */
+
+type Who = 'officer' | 'resident';
+interface Line { id: number; who: Who; src: string; dst?: string; err?: boolean }
+
+// Web Speech API 는 lib.dom 에 타입이 없어서 쓰는 만큼만 적는다. 크롬은 webkit 접두어 쪽만 있다.
+interface SR {
+  lang: string; interimResults: boolean; maxAlternatives: number;
+  start(): void; abort(): void;
+  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: ((e: { error: string }) => void) | null;
+  onend: (() => void) | null;
+}
+const w = (typeof window !== 'undefined' ? window : {}) as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR };
+const SRCtor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+
+const langOf = (code: Lang) => LANGS.find((l) => l.code === code) ?? LANGS[0];
+
+/**
+ * 직원 ↔ 주민 음성 통역. 직원 발화는 주민 언어로, 주민 발화는 한국어로 번역해 로그에 쌓고 바로 읽어준다.
+ * 음성 인식이 없는 브라우저(파이어폭스, 일부 웹뷰)에선 안내만 띄우고 글 입력으로 돌린다.
+ */
+function Interpreter({ cl }: { cl: Lang }) {
+  const { T, toast } = useApp();
+  const [log, setLog] = useState<Line[]>([]);
+  const [listening, setListening] = useState<Who | null>(null);
+  const [typer, setTyper] = useState<Who>('officer');
+  const [text, setText] = useState('');
+  const rec = useRef<SR | null>(null);
+  const seq = useRef(0);
+  const ai = getAi();
+  const res = langOf(cl);
+
+  useEffect(() => () => rec.current?.abort(), []);
+
+  const handle = (who: Who, src: string) => {
+    const id = ++seq.current;
+    const target: Lang = who === 'officer' ? cl : 'ko';
+    setLog((l) => [...l, { id, who, src }]);
+    if (!ai) return;
+    const patch = (p: Partial<Line>) => setLog((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+    ai.text(translateToPrompt(src, langOf(target).en))
+      .then((dst) => { patch({ dst }); if (!speak(dst, target)) toast(T(...CS.noVoice)); })
+      .catch(() => { patch({ err: true }); toast(T(...CS.trErr)); });
+  };
+
+  const listen = (who: Who) => {
+    if (!SRCtor) return;
+    rec.current?.abort();
+    const r = new SRCtor();
+    r.lang = who === 'officer' ? 'ko-KR' : res.locale.split('-u-')[0];
+    r.interimResults = false;
+    r.maxAlternatives = 1;
+    r.onresult = (e) => { const t = e.results[0]?.[0]?.transcript?.trim(); if (t) handle(who, t); };
+    r.onerror = (e) => { if (e.error !== 'aborted') toast(T(...CS.srErr)); };
+    r.onend = () => { if (rec.current === r) { rec.current = null; setListening(null); } };
+    rec.current = r;
+    setListening(who);
+    r.start();
+  };
+
+  const cancel = () => { rec.current?.abort(); rec.current = null; setListening(null); };
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const t = text.trim();
+    if (!t) return;
+    setText('');
+    handle(typer, t);
+  };
+
+  return (
+    <section className="panel">
+      <h2>{T(...CS.title)}</h2>
+      <p className="lead" style={{ margin: '0 0 12px' }}>{T(...CS.lead)}</p>
+      {!ai && <p style={{ margin: '0 0 12px' }}><span className="demo-flag">{T(...CS.noAi)}</span></p>}
+      {!SRCtor && <div className="callout info" style={{ marginBottom: 12 }}><Ic n="info" cls="sm" />{T(...CS.noSr)}</div>}
+
+      {SRCtor && (listening ? (
+        <div className="grid2" style={{ marginBottom: 12 }}>
+          <div className="btn secondary" aria-live="polite" lang={listening === 'officer' ? 'ko' : cl}>
+            <Ic n="chat" cls="sm" />{listening === 'officer' ? T(...CS.listening) : `${CS.listening[0]} · ${res.native}`}
+          </div>
+          <button type="button" className="btn primary" onClick={cancel}><Ic n="close" cls="sm" />{T(...CS.cancel)}</button>
+        </div>
+      ) : (
+        <div className="grid2" style={{ marginBottom: 12 }}>
+          <button type="button" className="btn primary" onClick={() => listen('officer')}><Ic n="chat" cls="sm" />{T(...CS.officer)}</button>
+          <button type="button" className="btn primary" onClick={() => listen('resident')}><Ic n="chat" cls="sm" />{T(...CS.resident)} (<span lang={cl}>{res.native}</span>)</button>
+        </div>
+      ))}
+
+      {log.length > 0 && (
+        <div className="msgs" style={{ marginBottom: 12 }}>
+          {log.map((x) => {
+            const target: Lang = x.who === 'officer' ? cl : 'ko';
+            return (
+              <div key={x.id} className={`msg ${x.who === 'officer' ? 'me' : 'bot'}`}>
+                <div style={{ fontSize: '.75rem', opacity: .8 }}>{x.who === 'officer' ? T(...CS.whoOfficer) : T(...CS.whoResident)}</div>
+                <div lang={x.who === 'officer' ? 'ko' : cl}>{x.src}</div>
+                {ai && (
+                  <div lang={target} style={{ fontWeight: 700, marginTop: 6, display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ flex: 1 }}>{x.dst ?? (x.err ? T(...CS.trErr) : T(...CS.translating))}</span>
+                    {x.dst && (
+                      <button type="button" className="icon-btn" aria-label={T(...CS.replay)} onClick={() => { if (!speak(x.dst!, target)) toast(T(...CS.noVoice)); }}>
+                        <Ic n="volume" cls="sm" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 글 입력 (음성 인식이 없거나 소음이 심할 때) */}
+      <div className="chips" style={{ marginBottom: 8 }}>
+        <button type="button" className="chip" aria-pressed={typer === 'officer'} onClick={() => setTyper('officer')}>{T(...CS.whoOfficer)} · 한국어</button>
+        <button type="button" className="chip" aria-pressed={typer === 'resident'} onClick={() => setTyper('resident')}>{T(...CS.whoResident)} · <span lang={cl}>{res.native}</span></button>
+      </div>
+      <form className="ask" onSubmit={submit}>
+        <input value={text} onChange={(e) => setText(e.target.value)} placeholder={T(...CS.ph)} lang={typer === 'officer' ? 'ko' : cl} aria-label={T(...CS.ph)} />
+        <button type="submit" className="icon-btn" aria-label={T(...CS.send)} disabled={!text.trim()}><Ic n="send" /></button>
+      </form>
+      {log.length > 0 && (
+        <button type="button" className="btn secondary sm" style={{ marginTop: 10 }} onClick={() => setLog([])}>{T(...CS.clear)}</button>
+      )}
+    </section>
   );
 }

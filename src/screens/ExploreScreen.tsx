@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Seg } from '@/components/ui/Bits';
 import { Ic } from '@/components/ui/Ic';
-import { AREAS, CERTS, EVENTS, HERITAGE, PLACES, type T5 } from '@/data/content';
+import { AREAS, CERTS, HERITAGE, PLACES, type T5 } from '@/data/content';
+import { EVENTS } from '@/data/events';
 import { EVENTS_URL, FOOD_AREAS } from '@/data/links';
 import { useApp } from '@/context/AppContext';
 import { loc, parseDate } from '@/i18n';
@@ -33,9 +34,10 @@ export function ExploreScreen({ tab: initial = 'events' }: { tab?: Tab }) {
 function Events() {
   const { lang, t, tx, fmtRange } = useApp();
   const mon = new Intl.DateTimeFormat(loc(lang), { month: 'short' });
+  const list = [...EVENTS].sort((a, b) => ORDER[eventStatus(a)] - ORDER[eventStatus(b)]);
   return (
     <div className="stack">
-      {[...EVENTS].sort((a, b) => ORDER[eventStatus(a)] - ORDER[eventStatus(b)]).map((e) => {
+      {list.map((e) => {
         const st = eventStatus(e);
         const range = e.tba ? null : e.range;
         const dt = range ? parseDate(range[0]) : null;
@@ -55,10 +57,17 @@ function Events() {
             {st !== 'done' && <span className="ev-go" aria-hidden="true"><Ic n="ext" cls="sm" /></span>}
           </>
         );
-        return st !== 'done'
-          ? <a key={e.id} className="ev" href={mapUrl(e.map)} target="_blank" rel="noopener" aria-label={`${tx(e.name)}, ${t('openMap')}`}>{inner}</a>
-          : <article key={e.id} className="ev done">{inner}</article>;
+        if (st === 'done') return <article key={e.id} className="ev done">{inner}</article>;
+        // 수집한 행사(url 있음)는 카드가 누리집 원문으로, 지도는 작은 보조 링크로. 고정 행사는 카드가 지도로.
+        return (
+          <div key={e.id} className="stack" style={{ gap: 6 }}>
+            <a className="ev" href={e.url ?? mapUrl(e.map)} target="_blank" rel="noopener" aria-label={`${tx(e.name)}, ${e.url ? t('eventsSrc') : t('openMap')}`}>{inner}</a>
+            {e.url && <a className="btn secondary sm" href={mapUrl(e.map)} target="_blank" rel="noopener" style={{ alignSelf: 'flex-end' }}><Ic n="pin" cls="sm" />{t('openMap')}</a>}
+          </div>
+        );
       })}
+      {/* 수집 행사 중 번역이 안 된 것이 있으면 AI 초안 안내 (한국어 화면에선 불필요) */}
+      {lang !== 'ko' && list.some((e) => e.draft) && <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('draftNote')}</span></p>}
       {/* 행사 원문은 양주시 누리집 (2차 개선점검 3.1) */}
       <a className="btn secondary sm" href={EVENTS_URL} target="_blank" rel="noopener">{t('eventsSrc')}<Ic n="ext" cls="sm" /></a>
     </div>

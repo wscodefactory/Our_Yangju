@@ -9,7 +9,7 @@ import { hasPii } from '@/utils/pii';
 const SUGS = ['sug1', 'sug2', 'sug3', 'sug4'];
 
 export function ChatSheet() {
-  const { t, go, closeOverlay, toast } = useApp();
+  const { t, tx, go, closeOverlay, toast } = useApp();
   const { messages, showSuggestions, busy, ask, routeTitle } = useGuide();
   const input = useRef<HTMLInputElement>(null);
 
@@ -51,7 +51,16 @@ export function ChatSheet() {
           const dest = m.go;
           return (
             <div key={m.id} className="msg bot">
-              {t(m.key ?? '')}
+              {m.key ? t(m.key) : m.text}
+              {/* 근거 문서 (기능 5): 제목 + 링크. 답변은 이 문서 안에서만 나온 것 */}
+              {m.source && (
+                <p className="src" style={{ margin: '8px 0 0' }}>
+                  <Ic n="info" cls="sm" />
+                  <span>{t('basis')}: {m.source.url
+                    ? <a href={m.source.url} target="_blank" rel="noopener">{tx(m.source.title)}</a>
+                    : tx(m.source.title)}</span>
+                </p>
+              )}
               {/* go() 가 시트를 닫고 history 칸을 바꿔 쓴다. closeOverlay()(=history.back) 를 먼저 부르면 그 popstate 가 새 화면을 도로 빼 버린다 */}
               {dest && (
                 <button type="button" className="btn secondary sm" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => go(dest)}>

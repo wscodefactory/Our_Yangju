@@ -1,11 +1,12 @@
 // AI 상담(양주무관) 대화 상태. 사용자의 한 문장을 받아 볼 화면을 추천한다.
-//  1. AI(Gemini)가 있으면 guidePrompt 로 생애 단계/고지서 여부를 뽑아 welfare/doc 화면으로
+//  1. 규칙(INTENTS)에 걸리면 바로 그 화면으로. 안 걸리면 AI 가 공식 문서(knowledge.ts) 안에서 답하고 근거를 붙인다
 //  2. 없거나 실패하면 INTENTS 정규식(5개 언어 키워드)으로 같은 일을 한다 — 키 없이도 동작해야 하므로
 // 메시지 문구는 전부 UI 사전 키(chatHello/chatFound/chatMiss)라 언어가 바뀌면 그대로 따라온다.
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { INTENTS, LIFE, STAGES, VISIT } from '@/data/content';
+import { INTENTS, LANGS, LIFE, STAGES, VISIT } from '@/data/content';
 import { getAi } from '@/services/ai';
-import { guidePrompt, type GuideResult } from '@/services/prompts';
+import { KNOWLEDGE, type KnowledgeDoc } from '@/data/knowledge';
+import { groundedPrompt } from '@/services/prompts';
 import type { Screen } from '@/types';
 import { useApp } from './AppContext';
 
@@ -13,11 +14,13 @@ export interface GuideMessage {
   id: number;
   /** 사용자가 보낸 말풍선 */
   me?: boolean;
-  /** UI 사전 키 (봇 메시지). me 면 text 를 쓴다 */
+  /** UI 사전 키 (봇 메시지). me 거나 근거 답변이면 text 를 쓴다 */
   key?: string;
   text?: string;
   /** 추천 화면. 있으면 말풍선 아래 이동 버튼 */
   go?: Screen;
+  /** 근거 문서 (기능 5). 있으면 "근거: 제목" 줄 */
+  source?: KnowledgeDoc;
 }
 
 export interface GuideState {
@@ -50,33 +53,32 @@ export function GuideProvider({ children }: { children: ReactNode }) {
     // 1) 규칙 먼저: 5개 언어 키워드로 정해 둔 화면이 가장 정확하고 즉시 답한다 ("이사했어요" → 체류지 변경 신고)
     const hit = INTENTS.find((i) => i.re.test(q));
     if (hit) { push({ key: 'chatFound', go: hit.go as Screen }); return; }
-    // 2) 규칙에 없으면 AI 가 생애 단계·고지서 여부를 뽑는다. AI 가 없거나 실패하면 "조금 더 알려 주세요"
+    // 2) 규칙에 없으면 AI 가 공식 문서(knowledge.ts) 안에서만 답하고 근거 id 를 돌려준다 (기능 5).
+    //    문서 밖이거나 AI 가 없거나 실패하면 "조금 더 알려 주세요 + 1345"
     const ai = getAi();
     if (!ai) { push({ key: 'chatMiss' }); return; }
     setBusy(true);
     try {
-      const r = await ai.json<GuideResult>(guidePrompt(q));
-      if (r.tax_notice) push({ key: 'chatFound', go: { k: 'doc' } });
-      else {
-        const s = (r.stages || []).find((id) => id in STAGES);
-        if (s) {
-          const g = s === 'care' ? 'child' : s === 'marry' || s === 'birth' ? 'newly' : 'youth';
-          push({ key: 'chatFound', go: { k: 'welfare', g, s } });
-        } else push({ key: 'chatMiss' });
-      }
+      const docs = KNOWLEDGE.map((d) => ({ id: d.id, title: d.title[0], text: d.text }));
+      const langName = LANGS.find((l) => l.code === lang)?.en ?? 'English';
+      const r = await ai.json<{ answer?: string; sourceId?: string | null }>(groundedPrompt(q, docs, langName));
+      const src = KNOWLEDGE.find((d) => d.id === r.sourceId);
+      const answer = (r.answer || '').trim();
+      if (src && answer) push({ text: answer, source: src, go: src.go as Screen | undefined });
+      else push({ key: 'chatMiss' });
     } catch {
       push({ key: 'chatMiss' });
     } finally {
       setBusy(false);
     }
-  }, [push]);
+  }, [push, lang]);
 
   const routeTitle = useCallback((r: Screen): string => {
     if (r.k === 'visitItem') return tx(VISIT.find((v) => v.id === r.id)?.name);
     if (r.k === 'lifeItem') return tx(LIFE.find((v) => v.id === r.id)?.name);
     if (r.k === 'doc') return t('docT');
     if (r.k === 'welfare') return `${t('welT')}${r.s ? `: ${tx((STAGES as Record<string, string[]>)[r.s])}` : ''}`;
-    if (r.k === 'explore') return t('exEvents');
+    if (r.k === 'explore') return t(r.tab === 'places' ? 'tabPlaces' : r.tab === 'food' ? 'tabFood' : r.tab === 'about' ? 'tabAbout' : 'exEvents');
     return '';
   }, [t, tx]);
 
