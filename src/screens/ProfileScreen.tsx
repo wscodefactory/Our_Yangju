@@ -53,7 +53,7 @@ export function ProfileScreen() {
               {housing.map((h) => <option key={h.id} value={h.id}>{tx(h.name)}</option>)}
             </select>
           </div>
-          <label className="check">
+          <label className="check plain">
             <input type="checkbox" checked={!!p.family} onChange={(e) => update({ family: e.target.checked || undefined })} />
             <span>{t('pfFamily')}</span>
           </label>
