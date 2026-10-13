@@ -237,6 +237,23 @@ main{max-width:var(--app-w);margin:0 auto;padding:0 16px 32px}
 .progress i{display:block;height:100%;background:var(--yj-green);transition:width .25s}
 .prog-txt{font-size:.8125rem;color:var(--text-2);font-weight:600}
 
+/* 업무 목록: 검색창 + 드롭다운(아코디언) 카드 */
+.search{position:relative;margin:0 0 14px}
+.search>.ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-2);pointer-events:none}
+.search input{width:100%;min-height:50px;padding:0 48px 0 44px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--surface);font-size:1rem}
+.search input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint-2)}
+.search input::-webkit-search-cancel-button{display:none}
+.search .x{position:absolute;right:4px;top:50%;transform:translateY(-50%)}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.tcard.open{border-color:var(--primary)}
+.tcard-h{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:transparent;border:0;text-align:left;color:var(--text)}
+.tcard-h .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.tcard-h .t{font-weight:700;font-size:1.0625rem;line-height:1.35}
+.tcard-h .d{font-size:.8125rem;color:var(--text-2)}
+.tcard-h .chev{color:var(--text-2);transition:transform .2s;flex:none}
+.tcard.open .chev{transform:rotate(90deg)}
+.tcard-b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--border);background:var(--surface-2)}
+
 /* say-to-staff */
 .say{border:2px solid var(--yj-green);background:var(--surface);border-radius:var(--radius);padding:18px 16px}
 .say .ko{font-size:1.25rem;font-weight:700;line-height:1.55;margin:6px 0 10px}
