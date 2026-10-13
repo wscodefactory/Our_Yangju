@@ -17,7 +17,7 @@ const MIN_RECT_PX = 8;
 /**
  * 드래그 중 상자(cur)는 state 가 아니라 ref — pointermove 마다 리렌더할 이유가 없고, draw() 로 캔버스에 직접 그린다.
  */
-/** Gemini 가 돌려주는 상자 (0~1000 정규화, [ymin, xmin, ymax, xmax]) */
+/** AI 가 돌려주는 상자 (0~1000 정규화, [ymin, xmin, ymax, xmax]) */
 interface PiiBox { label?: string; box_2d?: number[] }
 
 export function MaskScreen() {

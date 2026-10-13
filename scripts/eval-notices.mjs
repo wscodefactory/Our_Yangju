@@ -1,6 +1,7 @@
-// 고지서 사진 인식 정확도 테스트: tests/notices/cases.json 의 각 사진을 앱과 같은 프롬프트로 Gemini 에 보내 expected 와 비교한다.
+// 고지서 사진 인식 정확도 테스트: tests/notices/cases.json 의 각 사진을 앱과 같은 프롬프트로 Claude 에 보내 expected 와 비교한다.
 // 사용법: npm run eval:notices [-- --json]   (--json 이면 tests/notices/last-run.json 에 결과 저장)
 // 앱은 사진을 긴 변 1200px JPEG 0.8 로 줄여 보내지만 여기서는 원본을 그대로 보낸다 (Node 에 canvas 없음).
+import Anthropic from '@anthropic-ai/sdk';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,9 +17,10 @@ const env = Object.fromEntries(
     .map(l => l.match(/^\s*([\w.]+)\s*=\s*(.*?)\s*$/)).filter(Boolean)
     .map(m => [m[1], m[2].replace(/^(['"])(.*)\1$/, '$2')]),
 );
-const apiKey = env.VITE_GEMINI_API_KEY;
-if (!apiKey) { console.error('.env 에 VITE_GEMINI_API_KEY 가 없습니다'); process.exit(2); }
-const model = env.VITE_GEMINI_MODEL || 'gemini-3.5-flash-lite';
+const apiKey = env.VITE_CLAUDE_API_KEY;
+if (!apiKey) { console.error('.env 에 VITE_CLAUDE_API_KEY 가 없습니다'); process.exit(2); }
+const model = env.VITE_CLAUDE_MODEL || 'claude-haiku-5-5';
+const client = new Anthropic({ apiKey, maxRetries: 3 });
 
 // 앱 프롬프트를 그대로 가져온다 (prompts.ts 는 import 가 없어 transpile 만으로 실행 가능)
 const src = fs.readFileSync(path.join(root, 'src', 'services', 'prompts.ts'), 'utf8');
@@ -27,23 +29,19 @@ const m = { exports: {} };
 new Function('module', 'exports', js)(m, m.exports);
 const prompt = m.exports.READ_NOTICE_PROMPT;
 
-const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
+// 앱(services/ai.ts)과 같은 요청 모양: 이미지 블록 + 프롬프트, system 으로 JSON 만 지시
 async function readNotice(file) {
-  const mimeType = /\.jpe?g$/i.test(file) ? 'image/jpeg' : 'image/png';
-  const body = JSON.stringify({
-    contents: [{ role: 'user', parts: [{ text: prompt }, { inlineData: { mimeType, data: fs.readFileSync(path.join(dir, file)).toString('base64') } }] }],
-    generationConfig: { temperature: 0.2, responseMimeType: 'application/json', thinkingConfig: { thinkingLevel: 'minimal' } },
+  const media_type = /\.jpe?g$/i.test(file) ? 'image/jpeg' : 'image/png';
+  const res = await client.messages.create({
+    model, max_tokens: 4096, temperature: 0.2,
+    system: 'Respond with a single JSON value only. No prose, no markdown fences.',
+    messages: [{ role: 'user', content: [
+      { type: 'image', source: { type: 'base64', media_type, data: fs.readFileSync(path.join(dir, file)).toString('base64') } },
+      { type: 'text', text: prompt },
+    ] }],
   });
-  for (let attempt = 0; ; attempt++) {
-    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-    if ((res.status === 429 || res.status >= 500) && attempt === 0) { await sleep(3000); continue; }
-    const data = await res.json();
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${data.error?.message || ''}`);
-    const raw = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
-    return JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim());
-  }
+  const raw = res.content.map(b => (b.type === 'text' ? b.text : '')).join('');
+  return JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim());
 }
 
 const digits = s => String(s ?? '').replace(/\D/g, '');

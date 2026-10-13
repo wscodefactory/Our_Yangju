@@ -37,7 +37,7 @@ export interface DocInfo {
 }
 
 /**
- * Gemini 가 고지서 사진에서 돌려주는 JSON (services/prompts.ts READ_NOTICE_PROMPT).
+ * Claude 가 고지서 사진에서 돌려주는 JSON (services/prompts.ts READ_NOTICE_PROMPT).
  * 모델이 필드를 빼먹을 수 있어 전부 optional. ReadingScreen 이 DocInfo 로 바꾼다.
  */
 export interface DocData {

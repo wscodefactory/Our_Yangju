@@ -38,8 +38,8 @@ export const STORAGE_KEYS = {
   cardLang: 'hy-cl',
   mine: 'hy-mine',
   newBenefits: 'hy-newb',
-  /** 시연 기기에서 직접 넣은 Gemini 키 (빌드 env가 비었을 때만 쓰임). 기기 밖으로 안 나감 */
-  geminiKey: 'hy-gemini-key',
+  /** 시연 기기에서 직접 넣은 Claude API 키 (빌드 env가 비었을 때만 쓰임). 기기 밖으로 안 나감 */
+  aiKey: 'hy-claude-key',
   /** 큰 글씨 '1' | '0' */
   big: 'hy-big',
   /** 저장한 혜택 id 목록 (JSON) */
@@ -97,7 +97,7 @@ export async function copyText(text: string): Promise<void> {
   }
 }
 
-/** Blob → base64 문자열. "data:image/jpeg;base64," 접두어는 떼고 돌려준다 (Gemini inlineData 형식) */
+/** Blob → base64 문자열. "data:image/jpeg;base64," 접두어는 떼고 돌려준다 (Claude base64 이미지 블록 형식) */
 export function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

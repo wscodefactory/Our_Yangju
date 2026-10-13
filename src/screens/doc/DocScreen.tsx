@@ -24,7 +24,7 @@ export function DocScreen() {
   const enterKey = () => {
     const k = window.prompt(t('keyPrompt'))?.trim();
     if (!k) return;
-    storage.set(STORAGE_KEYS.geminiKey, k);
+    storage.set(STORAGE_KEYS.aiKey, k);
     location.reload();
   };
 

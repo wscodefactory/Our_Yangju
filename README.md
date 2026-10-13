@@ -10,13 +10,13 @@
 
 ```bash
 npm install
-cp .env.example .env     # 선택: VITE_GEMINI_API_KEY 입력. 비우면 데모 모드
+cp .env.example .env     # 선택: VITE_CLAUDE_API_KEY 입력. 비우면 데모 모드
 npm run dev              # http://localhost:3000  (같은 Wi-Fi 휴대폰은 Network 주소로)
 npm run build            # dist/ 정적 파일
 npm run preview          # 빌드 결과 미리보기 (4173)
 ```
 
-- Gemini 키가 있으면 고지서 사진 읽기 · 공고문 규칙 추출 · 질문 분류 · zh/vi/ne 번역이 AI로 동작한다.
+- Claude API 키가 있으면(기본 모델 claude-haiku-5-5) 고지서 사진 읽기 · 공고문 규칙 추출 · 질문 분류 · zh/vi/ne 번역이 AI로 동작한다.
 - 키가 없으면 **데모 모드**로 동작한다. 샘플 고지서, 예시 공고, 키워드 규칙으로 같은 흐름을 끝까지 볼 수 있다.
 - `.env`는 git에 올라가지 않는다. 키는 브라우저 번들에 들어가므로 시연용으로만 쓰고, 운영 시에는 서버 프록시를 두어야 한다.
 - **공유 링크(배포본)에서 사진 읽기가 안 보이면** 빌드 때 `.env`에 키가 없었던 것이다. `npm run build`를 키가 든 `.env`로 다시 돌리거나, 배포본의 "받은 문서 찍기" 화면에서 **AI 키 넣고 사진 읽기 켜기**로 시연 기기에 키를 한 번 넣는다(그 기기 localStorage에만 저장).
@@ -41,7 +41,7 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 4. **받은 고지서 읽기** — 사진 → 기기에서 가림 → 가린 이미지만 AI 전송 → 내용 확인(세목·금액·기한·전자납부번호·가상계좌) → 결과(요약 카드 + 탭: 납부 방법 / 자주 묻는 질문 / 상담) + 하단 [위택스에서 납부하기]. 샘플 고지서·직접 입력 경로도 있음
 5. **지원 혜택 찾기** — 대상 칩 → 단계 탭 → 혜택 카드(북마크) → 상세 탭(자격 확인 / 준비물 / 신청 방법) + 하단 [저장] [문의 메모]
 6. **생활 정보** — 긴급 전화(tel: 링크), 쓰레기, 아플 때, 교통, 일터
-7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Gemini 있으면 AI, 없으면 5개 언어 키워드 규칙)
+7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Claude 있으면 AI, 없으면 5개 언어 키워드 규칙)
 8. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드)
 
 ## 코드 구조
@@ -59,12 +59,12 @@ src/
 ├─ types/index.ts               DocInfo · Screen(내비게이션 스택 유니온) · 담당자 화면 타입
 ├─ context/AppContext.tsx       언어 · 큰 글씨 · 저장 혜택 · 내비 스택(history 연동) · 시트 · 토스트
 ├─ context/DocContext.tsx       고지서 흐름 상태 (캔버스·가림·DocInfo)
-├─ context/GuideContext.tsx     AI 상담 대화 (INTENTS 규칙 → knowledge.ts 근거 문서로만 답하는 Gemini → 모르면 1345 안내)
+├─ context/GuideContext.tsx     AI 상담 대화 (INTENTS 규칙 → knowledge.ts 근거 문서로만 답하는 Claude → 모르면 1345 안내)
 ├─ components/layout/Chrome.tsx AppBar · Title · BottomBar · Fab · Footer · Sheet · Toast
 ├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면
 ├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
 ├─ screens/                     Home · Lang · Explore · Saved · visit/ · life/ · doc/ · welfare/ · admin/
-├─ services/ai.ts, prompts.ts   Gemini 호출 (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
+├─ services/ai.ts, prompts.ts   Claude 호출 (@anthropic-ai/sdk) (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
 └─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · rule(담당자)
 scripts/                        fetch-events(행사 수집, 배포 때 매일 06:00 실행) · gen-easy-ko · eval-notices(고지서 인식 정확도, tests/notices)
 legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
@@ -85,4 +85,4 @@ legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드�
 - [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [x] 담당자 화면 "번역 검수" 탭 (2026-10-13) · [ ] 원어민 검수 반영
 - [x] AI 상담 근거 답변(2026-10-13) · [ ] 근거 문서를 시청 공고로 확장
 - [ ] 담당자 게시 혜택 공유 저장소(서버) 연결
-- [ ] Gemini 호출 서버 프록시화
+- [ ] Claude 호출 서버 프록시화 (지금은 브라우저에서 직접 호출, 키 노출)

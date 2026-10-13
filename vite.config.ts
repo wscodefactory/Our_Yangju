@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
               options: { cacheName: 'fonts', expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 }, cacheableResponse: { statuses: [0, 200] } },
             },
           ],
-          // Gemini 호출은 절대 캐시하지 않는다 (기본값도 캐시 안 함이지만 명시)
+          // Claude 호출은 절대 캐시하지 않는다 (기본값도 캐시 안 함이지만 명시)
           navigateFallbackDenylist: [/^\/api\//],
         },
       }),

@@ -1,7 +1,7 @@
 // 담당자 창구 모드. 창구에서 공무원이 자기 기기로 띄워놓고 쓰는 화면이라
 // 위는 주민 모국어, 아래는 한국어가 같은 내용으로 나란히 선다.
 // 데이터는 시청·주민센터 화면과 같은 VISIT(다섯 언어 배열)을 쓴다. 고정 안내는 AI 번역 없음.
-// 아래 Interpreter 는 자유 대화용: 브라우저 음성 인식(Web Speech API) → Gemini 번역 → 음성 합성.
+// 아래 Interpreter 는 자유 대화용: 브라우저 음성 인식(Web Speech API) → Claude 번역 → 음성 합성.
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
