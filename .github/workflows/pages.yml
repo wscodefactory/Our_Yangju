@@ -38,6 +38,8 @@ jobs:
         env:
           VITE_CLAUDE_API_KEY: ${{ secrets.VITE_CLAUDE_API_KEY }}
           VITE_CLAUDE_MODEL: claude-haiku-5-5
+          # 배포본은 중계 서버로 부른다 (키는 Worker 비밀값에만)
+          VITE_AI_PROXY: https://our-yangju.mikael8047.workers.dev
       # enablement: 저장소에 Pages 가 안 켜져 있으면 워크플로가 직접 켠다 (Settings → Pages 수동 설정 불필요)
       - uses: actions/configure-pages@v5
         with:

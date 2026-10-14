@@ -30,6 +30,16 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 - 설치 후 홈 화면 아이콘으로 열면 주소창 없이 전체 화면으로 실행된다
 - 아이콘은 `public/icon-*.png` (양주시 CI 심벌), 설정은 `vite.config.ts` 의 `VitePWA(...)`
 
+## AI 중계 서버 (worker/)
+
+배포본은 Claude 를 직접 부르지 않고 Cloudflare Worker `https://our-yangju.mikael8047.workers.dev` 를 거친다. 진짜 API 키는 Worker 비밀값에만 있고 브라우저에는 없다.
+
+- 코드 `worker/src/index.ts`, 설정 `worker/wrangler.toml`. 경로는 앱의 Anthropic SDK 가 쓰는 `POST /v1/messages` 하나
+- 막는 것: 허용 출처(배포 주소·localhost) 밖의 요청, 허용 모델 밖, 2.5MB 넘는 요청, 하루 상한(기기 150건·전체 3,000건, KV 카운터)
+- Anthropic 으로는 Cloudflare AI Gateway(`our-yangju`)를 거쳐 가고, Worker 는 미국 쪽 센터에서 돌린다(placement hint). 홍콩 센터에서 직접 보내면 Anthropic 이 지역 차단(403)을 한다
+- 배포: `cd worker && npx wrangler login && npx wrangler deploy`. 키 등록: `npx wrangler secret put ANTHROPIC_API_KEY`
+- 앱 쪽 스위치는 `VITE_AI_PROXY`. 비우면 예전처럼 키로 직접 호출(로컬 개발·시연 기기용)
+
 ## 바로가기 주소 (QR·안내문·문자용)
 
 서비스 주소 뒤에 붙인다. 언어를 이미 고른 사람은 그 화면이 바로 열리고, 처음 쓰는 사람은 언어를 고른 뒤 이어서 열린다. 방문 기록은 "홈 → 목적지"로 쌓여 뒤로 가기가 홈으로 간다. 읽은 뒤 주소창의 `?go=` 는 지운다.
@@ -107,4 +117,4 @@ legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드�
 - [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [x] 담당자 화면 "번역 검수" 탭 (2026-10-13) · [ ] 원어민 검수 반영
 - [x] AI 상담 근거 답변(2026-10-13) · [ ] 근거 문서를 시청 공고로 확장
 - [ ] 담당자 게시 혜택 공유 저장소(서버) 연결
-- [ ] Claude 호출 서버 프록시화 (지금은 브라우저에서 직접 호출, 키 노출)
+- [x] Claude 호출 서버 프록시화 (2026-10-14, Cloudflare Worker + AI Gateway) · [ ] 담당자 게시 혜택 서버 저장

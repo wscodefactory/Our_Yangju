@@ -1,4 +1,4 @@
-// AI 호출 창구. 독립 실행 버전이라 Claude API 를 브라우저에서 직접 친다.
+// AI 호출 창구. 중계 서버(VITE_AI_PROXY, worker/)가 있으면 거기로, 없으면 Claude API 를 브라우저에서 직접 친다.
 // 화면 코드는 AiProvider 인터페이스만 보고, getAi() 가 null 이면 "데모 모드" 로 규칙/샘플 데이터만 쓴다
 // (GuideContext, ReadingScreen, MaskScreen, CounterScreen 등).
 import Anthropic from '@anthropic-ai/sdk';
@@ -36,10 +36,10 @@ export class ClaudeProvider implements AiProvider {
   // json() 은 이미지가 섞이고 매번 다른 입력이라 캐시하지 않는다.
   private cache = new Map<string, string>();
 
-  // dangerouslyAllowBrowser: 키가 브라우저에 노출되는 구조라 시연용. 운영에선 서버를 거쳐야 한다.
-  // 429/5xx 는 SDK 가 기본 2회 재시도한다.
-  constructor(apiKey: string, private model = DEFAULT_MODEL) {
-    this.client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+  // baseURL 이 있으면 중계 서버로 간다(키는 서버에만 있고 여기 apiKey 는 자리만 채운다).
+  // 없으면 직접 호출 — 키가 브라우저에 노출되는 구조라 시연용. 429/5xx 는 SDK 가 기본 2회 재시도한다.
+  constructor(apiKey: string, private model = DEFAULT_MODEL, baseURL?: string) {
+    this.client = new Anthropic({ apiKey, baseURL, dangerouslyAllowBrowser: true });
   }
 
   // temperature 0.2 는 분류·추출 작업이라 낮게. thinking 은 켜지 않는다 — 금액·기한 추출, 분류, 번역은 추론이 필요 없고 속도가 우선.
@@ -97,11 +97,13 @@ export class ClaudeProvider implements AiProvider {
 // undefined = 아직 안 만들어 봄, null = 키 없음(데모 모드). 둘을 구분해야 매번 env 를 다시 읽지 않는다
 let instance: AiProvider | null | undefined;
 
-/** 빌드 env(VITE_CLAUDE_API_KEY) → 없으면 기기에 저장한 키(담당자 화면에서 입력) → 둘 다 없으면 null(데모 모드) */
+/** 중계 서버(VITE_AI_PROXY) → 빌드 env 키 → 기기에 저장한 키(담당자 화면에서 입력) → 전부 없으면 null(데모 모드) */
 export function getAi(): AiProvider | null {
   if (instance !== undefined) return instance;
+  const proxy = import.meta.env.VITE_AI_PROXY;
   const key = import.meta.env.VITE_CLAUDE_API_KEY || storage.get(STORAGE_KEYS.aiKey) || '';
   const model = import.meta.env.VITE_CLAUDE_MODEL || DEFAULT_MODEL;
+  if (proxy) { instance = new ClaudeProvider('proxy', model, proxy.replace(/\/$/, '')); return instance; }
   instance = key ? new ClaudeProvider(key, model) : null;
   return instance;
 }

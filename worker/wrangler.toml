@@ -1,0 +1,26 @@
+# Claude 중계 Worker 설정. 배포: cd worker && npx wrangler deploy
+# 비밀값(키)은 여기 적지 않는다: npx wrangler secret put ANTHROPIC_API_KEY
+name = "our-yangju"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+# 버전별 미리보기 주소는 쓰지 않는다 (출처 검사와 무관한 주소가 늘어나는 것 방지)
+preview_urls = false
+
+[vars]
+ALLOWED_ORIGINS = "https://wscodefactory.github.io,http://localhost:5173,http://localhost:4173"
+ALLOWED_MODELS = "claude-haiku-5-5,claude-sonnet-5-5"
+# AI Gateway 를 거쳐 Anthropic 으로. 직접 가면 홍콩 센터 발신이 지역 차단(403)에 걸린다
+UPSTREAM_URL = "https://gateway.ai.cloudflare.com/v1/a9593377bda2c96f08c19342864b67c0/our-yangju/anthropic/v1/messages"
+MAX_BODY_BYTES = "2500000"
+DAILY_PER_IP = "150"
+DAILY_TOTAL = "3000"
+
+# 하루 호출 카운터. id 는 `npx wrangler kv namespace create LIMITS` 가 돌려주는 값
+[[kv_namespaces]]
+binding = "LIMITS"
+id = "4ab0f0b76722478b90143a6509d0fdcf"
+
+# 미국 쪽 센터에서 돌게 해 Anthropic 지역 차단을 피한다 (홍콩 센터 발신은 403)
+[placement]
+mode = "smart"
+hint = "wnam"

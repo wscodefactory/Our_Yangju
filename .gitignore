@@ -16,3 +16,4 @@ dist
 
 # 인식 정확도 테스트 결과 (npm run eval:notices -- --json)
 tests/notices/last-run.json
+worker/.wrangler/
