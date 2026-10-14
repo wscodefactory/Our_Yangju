@@ -42,14 +42,14 @@ export class ClaudeProvider implements AiProvider {
     this.client = new Anthropic({ apiKey, baseURL, dangerouslyAllowBrowser: true });
   }
 
-  // temperature 0.2 는 분류·추출 작업이라 낮게. thinking 은 켜지 않는다 — 금액·기한 추출, 분류, 번역은 추론이 필요 없고 속도가 우선.
+  // thinking 은 끈다 — 금액·기한 추출, 분류, 번역은 추론이 필요 없고 속도가 우선. (Claude 5 계열은 기본이 '생각 켬'이고 temperature 는 받지 않는다)
   private async call(content: Anthropic.ContentBlockParam[], json: boolean): Promise<string> {
     const t0 = performance.now();
     try {
       const res = await this.client.messages.create({
         model: this.model,
         max_tokens: 4096,
-        temperature: 0.2,
+        thinking: { type: 'disabled' },
         ...(json ? { system: JSON_SYSTEM } : {}),
         messages: [{ role: 'user', content }],
       });

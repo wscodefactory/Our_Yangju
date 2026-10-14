@@ -29,7 +29,7 @@ const prompt = m.exports.READ_NOTICE_PROMPT;
 async function readNotice(file) {
   const media_type = /\.jpe?g$/i.test(file) ? 'image/jpeg' : 'image/png';
   const res = await client.messages.create({
-    model, max_tokens: 4096, temperature: 0.2,
+    model, max_tokens: 4096, thinking: { type: 'disabled' },
     system: 'Respond with a single JSON value only. No prose, no markdown fences.',
     messages: [{ role: 'user', content: [
       { type: 'image', source: { type: 'base64', media_type, data: fs.readFileSync(path.join(dir, file)).toString('base64') } },

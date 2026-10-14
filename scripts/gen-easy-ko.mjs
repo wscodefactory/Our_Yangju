@@ -35,7 +35,7 @@ for (let i = 0; i < targets.length; i += 25) {
   let text;
   try {
     const res = await client.messages.create({
-      model, max_tokens: 8192, temperature: 0.3,
+      model, max_tokens: 8192, thinking: { type: 'disabled' },
       system: 'Respond with a single JSON value only. No prose, no markdown fences.',
       messages: [{ role: 'user', content: prompt }],
     });

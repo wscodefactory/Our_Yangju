@@ -57,7 +57,7 @@ ${JSON.stringify(items.map(({ nttNo, title, place }) => ({ nttNo, title, place }
   let raw;
   try { // 429·5xx 는 SDK 가 재시도(maxRetries 3)
     const res = await client.messages.create({
-      model: MODEL, max_tokens: 8192, temperature: 0.2,
+      model: MODEL, max_tokens: 8192, thinking: { type: 'disabled' },
       system: 'Respond with a single JSON value only. No prose, no markdown fences.',
       messages: [{ role: 'user', content: prompt }],
     });
