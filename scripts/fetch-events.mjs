@@ -102,6 +102,8 @@ async function main() {
     }
     writeFileSync(CACHE, JSON.stringify(cache, null, 1) + '\n');
   } else if (todo.length) console.warn(`[events] VITE_CLAUDE_API_KEY 없음 — ${todo.length}건 한국어 그대로 (draft)`);
+  // Actions 로그에서 키가 들어왔는지 바로 보이게 (값은 절대 찍지 않는다)
+  console.log(`[events] 번역 키 ${KEY ? '있음' : '없음'}, 번역 대상 ${todo.length}건`);
 
   // 3) events.json. 번역이 없는 건은 다섯 칸 모두 한국어 + draft:true
   const fetchedAt = new Date().toISOString();
