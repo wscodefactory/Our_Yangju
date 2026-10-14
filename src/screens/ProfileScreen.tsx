@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';
+import { DateFields } from '@/components/ui/DateFields';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { VISIT_DETAIL } from '@/data/visit-detail';
@@ -46,7 +47,7 @@ export function ProfileScreen() {
     <>
       <Title>{t('profileT')}</Title>
       <Callout kind="green" icon="shield" sm style={{ margin: '4px 0 14px' }}>{t('pfPrivacy')}</Callout>
-      <div className="stack">
+      <div className="stack pf">
         <section className="panel form">
           <h2><Ic n="house" cls="sm" />{t('pfSecMove')}</h2>
           <div className="fld">
@@ -57,20 +58,19 @@ export function ProfileScreen() {
               ))}
             </div>
           </div>
-          <div className="grid2">
-            <div className="fld">
-              <label htmlFor="pf-area">{t('pfArea')}</label>
-              <select id="pf-area" value={p.area ?? ''} onChange={(e) => update({ area: e.target.value || undefined })}>
-                <option value="">{t('pfNone')}</option>
-                {AREAS.map((a) => <option key={a.id} value={a.id}>{tx(a.label)}</option>)}
-              </select>
-            </div>
-            <div className="fld">
-              <label htmlFor="pf-moved">{t('pfMovedOn')}</label>
-              <input id="pf-moved" type="date" value={p.movedOn ?? ''} max="2099-12-31" onChange={(e) => update({ movedOn: e.target.value || undefined })} />
-            </div>
+          <div className="fld">
+            <label htmlFor="pf-area">{t('pfArea')}</label>
+            <select id="pf-area" value={p.area ?? ''} onChange={(e) => update({ area: e.target.value || undefined })}>
+              <option value="">{t('pfNone')}</option>
+              {AREAS.map((a) => <option key={a.id} value={a.id}>{tx(a.label)}</option>)}
+            </select>
+            {isRural(p.area) && <p className="help">{t('pfRural')}</p>}
           </div>
-          {isRural(p.area) && <p className="help" style={{ marginTop: -6 }}>{t('pfRural')}</p>}
+          <div className="fld">
+            {/* 브라우저 달력은 기기 언어로 고정돼 앱 언어를 안 따른다. 라벨을 우리 문구로 붙이는 세 칸 입력으로 */}
+            <span className="field-label" id="pf-moved-l">{t('pfMovedOn')}</span>
+            <DateFields idPrefix="pf-moved" value={p.movedOn ?? ''} onChange={(ymd) => { if (ymd !== (p.movedOn ?? '')) update({ movedOn: ymd || undefined }); }} />
+          </div>
           <div className="fld">
             <label htmlFor="pf-housing">{t('pfHousing')}</label>
             <select id="pf-housing" value={p.housing ?? ''} onChange={(e) => update({ housing: e.target.value || undefined })}>
