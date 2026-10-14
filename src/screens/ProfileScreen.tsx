@@ -69,7 +69,14 @@ export function ProfileScreen() {
           <div className="fld">
             {/* 브라우저 달력은 기기 언어로 고정돼 앱 언어를 안 따른다. 라벨을 우리 문구로 붙이는 세 칸 입력으로 */}
             <span className="field-label" id="pf-moved-l">{t('pfMovedOn')}</span>
-            <DateFields idPrefix="pf-moved" value={p.movedOn ?? ''} onChange={(ymd) => { if (ymd !== (p.movedOn ?? '')) update({ movedOn: ymd || undefined }); }} />
+            <DateFields idPrefix="pf-moved" value={p.movedOn ?? ''} onChange={(ymd) => { if (ymd !== (p.movedOn ?? '')) update({ movedOn: ymd || undefined, moveDone: undefined }); }} />
+            <p className="help">{t('pfMovedHelp')}</p>
+            {p.movedOn && (
+              <label className="check plain">
+                <input type="checkbox" checked={!!p.moveDone} onChange={(e) => update({ moveDone: e.target.checked || undefined })} />
+                <span>{t('pfMoveDone')}</span>
+              </label>
+            )}
           </div>
           <div className="fld">
             <label htmlFor="pf-housing">{t('pfHousing')}</label>

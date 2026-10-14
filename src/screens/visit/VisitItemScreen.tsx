@@ -9,15 +9,17 @@ import { VISIT } from '@/data/content';
 import { VISIT_LINKS } from '@/data/links';
 import { VISIT_DETAIL } from '@/data/visit-detail';
 import { mapUrl } from '@/utils/events';
-import { areaOf, defaultType, isRural, loadProfile, moveDeadline } from '@/utils/profile';
+import { areaOf, defaultType, isRural, loadProfile, moveDeadline, saveProfile } from '@/utils/profile';
 
 // 비자를 안 넣었을 때 D-day 설명에 쓰는 말
 const VISAS_OTHER = ['일반', 'general'];
 
 export function VisitItemScreen({ id }: { id: string }) {
-  const { t, tx, lang, fmtDate, go, openOverlay } = useApp();
+  const { t, tx, lang, fmtDate, go, openOverlay, toast } = useApp();
   // 내 정보가 있으면 상황을 미리 고른다. 사용자가 바꾸면 그대로 둔다
-  const [profile] = useState(loadProfile);
+  const [profile, setProfile] = useState(loadProfile);
+  // 신고를 마쳤다고 표시하면 띠가 사라지고 내 정보에도 남는다
+  const markMoveDone = () => { const next = { ...profile, moveDone: true }; saveProfile(next); setProfile(next); toast(t('ddayDoneToast')); };
   const [typeId, setTypeId] = useState(() => defaultType(id, profile));
   const fromProfile = !!typeId && typeId === defaultType(id, profile);
   const v = VISIT.find((x) => x.id === id);
@@ -42,6 +44,10 @@ export function VisitItemScreen({ id }: { id: string }) {
             <span className="tx">
               <span className="t">{dl.days < 0 ? t('ddayOver') : t('ddayT', { date: fmtDate(dl.due, { month: 'long', day: 'numeric' }) })}</span>
               <span className="d">{t('ddayD', { moved: fmtDate(profile.movedOn!, { month: 'long', day: 'numeric' }), n: dl.limit, visa: visaName || VISAS_OTHER[lang === 'ko' ? 0 : 1] })}</span>
+              <span className="acts">
+                <button type="button" onClick={markMoveDone}><Ic n="check" cls="sm" />{t('ddayDone')}</button>
+                <button type="button" onClick={() => go({ k: 'profile' })}><Ic n="pencil" cls="sm" />{t('ddayEdit')}</button>
+              </span>
             </span>
           </div>
         )}

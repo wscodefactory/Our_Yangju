@@ -566,6 +566,11 @@ const UI_BANK = {
 /* 그 뒤에 덧붙인 문구 (AI 초안) */
 const UI_EXTRA = {
   // 내 정보 2차: 홈 안내 카드, 목적별 구분, 바뀐 안내, 이사 D-day, 납부 맞춤
+  pfMovedHelp:["한국에 들어온 날이 아니라 지금 집으로 옮긴 날이에요. 신고 기한(15일)을 세는 데 써요.","The day you moved into your current home, not the day you entered Korea. Used to count the 15-day report deadline.","是搬进现住处的日期，不是入境日期。用于计算15天申报期限。","Là ngày chuyển đến nhà hiện tại, không phải ngày nhập cảnh. Dùng để tính hạn khai báo 15 ngày.","कोरिया आएको मिति होइन, अहिलेको घरमा सरेको मिति हो। 15 दिने सूचना म्याद गन्न प्रयोग हुन्छ।"],
+  pfMoveDone:["체류지 변경 신고를 마쳤어요","I have already filed the residence report","已完成居留地变更申报","Tôi đã khai báo đổi nơi cư trú","ठेगाना परिवर्तन सूचना दिइसकें"],
+  ddayDone:["신고 끝냈어요","Done reporting","已申报","Đã khai báo","सूचना दिइसकें"],
+  ddayEdit:["날짜 바꾸기","Change date","修改日期","Đổi ngày","मिति बदल्नुहोस्"],
+  ddayDoneToast:["신고를 마친 것으로 표시했어요. 내 정보에서 되돌릴 수 있어요.","Marked as reported. You can undo this in My info.","已标记为已申报，可在“我的信息”中撤销。","Đã đánh dấu là đã khai báo. Có thể hoàn tác trong Thông tin của tôi.","सूचना दिइसकेको भनी चिन्ह लगाइयो। मेरो जानकारीमा उल्टाउन सकिन्छ।"],
   pfPromoT:["내 상황을 넣어 두세요","Tell us your situation","填写我的情况","Nhập tình huống của bạn","आफ्नो अवस्था राख्नुहोस्"],
   pfPromoD:["신고 기한과 납부 안내가 나에게 맞춰져요","Deadlines and payment tips get tailored to you","申报期限和缴纳指南会按您的情况显示","Hạn khai báo và hướng dẫn nộp sẽ theo tình huống của bạn","सूचना म्याद र भुक्तानी सुझाव तपाईं अनुसार मिल्छ"],
   pfPromoTime:["30초","30 sec","30秒","30 giây","30 सेकेन्ड"],

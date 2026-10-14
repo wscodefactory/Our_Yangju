@@ -13,6 +13,8 @@ export interface Profile {
   movedOn?: string;
   /** 거주 형태: 이사 신고의 상황 id (own-lease | owner | company | shared) */
   housing?: string;
+  /** 체류지 변경 신고를 마쳤다. 켜면 D-day 띠와 바뀐 안내 목록에서 빠진다 */
+  moveDone?: boolean;
   /** 배우자·자녀와 함께 산다 */
   family?: boolean;
   /** 건강보험료를 내가 직접 낸다 (지역가입자). false 면 회사가 낸다 */
@@ -75,7 +77,7 @@ export function defaultType(visitId: string, p: Profile): string {
 
 /** 체류지 변경 신고 기한: 이사한 날부터 15일, F-4 거소신고자는 14일 */
 export function moveDeadline(p: Profile): { due: string; days: number; limit: number } | null {
-  if (!p.movedOn) return null;
+  if (!p.movedOn || p.moveDone) return null;
   const limit = p.visa === 'f4' ? 14 : 15;
   const d = parseDate(p.movedOn);
   d.setDate(d.getDate() + limit);
