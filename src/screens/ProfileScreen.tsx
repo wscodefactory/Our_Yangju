@@ -8,7 +8,7 @@ import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';
 import { VISIT_DETAIL } from '@/data/visit-detail';
 import type { Screen } from '@/types';
-import { AREAS, BANKS, VISAS, areaOf, bankLabel, clearAllData, clearProfile, hasProfile, isRural, loadProfile, moveDeadline, saveProfile, type Profile } from '@/utils/profile';
+import { AREAS, BANKS, VISAS, areaOf, bankLabel, clearAllData, clearProfile, hasProfile, isRural, loadProfile, moveDeadline, moveDue, saveProfile, type Profile } from '@/utils/profile';
 
 export function ProfileScreen() {
   const { t, tx, lang, fmtDate, toast, go } = useApp();
@@ -30,6 +30,7 @@ export function ProfileScreen() {
 
   // 지금 정보로 달라진 안내 목록. 기한이 가까운 것부터
   const dl = moveDeadline(p);
+  const due = moveDue(p);
   const area = areaOf(p);
   const center = area ? `${tx(area.label)} ${t('centerWord')}` : '';
   const items: { icon: string; title: string; desc: string; badge?: string; to: Screen }[] = [];
@@ -71,11 +72,15 @@ export function ProfileScreen() {
             <span className="field-label" id="pf-moved-l">{t('pfMovedOn')}</span>
             <DateFields idPrefix="pf-moved" value={p.movedOn ?? ''} onChange={(ymd) => { if (ymd !== (p.movedOn ?? '')) update({ movedOn: ymd || undefined, moveDone: undefined }); }} />
             <p className="help">{t('pfMovedHelp')}</p>
-            {p.movedOn && (
-              <label className="check plain">
-                <input type="checkbox" checked={!!p.moveDone} onChange={(e) => update({ moveDone: e.target.checked || undefined })} />
-                <span>{t('pfMoveDone')}</span>
-              </label>
+            {/* 신고 상태 한 줄: 기한 안 / 기한 지남 / 신고 완료. 버튼 하나로 상태를 바꾼다 */}
+            {due && (
+              <div className={`pf-status ${p.moveDone ? 'done' : due.days < 0 ? 'over' : ''}`.trim()}>
+                <Ic n={p.moveDone ? 'check' : due.days < 0 ? 'alert' : 'calendar'} cls="sm" />
+                <span className="tx">
+                  {p.moveDone ? t('pfStatusDone') : due.days < 0 ? t('pfStatusOver') : t('pfStatusDue', { n: due.days, date: fmtDate(due.due, { month: 'long', day: 'numeric' }) })}
+                </span>
+                <button type="button" onClick={() => update({ moveDone: p.moveDone ? undefined : true })}>{p.moveDone ? t('pfUndoDone') : t('ddayDone')}</button>
+              </div>
             )}
           </div>
           <div className="fld">

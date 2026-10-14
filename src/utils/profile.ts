@@ -75,9 +75,12 @@ export function defaultType(visitId: string, p: Profile): string {
   return '';
 }
 
-/** 체류지 변경 신고 기한: 이사한 날부터 15일, F-4 거소신고자는 14일 */
-export function moveDeadline(p: Profile): { due: string; days: number; limit: number } | null {
-  if (!p.movedOn || p.moveDone) return null;
+/** 체류지 변경 신고 기한: 이사한 날부터 15일, F-4 거소신고자는 14일. 신고를 마쳤으면 null (안내할 게 없다) */
+export const moveDeadline = (p: Profile) => (p.moveDone ? null : moveDue(p));
+
+/** 신고 완료 여부와 상관없는 기한 계산. 내 정보 화면의 상태 띠가 쓴다 */
+export function moveDue(p: Profile): { due: string; days: number; limit: number } | null {
+  if (!p.movedOn) return null;
   const limit = p.visa === 'f4' ? 14 : 15;
   const d = parseDate(p.movedOn);
   d.setDate(d.getDate() + limit);

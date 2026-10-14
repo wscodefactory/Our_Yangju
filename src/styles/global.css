@@ -563,6 +563,11 @@ body.has-install .fab{display:none}
 .pf .check.plain{padding:6px 0 0;border:0}
 .pf .seg button{min-height:46px}
 .pf .list .row{padding:14px 12px}
+.pf-status{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 10px 10px 12px;border-radius:12px;background:var(--primary-tint);color:var(--primary);font-weight:600;font-size:.875rem}
+.pf-status .tx{flex:1;min-width:0}
+.pf-status button{flex:none;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid currentColor;background:var(--surface);color:inherit;font-size:.8125rem;font-weight:700}
+.pf-status.over{background:var(--danger-tint);color:var(--danger)}
+.pf-status.done{background:var(--surface-2);color:var(--text-2)}
 .promo{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 4px;padding:12px 14px;border:1px solid var(--primary-tint-2);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-align:left;color:var(--text)}
 .promo .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .promo .t{font-weight:700}
