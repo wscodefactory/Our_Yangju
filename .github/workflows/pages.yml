@@ -18,6 +18,14 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
+  # 번역 키(secret)가 들어 있는지만 본다. 없으면 이 작업만 실패하고 배포는 그대로 간다 (행사가 한국어로만 올라감)
+  secrets-check:
+    runs-on: ubuntu-latest
+    env:
+      KEY: ${{ secrets.VITE_CLAUDE_API_KEY }}
+    steps:
+      - run: |
+          if [ -n "$KEY" ]; then echo "번역 키 있음 (길이 ${#KEY})"; else echo "::error::VITE_CLAUDE_API_KEY secret 없음"; exit 1; fi
   deploy:
     runs-on: ubuntu-latest
     environment:
