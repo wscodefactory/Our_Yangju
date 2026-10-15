@@ -7,7 +7,8 @@ compatibility_date = "2026-10-01"
 preview_urls = false
 
 [vars]
-ALLOWED_ORIGINS = "https://wscodefactory.github.io,http://localhost:5173,http://localhost:4173"
+# 로컬은 dev 3000(vite.config.ts server.port) 과 preview 4173
+ALLOWED_ORIGINS = "https://wscodefactory.github.io,http://localhost:3000,http://localhost:4173"
 ALLOWED_MODELS = "claude-haiku-5-5,claude-sonnet-5-5"
 # AI Gateway 를 거쳐 Anthropic 으로. 직접 가면 홍콩 센터 발신이 지역 차단(403)에 걸린다
 UPSTREAM_URL = "https://gateway.ai.cloudflare.com/v1/a9593377bda2c96f08c19342864b67c0/our-yangju/anthropic/v1/messages"

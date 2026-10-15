@@ -1,7 +1,7 @@
 # GitHub Pages 배포. main 또는 feature/* 에 푸시하면 dist/ 를 빌드해 올린다.
 # 저장소 Settings → Pages → Source 를 "GitHub Actions" 로 한 번 바꿔 둬야 동작한다.
-# Claude 키는 기본적으로 넣지 않는다(공개 번들에 키가 노출되므로). 시연 기기에서 "AI 키 넣기" 버튼으로 넣는 게 기본.
-# 꼭 번들에 넣어야 하면 Settings → Secrets → VITE_CLAUDE_API_KEY 를 등록하면 아래 env 로 들어간다.
+# Claude 키(secret VITE_CLAUDE_API_KEY)는 행사 번역(fetch-events) 에만 쓴다. 배포본은 Worker(VITE_AI_PROXY)를 거치므로
+# vite build 에는 키를 넘기지 않는다 — 넘기면 공개 번들에 들어갈 수 있다.
 name: pages
 on:
   push:
@@ -44,7 +44,6 @@ jobs:
           VITE_CLAUDE_API_KEY: ${{ secrets.VITE_CLAUDE_API_KEY }}
       - run: npx tsc -b && npx vite build --mode pages
         env:
-          VITE_CLAUDE_API_KEY: ${{ secrets.VITE_CLAUDE_API_KEY }}
           VITE_CLAUDE_MODEL: claude-haiku-5-5
           # 배포본은 중계 서버로 부른다 (키는 Worker 비밀값에만)
           VITE_AI_PROXY: https://our-yangju.mikael8047.workers.dev

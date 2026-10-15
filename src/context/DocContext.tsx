@@ -46,9 +46,11 @@ export function DocProvider({ children }: { children: ReactNode }) {
     setDoc({ type: 'auto', amount: 0, due: '', epay: '', vacct: '', manual: true });
   }, []);
 
+  // 직전에 샘플·직접 입력을 거쳤으면 doc 에 sample/manual 이 남아 MaskScreen 이 AI 읽기를 건너뛴다 → 새 사진은 doc 을 비운다
   const loadFile = useCallback(async (file: File) => {
     setCanvas(await fileToCanvas(file));
     setRects([]);
+    setDoc(null);
   }, []);
 
   const addRect = useCallback((r: Rect) => setRects((prev) => [...prev, r]), []);

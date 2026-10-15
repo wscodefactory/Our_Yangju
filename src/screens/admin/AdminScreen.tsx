@@ -19,7 +19,9 @@ type Tab = 'reg' | 'sig' | 'tr';
  */
 export function AdminScreen({ tab }: { tab: Tab }) {
   const { T, t, go, goHome, replace } = useApp();
-  // 시연 기기의 AI 키. 시민 화면에는 입력 자리가 없다. localStorage 에만 저장하고, getAi() 가 모듈 캐시라 새로고침으로 반영
+  // 시연 기기의 AI 키. 시민 화면에는 입력 자리가 없다. localStorage 에만 저장하고, getAi() 가 모듈 캐시라 새로고침으로 반영.
+  // 중계 서버(VITE_AI_PROXY)로 빌드된 배포본은 키를 안 쓰므로 버튼을 숨긴다
+  const proxied = !!import.meta.env.VITE_AI_PROXY;
   const enterKey = () => {
     const k = window.prompt(t('keyPrompt'))?.trim();
     if (!k) return;
@@ -38,7 +40,7 @@ export function AdminScreen({ tab }: { tab: Tab }) {
       {tab === 'sig' ? <SignalsPanel /> : tab === 'tr' ? <ReviewPanel /> : <RegisterPanel state={reg} setState={patch} />}
       <div className="btn-row">
         <button type="button" className="btn secondary sm" onClick={() => go({ k: 'counter' })}>{T('창구 모드 열기', 'Open counter mode')}</button>
-        <button type="button" className="btn secondary sm" onClick={enterKey}>{getAi() ? T('AI 키 바꾸기', 'Change AI key') : T('AI 키 넣기 (사진 읽기 켜기)', 'Enter AI key (enable photo reading)')}</button>
+        {!proxied && <button type="button" className="btn secondary sm" onClick={enterKey}>{getAi() ? T('AI 키 바꾸기', 'Change AI key') : T('AI 키 넣기 (사진 읽기 켜기)', 'Enter AI key (enable photo reading)')}</button>}
         <button type="button" className="btn ghost sm" onClick={goHome}>{T('시민 화면으로', 'Citizen view')}</button>
       </div>
     </div>
