@@ -1,8 +1,7 @@
-// 납부 기한을 휴대폰 달력에 넣는 .ics 파일. 서버 없이 Blob 으로 내려받는다.
-// 종일 일정 + 3일 전 알림. 휴대폰이 파일을 열면 기본 달력 앱이 "추가할까요?" 를 띄운다.
+// 납부 기한을 종일 일정과 3일 전 알림이 있는 .ics 파일로 내려받는다.
 
-const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
-const ymd = (s: string) => s.replace(/-/g, '');
+const escapeIcs = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+const compactDate = (s: string) => s.replace(/-/g, '');
 // 종일 일정의 DTEND 는 다음날(배타). toISOString 은 UTC 라 한국 시간대에서 하루가 밀리므로 로컬 날짜 조각으로 만든다
 const nextDay = (s: string) => {
   const [y, m, d] = s.split('-').map(Number);
@@ -15,13 +14,13 @@ export function buildIcs(title: string, due: string, description: string): strin
   return [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Our Yangju//Tax due//KO', 'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
-    `UID:${ymd(due)}-${Math.random().toString(36).slice(2)}@our-yangju`,
+    `UID:${compactDate(due)}-${Math.random().toString(36).slice(2)}@our-yangju`,
     `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${ymd(due)}`,
-    `DTEND;VALUE=DATE:${ymd(nextDay(due))}`,
-    `SUMMARY:${esc(title)}`,
-    `DESCRIPTION:${esc(description)}`,
-    'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${esc(title)}`, 'END:VALARM',
+    `DTSTART;VALUE=DATE:${compactDate(due)}`,
+    `DTEND;VALUE=DATE:${compactDate(nextDay(due))}`,
+    `SUMMARY:${escapeIcs(title)}`,
+    `DESCRIPTION:${escapeIcs(description)}`,
+    'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${escapeIcs(title)}`, 'END:VALARM',
     'END:VEVENT', 'END:VCALENDAR',
   ].join('\r\n');
 }
@@ -30,7 +29,7 @@ export function buildIcs(title: string, due: string, description: string): strin
 export function downloadIcs(filename: string, ics: string) {
   const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  const link = document.createElement('a');
+  link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

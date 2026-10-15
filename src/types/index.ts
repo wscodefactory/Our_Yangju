@@ -1,8 +1,6 @@
-// 앱 전체에서 쓰는 공용 타입.
-// 시민 화면의 콘텐츠·문구는 data/content.ts 의 다섯 칸 배열(T5)이 기본 단위이고,
-// 담당자 화면용 타입은 #admin 경로(공고 → 규칙 등록)에서만 쓴다.
+// 화면 이동, 고지서, 담당자 공고 등록에 사용하는 공용 타입.
 
-/* ---------- 고지서 ---------- */
+/* 고지서 */
 
 /** 세목 키. data/content.ts 의 TAX_TYPES 키와 같다 */
 export type TaxType = 'auto' | 'resident' | 'property' | 'income' | 'other';
@@ -50,7 +48,7 @@ export interface DocData {
   confidence?: 'high' | 'low';
 }
 
-/* ---------- 담당자 화면(공고 → 규칙) ---------- */
+/* 담당자 화면(공고 → 규칙) */
 
 export interface Quoted { text: string; quote: string }
 export interface Condition { label: string; question: string; quote: string }
@@ -85,7 +83,7 @@ export interface PublishedBenefit {
 
 export interface CheckItem { kind: string; text: string; quote?: string; found: boolean }
 
-/* ---------- 화면(내비게이션 스택) ---------- */
+/* 화면(내비게이션 스택) */
 
 /** 내비게이션 스택의 한 칸. k 가 화면 종류 */
 export type Screen =

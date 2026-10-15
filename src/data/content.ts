@@ -1,5 +1,4 @@
-/* 앱의 문구와 고정 콘텐츠. 모든 문구는 [ko, en, zh, vi, ne] 다섯 칸(T5)이고, 빈 칸이 있으면 i18n.ts 의 audit 가 콘솔에 경고한다.
-   UI 사전은 UI_BASE(원본 번역)에 UI_BANK·UI_EXTRA(뒤에 추가된 AI 초안)를 합친 것이다. */
+// [ko, en, zh, vi, ne] 순서의 문구와 기본 콘텐츠. UI는 기본 문구와 추가 문구를 합쳐 사용한다.
 export type T5 = string[];
 
 export const LANGS = [
@@ -82,7 +81,7 @@ const UI_BASE = {
   st2:["개인정보 가리기","Cover info","遮挡信息","Che thông tin","विवरण छोप्ने"],
   st3:["내용 확인","Check","核对","Kiểm tra","जाँच"],
   st4:["할 일","What to do","待办","Việc cần làm","के गर्ने"],
-  privacyDoc:["이름과 주소는 가리고, 촬영한 사진과 전자납부번호는 저장하지 않습니다.","Your name and address are covered. The photo and the e-payment number are not stored.","姓名和地址会被遮挡，拍摄的照片和电子缴纳号码不会被保存。","Tên và địa chỉ được che; ảnh đã chụp và số nộp điện tử không được lưu.","नाम र ठेगाना छोपिन्छ; खिचेको फोटो र इ-भुक्तानी नम्बर सेभ गरिँदैन।"],
+  privacyDoc:["이름과 주소는 직접 가려 주세요. 앱은 사진과 전자납부번호를 기기에 따로 저장하지 않아요.","Cover your name and address before reading. The app does not save the photo or e-payment number to device storage.","读取前请遮挡姓名和地址。应用不会将照片或电子缴纳号码存入设备存储。","Hãy che tên và địa chỉ trước khi đọc. Ứng dụng không lưu ảnh hoặc số nộp điện tử vào bộ nhớ thiết bị.","पढ्नुअघि नाम र ठेगाना छोप्नुहोस्। एपले फोटो वा इ-भुक्तानी नम्बर उपकरणको भण्डारणमा सेभ गर्दैन।"],
   btnSample:["샘플 고지서로 해보기","Try a sample notice","用示例税单试试","Thử với giấy báo mẫu","नमुना बिलबाट प्रयास गर्नुहोस्"],
   btnManual:["직접 입력","Enter manually","手动输入","Nhập thủ công","आफैं लेख्नुहोस्"],
   btnPhoto:["촬영 / 사진 불러오기","Take a photo / Choose a photo","拍照 / 选择照片","Chụp ảnh / Chọn ảnh","फोटो खिच्नुहोस् / फोटो छान्नुहोस्"],
@@ -515,7 +514,7 @@ const UI_BANK = {
   paidOn:["납부일","Paid on","缴纳日期","Ngày nộp","तिरेको मिति"],
   deleteAll:["삭제","Delete","删除","Xóa","मेटाउनुहोस्"],
   // 사진 경로(가리기·읽는 중)
-  maskLead:["이름·주소·납세번호 위를 손가락으로 눌러 드래그하면 검은 상자로 가려집니다. 가린 부분은 전송되지 않습니다.","Press and drag over your name, address and tax number to cover them with black boxes. Covered parts are not sent.","用手指按住并拖过姓名、地址和纳税号码，就会用黑框遮住。遮住的部分不会被发送。","Dùng ngón tay nhấn và kéo qua tên, địa chỉ và mã số thuế để che bằng ô màu đen. Phần đã che sẽ không được gửi đi.","नाम, ठेगाना र कर नम्बरमाथि औंलाले थिचेर तान्नुहोस्, कालो बाकसले छोपिन्छ। छोपिएको भाग पठाइँदैन।"],
+  maskLead:["이름·주소·납세번호를 손가락으로 눌러 드래그해 가려 주세요. ‘가리기 완료’를 누르면 검은 상자를 적용한 사진으로 내용을 읽어요.","Press and drag over your name, address and tax number. When you finish covering, the app reads the photo with the black boxes applied.","请按住并拖动以遮挡姓名、地址和纳税号码。完成遮挡后，应用会读取已加上黑框的照片。","Nhấn và kéo để che tên, địa chỉ và mã số thuế. Khi hoàn tất che, ứng dụng đọc ảnh đã được phủ các ô đen.","नाम, ठेगाना र कर नम्बरमाथि थिचेर तानेर छोप्नुहोस्। छोप्ने काम सकेपछि एपले कालो बाकस लगाइएको फोटो पढ्छ।"],
   maskCanvas:["고지서 사진. 드래그해서 가리기","Notice photo. Drag to cover","税单照片。拖动以遮挡","Ảnh giấy báo. Kéo để che","बिलको फोटो। छोप्न तान्नुहोस्"],
   maskUndo:["마지막 상자 지우기","Remove last box","删除最后一个框","Xóa ô vừa che","अन्तिम बाकस हटाउनुहोस्"],
   maskDone:["가리기 완료","Done covering","遮挡完成","Hoàn tất che","छोप्ने काम सकियो"],
@@ -551,7 +550,7 @@ const UI_BANK = {
   // AI 가릴 곳 찾기, 달력 알림, 개인정보 감지
   autoMask:["AI로 가릴 곳 찾기","Find what to cover with AI","用 AI 查找需遮挡处","Dùng AI tìm chỗ cần che","AI ले छोप्ने ठाउँ खोज्नुहोस्"],
   autoMaskBusy:["찾는 중…","Finding…","查找中…","Đang tìm…","खोज्दै…"],
-  autoMaskNote:["위치를 찾기 위해 흐린 저해상도 사본만 AI에 보내요. 읽기는 가린 사진으로만 해요.","Only a blurry low-resolution copy is sent to find positions. Reading uses the covered photo only.","仅发送模糊的低分辨率副本用于定位，读取时只使用遮挡后的照片。","Chỉ gửi bản sao mờ độ phân giải thấp để tìm vị trí. Việc đọc chỉ dùng ảnh đã che.","स्थान खोज्न धमिलो कम रिजोल्युसनको प्रति मात्र पठाइन्छ। पढ्दा छोपिएको फोटो मात्र प्रयोग हुन्छ।"],
+  autoMaskNote:["가릴 곳 찾기는 가리기 전 사진의 작은 사본을 AI에 보내요. 이미 가린 곳도 포함될 수 있어요. 직접 가리기만 해도 됩니다.","Auto-detect sends a smaller copy of the photo before masking to AI, including areas you have already covered. You can cover the photo manually instead.","自动查找会将遮挡前照片的缩小副本发送给AI，其中也包括已标记遮挡的区域。您也可以只手动遮挡。","Tìm tự động gửi bản thu nhỏ của ảnh trước khi che tới AI, kể cả vùng bạn đã đánh dấu che. Bạn cũng có thể chỉ che thủ công.","स्वचालित खोजले छोप्नुअघिको फोटोको सानो प्रति AI मा पठाउँछ। यसमा तपाईंले छोपिसकेका भाग पनि पर्छन्। चाहनुहुन्छ भने आफैं मात्र छोप्न सक्नुहुन्छ।"],
   autoMaskFound:["{n}곳을 찾았어요. 확인하고 빠진 곳은 직접 가리세요.","Found {n} spot(s). Check them and cover anything missed.","找到 {n} 处。请确认并手动遮挡遗漏部分。","Đã tìm thấy {n} chỗ. Hãy kiểm tra và che thêm chỗ còn sót.","{n} ठाउँ भेटियो। जाँचेर छुटेको ठाउँ आफैं छोप्नुहोस्।"],
   autoMaskNone:["가릴 곳을 찾지 못했어요. 직접 가려 주세요.","Nothing found to cover. Please cover it yourself.","未找到需遮挡处，请手动遮挡。","Không tìm thấy chỗ cần che. Hãy tự che.","छोप्ने ठाउँ भेटिएन। आफैं छोप्नुहोस्।"],
   autoMaskFail:["AI 찾기에 실패했어요. 직접 가려 주세요.","AI search failed. Please cover it yourself.","AI 查找失败，请手动遮挡。","AI tìm thất bại. Hãy tự che.","AI खोज असफल भयो। आफैं छोप्नुहोस्।"],

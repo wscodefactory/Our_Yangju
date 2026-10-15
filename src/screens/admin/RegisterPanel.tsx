@@ -1,7 +1,4 @@
-// 담당자 화면 › 혜택 등록 패널.
-// 공고문 텍스트를 붙여 넣으면 AI가 ExtractedRule(조건·지원·기간·신청처·서류)을 뽑고,
-// 각 항목의 근거 문장(quote)을 원문에 형광펜으로 표시한다. 담당자가 항목을 전부 체크해야만 게시 버튼이 열린다.
-// 상태는 AdminScreen이 들고 있고 여기선 state/setState로 받기만 한다(탭 전환 시 보존 때문).
+// 공고의 규칙 초안과 근거를 확인한 뒤 게시한다. 탭 이동 시 입력을 유지하도록 상태는 AdminScreen에서 관리한다.
 import { useMemo } from 'react';
 import { Callout } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';
@@ -84,7 +81,7 @@ export function RegisterPanel({ state, setState }: Props) {
     return <Callout kind="info" icon="info">{T('AI가 공고문에서 조건·서류·기간을 뽑고 있어요… (20~60초)', 'AI is extracting conditions, documents and dates… (20–60 s)')}</Callout>;
   }
 
-  /* ----- 1단계: 공고문 입력 ----- */
+  /* 1단계: 공고문 입력 */
   if (!rule) {
     return (
       <section className="panel">
@@ -106,7 +103,7 @@ export function RegisterPanel({ state, setState }: Props) {
     );
   }
 
-  /* ----- 2단계: 근거 확인 → 게시 ----- */
+  /* 2단계: 근거 확인 → 게시 */
   return (
     <div className="stack">
       <section className="panel">

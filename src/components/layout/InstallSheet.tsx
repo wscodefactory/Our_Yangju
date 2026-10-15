@@ -1,4 +1,4 @@
-// 홈 화면에 추가 안내 시트. 안드로이드 크롬은 설치창이 바로 뜨므로 여기는 아이폰과 설치창이 없는 브라우저용.
+// 설치창을 지원하지 않는 브라우저에 홈 화면 추가 방법을 안내한다.
 import { useState } from 'react';
 import { Sheet, isIos } from '@/components/layout/Chrome';
 import { Seg } from '@/components/ui/Bits';

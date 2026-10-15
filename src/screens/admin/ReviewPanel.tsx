@@ -1,13 +1,12 @@
-// 번역 검수 탭. AI 초안 문구(UI_DRAFT_KEYS)를 키마다 한국어 + zh/vi/ne 로 펼치고 언어별 "검수 완료" 체크.
-// 검수 결과는 JSON 으로 내려받아 보내고, 받은 쪽은 붙여넣어 적용한다 (서버 없음).
+// 언어별 번역 검수 상태를 표시하고 JSON으로 주고받는다. 번역 문구 자체를 수정하는 기능은 아니다.
 import { useState } from 'react';
 import { Callout } from '@/components/ui/Bits';
 import { useApp } from '@/context/AppContext';
 import { UI, UI_DRAFT_KEYS, type T5 } from '@/data/content';
 import { REVIEW_LANGS, useReview, type ReviewLang } from '@/utils/review';
 
-const COL: Record<ReviewLang, number> = { zh: 2, vi: 3, ne: 4 };
-const DICT = UI as Record<string, T5>;
+const LANGUAGE_COLUMN: Record<ReviewLang, number> = { zh: 2, vi: 3, ne: 4 };
+const UI_STRINGS = UI as Record<string, T5>;
 
 export function ReviewPanel() {
   const { T, toast } = useApp();
@@ -53,11 +52,11 @@ export function ReviewPanel() {
         {UI_DRAFT_KEYS.map((k) => (
           <div key={k} className="row" style={{ display: 'block', paddingTop: 12 }}>
             <div className="muted" style={{ fontSize: '.75rem' }}>{k}</div>
-            <div lang="ko"><b>{DICT[k]?.[0]}</b></div>
+            <div lang="ko"><b>{UI_STRINGS[k]?.[0]}</b></div>
             {REVIEW_LANGS.map((l) => (
               <label key={l} className="check" style={{ alignItems: 'flex-start' }}>
                 <input type="checkbox" checked={!!state[k]?.[l]} onChange={(e) => toggle(k, l, e.target.checked)} aria-label={`${k} ${l} ${T('검수 완료', 'reviewed')}`} />
-                <span><span className="bdg gray" style={{ marginRight: 6 }}>{l.toUpperCase()}</span><span lang={l}>{DICT[k]?.[COL[l]]}</span></span>
+                <span><span className="bdg gray" style={{ marginRight: 6 }}>{l.toUpperCase()}</span><span lang={l}>{UI_STRINGS[k]?.[LANGUAGE_COLUMN[l]]}</span></span>
               </label>
             ))}
           </div>

@@ -1,6 +1,4 @@
-// 브라우저 API 를 감싸는 얇은 래퍼. localStorage · 음성 읽기 · 클립보드 · Blob 변환.
-// 공통점은 "환경에 따라 없거나 예외를 던질 수 있는 것" 이라 전부 try/catch 로 감싸고
-// 실패해도 앱이 멈추지 않게 조용히 넘어간다. 시연 환경(사생활 모드, 구형 웹뷰)을 염두에 둔 것.
+// 저장소·음성·클립보드·파일 변환. 브라우저가 기능을 지원하지 않거나 차단한 경우도 처리한다.
 import { LANGS } from '@/data/content';
 import type { Lang } from '@/i18n';
 
@@ -24,16 +22,13 @@ export const storage = {
   },
 };
 
-/**
- * localStorage 키 모음. 같은 도메인에 다른 시안이 올라가도 안 섞이게 'hy-' 접두어.
- * 키를 바꾸면 기존 사용자의 저장값이 사라지니 바꾸지 말 것.
- */
+/** 앱 저장 키. 기존 데이터를 읽을 수 있도록 hy- 접두어와 키 값은 유지한다. */
 export const STORAGE_KEYS = {
   /** 고른 언어 (Lang) */
   cardLang: 'hy-cl',
   /** 담당자가 게시한 혜택 목록 (JSON, services/benefitsStore.ts) */
   newBenefits: 'hy-newb',
-  /** 시연 기기에서 직접 넣은 Claude API 키 (빌드 env 가 비었을 때만 쓰임). 기기 밖으로 안 나감 */
+  /** 시연용 직접 호출 키. 이 브라우저에 저장하며 Claude 요청의 인증에 사용한다. */
   aiKey: 'hy-claude-key',
   /** 큰 글씨 '1' | '0' */
   big: 'hy-big',
@@ -51,10 +46,7 @@ export const STORAGE_KEYS = {
 
 export const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-/**
- * 텍스트 읽어주기. 기기에 그 언어 음성이 없으면 재생하지 않고 false 를 돌려준다 → 호출부가 안내 토스트(noVoice).
- * rate 0.95 는 외국어 학습자 기준으로 약간 느리게.
- */
+/** 해당 언어의 음성이 있으면 읽고, 지원하지 않으면 false를 반환한다. */
 export function speak(text: string, lang: Lang): boolean {
   if (!canSpeak || !text) return false;
   const lg = LANGS.find((l) => l.code === lang) || LANGS[0];
@@ -78,10 +70,7 @@ export function stopSpeaking() {
   try { speechSynthesis.cancel(); } catch { /* 무시 */ }
 }
 
-/**
- * 클립보드 복사. clipboard API 가 막힌 환경(http, 구형 웹뷰)에서는 숨은 textarea + execCommand 로 한 번 더 시도.
- * 성공 여부와 무관하게 호출부는 "복사했어요" 토스트를 띄운다.
- */
+/** 클립보드 API를 사용할 수 없으면 textarea 복사를 시도한다. */
 export async function copyText(text: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(text);

@@ -1,6 +1,4 @@
-// 쉬운 한국어 문구 생성. UI 사전의 한국어 문장(15자 이상)을 Claude 로 "쉬운 한국어" 로 바꿔 src/data/easy-ko.json 에 저장한다.
-// 어르신·한국어 학습자용: 짧은 문장, 쉬운 단어, 한 문장에 한 가지. 숫자·전화번호·고유명사·{자리표시자}는 그대로.
-// 결과는 AI 초안이다. 다시 돌리면 이미 있는 키는 건너뛴다 (--force 로 전부 다시).
+// 긴 한국어 안내를 쉬운 문장으로 미리 생성한다. 기존 문구는 --force일 때만 다시 만든다.
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'node:fs';
 import path from 'node:path';

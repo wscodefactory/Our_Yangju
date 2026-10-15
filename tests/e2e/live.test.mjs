@@ -1,5 +1,4 @@
-// 배포본에서 실제 AI 호출(중계 서버 경유): 상담 근거 답변, 가릴 곳 찾기, 고지서 사진 읽기.
-// 돈이 드는 호출이라 run.mjs 가 자동으로 돌리지 않는다:  E2E_URL=https://wscodefactory.github.io/Our_Yangju/ npm run e2e -- live
+// 실제 API 연결 점검. E2E_URL이 없으면 건너뛰며, 지정하면 API 비용과 호출 한도를 사용한다.
 import path from 'node:path';
 import { URL, check, launch, wait } from './lib.mjs';
 

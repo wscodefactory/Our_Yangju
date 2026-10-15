@@ -1,5 +1,4 @@
-// 내 정보: 체류지 신고에 쓰는 것(비자·사는 곳·이사한 날·거주 형태·가족)과 고지서 납부에 쓰는 것(건강보험 납부 방식·차·은행 앱).
-// 휴대폰 localStorage 에만 두고 서버로 보내지 않는다. 이름·번호·계좌처럼 식별되는 값은 받지 않는다.
+// 기기에 저장하는 생활·행정 안내 설정. 이름, 등록번호, 계좌번호는 입력받지 않는다.
 import { BANK_EN } from '@/data/links';
 import { VISIT_DETAIL } from '@/data/visit-detail';
 import { daysUntil, parseDate } from '@/i18n';

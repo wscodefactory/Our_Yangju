@@ -1,6 +1,4 @@
-// 고지서 흐름 2단계: 개인정보 가리기.
-// DocContext 의 canvas(원본 사진)를 화면용 <canvas>에 복사해 보여주고, 드래그한 사각형을 rects 로 쌓는다.
-// 실제로 픽셀을 지우는 건 ReadingScreen 에서 finalizeMask() 가 한다.
+// 사용자가 지정한 가림 영역을 표시한다. 실제 이미지 적용은 읽기 단계의 finalizeMask에서 처리한다.
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
@@ -14,7 +12,7 @@ import { Stepper } from './Stepper';
 /** 이 크기(캔버스 픽셀) 이하의 상자는 탭 실수로 보고 버린다 */
 const MIN_RECT_PX = 8;
 /** AI 상자 둘레에 두는 여유 (상자 크기 대비). 글자 끝이 삐져나오지 않게 */
-const PAD = 0.04;
+const MASK_PADDING_RATIO = 0.04;
 
 /** AI 가 돌려주는 상자 (0~1000 정규화, [ymin, xmin, ymax, xmax]) */
 interface PiiBox { label?: string; box_2d?: number[] }
@@ -24,32 +22,31 @@ export function MaskScreen() {
   const { canvas, rects, addRect, undoRect, doc } = useDoc();
   const viewRef = useRef<HTMLCanvasElement>(null);
   const [detecting, setDetecting] = useState(false);
-  const canDetect = !!getAi()?.supportsImages;
-  // 드래그 중 상자는 state 가 아니라 ref — pointermove 마다 리렌더할 이유가 없고, draw() 가 캔버스에 직접 그린다
+  const canDetectPersonalInfo = !!getAi()?.supportsImages;
+  // 드래그 중에는 ref와 캔버스만 갱신해 pointermove마다 렌더하지 않는다.
   const dragStart = useRef<[number, number] | null>(null);
-  const cur = useRef<Rect | null>(null);
+  const dragRect = useRef<Rect | null>(null);
 
-  // AI 가릴 곳 찾기. 긴 변 640px 사본을 보내 위치만 받고(글자 내용은 출력 금지), 캔버스 좌표로 바꿔 상자를 추가한다.
-  // 사용자가 결과를 확인하고 빠진 곳은 직접 가린다.
-  const detect = async () => {
+  // 가림 전 사진을 640px로 줄여 위치를 요청한다. 기존 가림 영역은 이 사본에 적용되지 않는다.
+  const detectPersonalInfo = async () => {
     const ai = getAi();
     if (!ai || !canvas) return;
     setDetecting(true);
     try {
       const blob = await canvasToBlob(downscale(canvas, 640), 0.7);
-      const r = await ai.json<{ boxes?: PiiBox[] }>(DETECT_PII_PROMPT, { image: blob });
-      let found = 0;
-      for (const b of r.boxes ?? []) {
-        if (!Array.isArray(b.box_2d) || b.box_2d.length !== 4) continue;
-        found++;
-        const [y0, x0, y1, x1] = b.box_2d.map((v) => Math.max(0, Math.min(1000, v)) / 1000);
-        const x = Math.max(0, (x0 - PAD * (x1 - x0)) * canvas.width);
-        const y = Math.max(0, (y0 - PAD * (y1 - y0)) * canvas.height);
-        const w = Math.min(canvas.width - x, (x1 - x0) * (1 + 2 * PAD) * canvas.width);
-        const h = Math.min(canvas.height - y, (y1 - y0) * (1 + 2 * PAD) * canvas.height);
+      const detection = await ai.json<{ boxes?: PiiBox[] }>(DETECT_PII_PROMPT, { image: blob });
+      let foundCount = 0;
+      for (const detectedBox of detection.boxes ?? []) {
+        if (!Array.isArray(detectedBox.box_2d) || detectedBox.box_2d.length !== 4) continue;
+        foundCount++;
+        const [y0, x0, y1, x1] = detectedBox.box_2d.map((v) => Math.max(0, Math.min(1000, v)) / 1000);
+        const x = Math.max(0, (x0 - MASK_PADDING_RATIO * (x1 - x0)) * canvas.width);
+        const y = Math.max(0, (y0 - MASK_PADDING_RATIO * (y1 - y0)) * canvas.height);
+        const w = Math.min(canvas.width - x, (x1 - x0) * (1 + 2 * MASK_PADDING_RATIO) * canvas.width);
+        const h = Math.min(canvas.height - y, (y1 - y0) * (1 + 2 * MASK_PADDING_RATIO) * canvas.height);
         if (w > MIN_RECT_PX && h > MIN_RECT_PX) addRect([x, y, w, h]);
       }
-      toast(found ? t('autoMaskFound', { n: found }) : t('autoMaskNone'));
+      toast(foundCount ? t('autoMaskFound', { n: foundCount }) : t('autoMaskNone'));
     } catch {
       toast(t('autoMaskFail'));
     } finally {
@@ -64,13 +61,13 @@ export function MaskScreen() {
     const g = view.getContext('2d')!;
     g.drawImage(canvas, 0, 0);
     g.fillStyle = '#000';
-    [...rects, ...(cur.current ? [cur.current] : [])].forEach((r) => g.fillRect(r[0], r[1], r[2], r[3]));
+    [...rects, ...(dragRect.current ? [dragRect.current] : [])].forEach((r) => g.fillRect(r[0], r[1], r[2], r[3]));
   };
 
   useEffect(() => {
     const view = viewRef.current;
     if (!view || !canvas) return;
-    // 내부 해상도를 원본과 맞춰야 drawImage 가 1:1. 표시 크기는 CSS(.canvaswrap)가 줄이고 좌표 변환은 pt() 가 한다
+    // 내부 해상도를 원본과 맞춰야 drawImage 가 1:1. 표시 크기는 CSS(.canvaswrap)가 줄이고 좌표 변환은 canvasPoint()에서 한다
     view.width = canvas.width;
     view.height = canvas.height;
     draw();
@@ -78,7 +75,7 @@ export function MaskScreen() {
   }, [canvas, rects]);
 
   /** 화면 픽셀 → 캔버스 픽셀 (CSS 축소 비율 보정) */
-  const pt = (e: PointerEvent<HTMLCanvasElement>): [number, number] => {
+  const canvasPoint = (e: PointerEvent<HTMLCanvasElement>): [number, number] => {
     const view = e.currentTarget;
     const box = view.getBoundingClientRect();
     return [
@@ -87,26 +84,26 @@ export function MaskScreen() {
     ];
   };
 
-  const onDown = (e: PointerEvent<HTMLCanvasElement>) => {
+  const startDrag = (e: PointerEvent<HTMLCanvasElement>) => {
     // 캡처를 걸어두면 손가락이 캔버스 밖으로 나가도 move/up 이 계속 들어온다
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragStart.current = pt(e);
+    dragStart.current = canvasPoint(e);
   };
 
-  const onMove = (e: PointerEvent<HTMLCanvasElement>) => {
+  const updateDrag = (e: PointerEvent<HTMLCanvasElement>) => {
     if (!dragStart.current) return;
-    const p = pt(e);
+    const p = canvasPoint(e);
     const s = dragStart.current;
     // 어느 방향으로 드래그하든 [좌상단 x, y, 너비, 높이]로 정규화
-    cur.current = [Math.min(s[0], p[0]), Math.min(s[1], p[1]), Math.abs(p[0] - s[0]), Math.abs(p[1] - s[1])];
+    dragRect.current = [Math.min(s[0], p[0]), Math.min(s[1], p[1]), Math.abs(p[0] - s[0]), Math.abs(p[1] - s[1])];
     draw();
   };
 
   // commit=false 는 pointercancel (브라우저가 제스처를 가져간 경우): 그리던 상자를 버린다
   const endDrag = (commit: boolean) => {
-    const finished = cur.current;
+    const finished = dragRect.current;
     if (commit && finished && finished[2] > MIN_RECT_PX && finished[3] > MIN_RECT_PX) addRect(finished);
-    cur.current = null;
+    dragRect.current = null;
     dragStart.current = null;
     draw(); // 버려진 상자는 여기서 지워야 한다
   };
@@ -120,17 +117,17 @@ export function MaskScreen() {
         <canvas
           ref={viewRef}
           aria-label={t('maskCanvas')}
-          onPointerDown={onDown}
-          onPointerMove={onMove}
+          onPointerDown={startDrag}
+          onPointerMove={updateDrag}
           onPointerUp={() => endDrag(true)}
           onPointerCancel={() => endDrag(false)}
         />
       </div>
       <div className="stack" style={{ marginTop: 12 }}>
-        {/* 저해상도 사본으로 위치만 받고, 전송은 여전히 가린 사진만. 샘플은 이미 가려져 있어 숨김 */}
-        {canDetect && !doc?.sample && (
+        {/* 자동 찾기는 가림 전 사본을 전송한다. 샘플에서는 표시하지 않는다. */}
+        {canDetectPersonalInfo && !doc?.sample && (
           <>
-            <button type="button" className="btn secondary" disabled={detecting} onClick={() => void detect()}>
+            <button type="button" className="btn secondary" disabled={detecting} onClick={() => void detectPersonalInfo()}>
               <Ic n="shield" cls="sm" />{detecting ? t('autoMaskBusy') : t('autoMask')}
             </button>
             <p className="muted" style={{ margin: 0 }}>{t('autoMaskNote')}</p>

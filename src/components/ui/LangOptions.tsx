@@ -1,5 +1,4 @@
-// 언어 목록(라디오 모양). 첫 실행 화면과 헤더 지구본 시트가 같이 쓴다.
-// 각 언어는 자기 문자로 쓰고 영어 이름을 보조로 둔다. 아직 안 골랐으면 어느 것도 선택 표시를 안 한다.
+// 첫 실행과 언어 시트에서 함께 사용하는 언어 선택 목록.
 import { useApp } from '@/context/AppContext';
 import { LANGS } from '@/data/content';
 import type { Lang } from '@/i18n';

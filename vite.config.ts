@@ -2,8 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Vite 설정. '@' 별칭, 포트 고정, GitHub Pages 경로, PWA(홈 화면 설치형).
-// tsconfig.app.json 의 paths 에도 같은 '@/*' 매핑이 있어야 타입 검사가 맞는다. 한쪽만 바꾸지 말 것.
+// 개발·배포 경로와 PWA 설정. @ 별칭은 tsconfig.app.json의 paths와 함께 관리한다.
 export default defineConfig(({ mode }) => {
   // GitHub Pages 는 https://wscodefactory.github.io/Our_Yangju/ 아래에 올라가므로 에셋 경로 앞에 저장소 이름이 붙어야 한다.
   // 로컬 dev/preview 는 '/' 그대로. (.github/workflows/pages.yml 이 `vite build --mode pages` 로 빌드)
@@ -12,8 +11,7 @@ export default defineConfig(({ mode }) => {
     base,
     plugins: [
       react(),
-      // PWA: manifest + service worker. 설치하면 홈 화면 아이콘으로 전체 화면 실행, 화면·글꼴은 기기에 캐시.
-      // 새 버전을 올리면 다음 실행 때 자동 갱신(autoUpdate). 사진 읽기·AI 상담만 네트워크가 필요하다.
+      // 화면 자산과 글꼴을 캐시하고 새 버전을 자동 갱신한다. 외부 연결 기능에는 네트워크가 필요하다.
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['yangju-ci.png', 'yangju-symbol.png', 'apple-touch-icon.png'],
@@ -42,7 +40,7 @@ export default defineConfig(({ mode }) => {
               options: { cacheName: 'fonts', expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 }, cacheableResponse: { statuses: [0, 200] } },
             },
           ],
-          // Claude 호출은 절대 캐시하지 않는다 (기본값도 캐시 안 함이지만 명시)
+          // /api/ 경로를 앱 화면으로 대체하지 않는다. AI POST 요청용 캐시 규칙은 두지 않는다.
           navigateFallbackDenylist: [/^\/api\//],
         },
       }),

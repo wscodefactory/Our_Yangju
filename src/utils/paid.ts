@@ -1,4 +1,4 @@
-// 납부 기록. [납부 완료] 를 누르면 저장할지 묻고, 이 휴대폰 localStorage 에만 둔다. 사진·이름·계좌번호는 넣지 않는다.
+// 사용자가 저장을 선택한 납부 기록. 실제 납부 여부를 은행에 조회하지는 않는다.
 import type { TaxType } from '@/types';
 import { STORAGE_KEYS, storage } from './browser';
 

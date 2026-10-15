@@ -1,4 +1,4 @@
-// 행사 목록. scripts/fetch-events.mjs 가 만든 events.json 이 있으면 그것을, 비어 있으면 content.ts 의 고정 목록을 쓴다.
+// 수집한 행사 목록을 우선 사용하고, 목록이 비어 있으면 기본 콘텐츠로 대체한다.
 import { EVENTS as STATIC_EVENTS, type T5 } from '@/data/content';
 import cityEvents from '@/data/events.json';
 

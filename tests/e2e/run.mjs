@@ -1,6 +1,4 @@
-// 전체 점검 실행: 빌드본을 preview 로 띄우고 tests/e2e/*.test.mjs 를 차례로 돌린다.
-//   npm run e2e            — 로컬 빌드본(dist) 대상. 먼저 `npx vite build` 가 되어 있어야 한다
-//   E2E_URL=https://... npm run e2e -- live   — 배포본 대상 (live.test.mjs 만)
+// 기존 dist를 preview로 띄워 점검한다. 먼저 npm run build 실행. E2E_URL 지정 시 live도 포함된다.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';

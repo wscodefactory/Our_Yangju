@@ -1,5 +1,4 @@
-// 창구 모드 "대화 통역" 문구. 담당자 전용 화면이라 [ko, en] 두 칸만 있고 useApp().T 로 꺼내 쓴다.
-// 주민 쪽 버튼 라벨은 LANGS[].native 를 붙여서 쓰므로 여기 없다.
+// 담당자 창구 화면의 한국어·영어 문구. 주민 언어 이름은 LANGS에서 가져온다.
 export const CS = {
   title: ['대화 통역', 'Live interpreting'],
   lead: ['버튼을 누르고 말하면 상대 언어로 번역해 보여주고 읽어줘요. 직원 말은 주민 언어로, 주민 말은 한국어로.', 'Press a button and speak. The other side sees and hears the translation: officer to resident language, resident to Korean.'],

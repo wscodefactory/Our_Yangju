@@ -1,5 +1,4 @@
-// 연·월·일 세 칸 날짜 입력. <input type="date"> 는 브라우저 달력이 기기 언어(한국어 크롬이면 "연도-월-일")로 고정돼
-// 앱 언어를 따르지 않아서, 라벨을 우리 문구로 붙일 수 있는 숫자 칸으로 대신한다. 값은 'YYYY-MM-DD' 또는 '' 로 돌려준다.
+// 기기 언어에 고정되는 기본 달력 대신 앱 언어로 연·월·일을 입력받는다.
 import { forwardRef, useEffect, useState } from 'react';
 import { useApp } from '@/context/AppContext';
 

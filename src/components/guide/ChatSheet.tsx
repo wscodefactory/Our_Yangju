@@ -6,21 +6,21 @@ import { useApp } from '@/context/AppContext';
 import { useGuide } from '@/context/GuideContext';
 import { hasPii } from '@/utils/pii';
 
-const SUGS = ['sug1', 'sug2', 'sug3', 'sug4'];
+const SUGGESTION_KEYS = ['sug1', 'sug2', 'sug3', 'sug4'];
 
 export function ChatSheet() {
   const { t, tx, go, closeOverlay, toast } = useApp();
   const { messages, showSuggestions, busy, ask, routeTitle } = useGuide();
-  const input = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // 열리면 입력창에 포커스 (Sheet 가 닫기 버튼에 먼저 주므로 한 틱 뒤)
-  useEffect(() => { const id = window.setTimeout(() => input.current?.focus(), 30); return () => window.clearTimeout(id); }, []);
+  useEffect(() => { const id = window.setTimeout(() => inputRef.current?.focus(), 30); return () => window.clearTimeout(id); }, []);
   // 새 말풍선이 생기면 맨 아래로
   useEffect(() => { const el = document.getElementById('chat-body'); if (el) el.scrollTop = el.scrollHeight; }, [messages, busy]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const el = input.current;
+    const el = inputRef.current;
     if (!el) return;
     // 주민등록번호·외국인등록번호 모양이 들어 있으면 보내지 않는다
     if (hasPii(el.value)) { toast(t('piiBlocked')); return; }
@@ -36,7 +36,7 @@ export function ChatSheet() {
         <>
           <form className="ask" onSubmit={submit}>
             <label className="sr-only" htmlFor="ask-in">{t('chatTitle')}</label>
-            <input id="ask-in" ref={input} autoComplete="off" placeholder={t('chatPh')} />
+            <input id="ask-in" ref={inputRef} autoComplete="off" placeholder={t('chatPh')} />
             <button type="submit" className="icon-btn" aria-label={t('chatSend')}><Ic n="send" /></button>
           </form>
           <p className="hint"><Ic n="shield" cls="sm" />{t('chatPrivacy')}</p>
@@ -46,25 +46,25 @@ export function ChatSheet() {
       <p className="demo-flag" style={{ margin: '0 0 12px' }}><Ic n="info" cls="sm" />{t('chatDemo')}</p>
       <div className="msgs" aria-live="polite">
         <div className="msg bot">{t('chatHello')}</div>
-        {messages.map((m) => {
-          if (m.me) return <div key={m.id} className="msg me">{m.text}</div>;
-          const dest = m.go;
+        {messages.map((message) => {
+          if (message.me) return <div key={message.id} className="msg me">{message.text}</div>;
+          const destination = message.go;
           return (
-            <div key={m.id} className="msg bot">
-              {m.key ? t(m.key) : m.text}
-              {/* 근거 문서: 제목 + 링크. 답변은 이 문서 안에서만 나온 것 */}
-              {m.source && (
+            <div key={message.id} className="msg bot">
+              {message.key ? t(message.key) : message.text}
+              {/* 응답의 sourceId에 해당하는 근거 제목과 링크 */}
+              {message.source && (
                 <p className="src" style={{ margin: '8px 0 0' }}>
                   <Ic n="info" cls="sm" />
-                  <span>{t('basis')}: {m.source.url
-                    ? <a href={m.source.url} target="_blank" rel="noopener">{tx(m.source.title)}</a>
-                    : tx(m.source.title)}</span>
+                  <span>{t('basis')}: {message.source.url
+                    ? <a href={message.source.url} target="_blank" rel="noopener">{tx(message.source.title)}</a>
+                    : tx(message.source.title)}</span>
                 </p>
               )}
               {/* go() 가 시트를 닫고 history 칸을 바꿔 쓴다. closeOverlay()(=history.back) 를 먼저 부르면 그 popstate 가 새 화면을 도로 빼 버린다 */}
-              {dest && (
-                <button type="button" className="btn secondary sm" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => go(dest)}>
-                  <span>{routeTitle(dest)}</span><Ic n="chev" cls="sm" />
+              {destination && (
+                <button type="button" className="btn secondary sm" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => go(destination)}>
+                  <span>{routeTitle(destination)}</span><Ic n="chev" cls="sm" />
                 </button>
               )}
             </div>
@@ -73,7 +73,7 @@ export function ChatSheet() {
         {busy && <div className="msg bot">…</div>}
       </div>
       {showSuggestions && (
-        <div className="sugs">{SUGS.map((k) => <button key={k} type="button" className="chip" onClick={() => { void ask(t(k)); }}>{t(k)}</button>)}</div>
+        <div className="sugs">{SUGGESTION_KEYS.map((k) => <button key={k} type="button" className="chip" onClick={() => { void ask(t(k)); }}>{t(k)}</button>)}</div>
       )}
     </Sheet>
   );

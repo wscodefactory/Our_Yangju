@@ -1,8 +1,4 @@
-// 앱 전역 상태. 언어·큰 글씨·저장 혜택·내비게이션 스택·시트·토스트를 Provider 하나에 모았다.
-//  - 언어는 ko/en/zh/vi/ne 중 하나. 모든 문구가 다섯 칸 배열이라 AI 번역 없이 즉시 바뀐다
-//  - 내비 스택은 history 와 같이 움직여서 휴대폰 뒤로 가기가 통한다
-//  - 시트·전체 화면(overlay)은 한 번에 하나. Esc 로 닫힘
-//  - 큰 글씨·쉬운 한국어·언어·저장 혜택은 localStorage
+// 앱 설정과 화면 이동 상태. 화면·시트의 뒤로 가기는 브라우저 history와 함께 처리한다.
 import {
   createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode,
 } from 'react';
@@ -94,7 +90,7 @@ const Ctx = createContext<AppState | null>(null);
 const isLang = (v: unknown): v is Lang => typeof v === 'string' && (i18n.LANG_CODES as string[]).includes(v);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  /* ----- 언어 ----- */
+  /* 언어 */
   const [langState, setLangState] = useState<Lang | null>(() => {
     const saved = storage.get(STORAGE_KEYS.cardLang);
     return isLang(saved) ? saved : null;
@@ -102,7 +98,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const lang: Lang = langState ?? 'ko';
   const tx = useCallback((arr?: T5) => i18n.tx(arr, lang), [lang]);
 
-  /* ----- 쉬운 한국어 ----- */
+  /* 쉬운 한국어 */
   // 한국어 화면에서만. 켜면 UI 사전의 긴 문장을 미리 다듬어 둔 쉬운 문장(easy-ko.json)으로 바꾼다
   const [easy, setEasy] = useState(() => storage.get(STORAGE_KEYS.easy) === '1');
   const toggleEasy = useCallback(() => setEasy((v) => { storage.set(STORAGE_KEYS.easy, v ? '0' : '1'); return !v; }), []);
@@ -116,13 +112,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const fmtNum = useCallback((n: number) => i18n.fmtNum(n, lang), [lang]);
   const T = useCallback((ko: string, en: string) => (lang === 'ko' ? ko : en), [lang]);
 
-  /* ----- 큰 글씨 ----- */
+  /* 큰 글씨 */
   const [big, setBig] = useState(() => storage.get(STORAGE_KEYS.big) === '1');
   const toggleBig = useCallback(() => setBig((v) => { storage.set(STORAGE_KEYS.big, v ? '0' : '1'); return !v; }), []);
   useEffect(() => { document.documentElement.classList.toggle('big', big); }, [big]);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
-  /* ----- 저장한 혜택 ----- */
+  /* 저장한 혜택 */
   const [saved, setSaved] = useState<string[]>(() => storage.getJSON<string[]>(STORAGE_KEYS.saved, []));
   const isSaved = useCallback((id: string) => saved.includes(id), [saved]);
   const toggleSaved = useCallback((id: string) => setSaved((prev) => {
@@ -131,12 +127,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return next;
   }), []);
 
-  /* ----- 시트 상태 (내비게이션이 참조하므로 먼저 선언) ----- */
+  /* 시트 상태 (내비게이션이 참조하므로 먼저 선언) */
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const overlayRef = useRef<Overlay | null>(null);
   overlayRef.current = overlay;
 
-  /* ----- 내비게이션 ----- */
+  /* 내비게이션 */
   // 불변식: history 항목 수 = nav.length - 1 + (시트가 열려 있으면 1). 시트도 history 한 칸을 차지한다.
   // 바로가기(?go=): 언어가 있으면 '홈, 목적지' 로 쌓아 뒤로 가기가 홈으로 가게 하고, 없으면 언어를 고를 때까지 기억
   const [deep] = useState(readDeepLink);
@@ -169,8 +165,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setNav([{ k: 'home' }]);
     if (n > 0) history.go(-n);
   }, []);
-  // back() 은 history.back() 이라 비동기다. back() 뒤에 바로 go() 하면 popstate 가 새로 push 한 화면을 도로 빼 버리므로
-  // 그 조합 대신 이걸 쓴다
+  // back 후 go를 연달아 호출하면 popstate와 충돌하므로 현재 항목을 직접 바꾼다.
   const replace = useCallback((s: Screen) => {
     setNav((st) => [...st.slice(0, -1), s]);
     history.replaceState(null, '');
@@ -199,7 +194,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  /* ----- 시트·전체 화면 ----- */
+  /* 시트·전체 화면 */
   // 화면이 바뀌거나 시트가 닫히면 읽어주기를 멈춘다 (뒤로 가기 포함). 안 그러면 다음 화면에서도 계속 들린다
   useEffect(() => { stopSpeaking(); }, [nav, overlay]);
   // 열 때 push, 닫을 때는 history.back() → popstate 가 닫는다. 닫기 버튼·Esc·바깥 탭·휴대폰 뒤로 가기가 전부 같은 길
@@ -227,13 +222,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [langState, pending]);
 
-  /* ----- 앱 바 제목 · 하단 바 포털 ----- */
+  /* 앱 바 제목 · 하단 바 포털 */
   const [titleEl, setTitleEl] = useState<HTMLElement | null>(null);
   const [barEl, setBarEl] = useState<HTMLElement | null>(null);
   const [barUsed, setBarUsed] = useState(false);
   useEffect(() => { document.body.classList.toggle('has-bar', barUsed); }, [barUsed]);
 
-  /* ----- 토스트 ----- */
+  /* 토스트 */
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const timer = useRef<number | undefined>(undefined);
   const toast = useCallback((msg: string) => {
@@ -242,7 +237,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     timer.current = window.setTimeout(() => setToastMsg(null), 2600);
   }, []);
 
-  /* ----- 담당자 게시 혜택 ----- */
+  /* 담당자 게시 혜택 */
   const [published, setPublished] = useState<PublishedBenefit[]>(() => benefitsStore.load());
   const publishBenefit = useCallback((b: PublishedBenefit) => setPublished(benefitsStore.add(b)), []);
 

@@ -1,6 +1,4 @@
-// 고지서 사진 인식 정확도 테스트: tests/notices/cases.json 의 각 사진을 앱과 같은 프롬프트로 Claude 에 보내 expected 와 비교한다.
-// 사용법: npm run eval:notices [-- --json]   (--json 이면 tests/notices/last-run.json 에 결과 저장)
-// 앱은 사진을 긴 변 1200px JPEG 0.8 로 줄여 보내지만 여기서는 원본을 그대로 보낸다 (Node 에 canvas 없음).
+// 앱의 읽기 프롬프트로 고지서 기대값을 비교한다. 이미지 파일은 축소·가림 없이 전송한다.
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'node:fs';
 import path from 'node:path';

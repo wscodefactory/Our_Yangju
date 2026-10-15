@@ -1,33 +1,21 @@
-// 담당자 화면(공고 → 규칙 → 게시) 데이터 변환. 공고문에서 뽑은 ExtractedRule 을 담당자가 체크할 목록으로 펼치고,
-// 원문 하이라이트 조각으로 자르고, 게시용 PublishedBenefit 으로 바꾼다. 전부 순수 함수. RegisterPanel 이 부른다.
+// 추출한 공고 규칙을 확인 목록, 원문 강조 구간, 게시 항목으로 변환한다.
 import type { CheckItem, ExtractedRule, PublishedBenefit } from '@/types';
 
-/**
- * 추출 결과를 "조건 / 지원 / 기간 / 신청 / 서류" 순서의 확인 항목 목록으로 펼친다.
- * found 는 quote 가 공고 원문에 글자 그대로 있는지. 모델이 원문에 없는 문장을 지어냈으면 false 가 되고
- * 화면에서 "원문에서 못 찾음" 으로 표시돼 담당자가 한 번 더 보게 된다.
- * conditions/documents 에 `|| []` 가 붙어 있는 건 모델 응답에 배열이 통째로 빠질 때가 있어서.
- */
+/** 조건·지원·기간·신청·서류를 확인 목록으로 만들고, 근거 문장이 원문에 있는지 표시한다. */
 export function toCheckItems(rule: ExtractedRule, original: string): CheckItem[] {
-  const out: Omit<CheckItem, 'found'>[] = [];
-  (rule.conditions || []).forEach((c) => out.push({ kind: '조건', text: c.label, quote: c.quote }));
-  if (rule.amount) out.push({ kind: '지원', text: rule.amount.text, quote: rule.amount.quote });
-  if (rule.period) out.push({ kind: '기간', text: rule.period.text, quote: rule.period.quote });
-  if (rule.channel) out.push({ kind: '신청', text: rule.channel.where, quote: rule.channel.quote });
-  (rule.documents || []).forEach((d) => out.push({ kind: '서류', text: d.name, quote: d.quote }));
-  return out.map((item) => ({ ...item, found: !!(item.quote && original.includes(item.quote)) }));
+  const items: Omit<CheckItem, 'found'>[] = [];
+  (rule.conditions || []).forEach((condition) => items.push({ kind: '조건', text: condition.label, quote: condition.quote }));
+  if (rule.amount) items.push({ kind: '지원', text: rule.amount.text, quote: rule.amount.quote });
+  if (rule.period) items.push({ kind: '기간', text: rule.period.text, quote: rule.period.quote });
+  if (rule.channel) items.push({ kind: '신청', text: rule.channel.where, quote: rule.channel.quote });
+  (rule.documents || []).forEach((document) => items.push({ kind: '서류', text: document.name, quote: document.quote }));
+  return items.map((item) => ({ ...item, found: !!(item.quote && original.includes(item.quote)) }));
 }
 
 /** 원문 조각. mark 가 있으면 <mark> 로 감싸고 번호(1부터)를 위첨자로 붙인다 */
 export type HighlightPart = { text: string; mark?: number };
 
-/**
- * 공고 원문을 [일반 텍스트, 하이라이트, 일반 텍스트, ...] 조각으로 나눈다.
- * found 인 항목만 대상으로, 각 quote 가 원문에서 처음 나오는 위치순으로 앞에서부터 잘라 나간다.
- * 겹치는 구간은 뒤에 온 쪽을 버린다 — 중첩 mark 는 그리기 복잡하고
- * 어차피 같은 문장을 두 항목이 근거로 쓰는 경우라 하나만 표시해도 충분.
- * mark 번호는 items 의 인덱스 + 1 이라 체크 목록의 번호와 일치한다.
- */
+/** 근거 문장의 첫 위치를 순서대로 표시한다. 겹친 구간은 건너뛰고 확인 목록의 번호를 유지한다. */
 export function highlightParts(text: string, items: CheckItem[]): HighlightPart[] {
   const ranges: { start: number; end: number; mark: number }[] = [];
   items.forEach((item, i) => {
@@ -49,11 +37,7 @@ export function highlightParts(text: string, items: CheckItem[]): HighlightPart[
   return parts;
 }
 
-/**
- * 추출 규칙 → 게시 레코드. 빈 필드는 가능한 대체값으로 채운다
- * (summary 없으면 금액 문구, when 없으면 기간 문구, stage 없으면 '독립').
- * id 는 지금 아무 데서도 안 채운다(optional). 서버가 생기면 서버가 발급하는 걸 상정.
- */
+/** 게시 항목으로 변환한다. 누락된 요약·기간은 추출 결과의 다른 필드로 보완한다. */
 export function ruleToPublished(rule: ExtractedRule): PublishedBenefit {
   return {
     name: rule.name,

@@ -1,6 +1,4 @@
-// 양주시 누리집 행사 게시판을 긁어 src/data/events.json 을 만든다. (빌드 전 `npm run events`)
-// 제목·장소는 Claude 로 en/zh/vi/ne 번역하고, 번역 결과는 events-cache.json 에 nttNo 별로 쌓아 재실행 때 새 글만 번역한다.
-// 가져오기·파싱이 실패하면 기존 events.json 을 건드리지 않고 0 으로 끝낸다 (마지막 성공 데이터로 빌드).
+// 시청 행사 목록을 수집하고 새 제목·장소를 번역한다. 실패하면 기존 행사 파일을 유지한다.
 import Anthropic from '@anthropic-ai/sdk';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

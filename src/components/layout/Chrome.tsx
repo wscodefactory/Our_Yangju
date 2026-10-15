@@ -1,4 +1,4 @@
-// 화면 바깥의 고정 요소들: 앱 바, 제목·하단 바 포털, 설치 배너, FAB, 푸터, 토스트, 본문 바로가기, 바텀 시트 틀.
+// 앱 바, 하단 바, 설치 안내와 시트 등 화면 공통 요소.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Ic } from '@/components/ui/Ic';
@@ -93,7 +93,7 @@ export function Fab() {
   );
 }
 
-/* ----- 앱 설치 (PWA) ----- */
+/* 앱 설치 (PWA) */
 // 크롬의 beforeinstallprompt 는 한 번만 오고, 받아 둔 이벤트 객체로 나중에 prompt() 를 불러야 한다.
 // 컴포넌트가 뜨기 전에 올 수 있어 모듈 수준에서 잡아 두고, 바뀌면 구독자(useInstall)에게 알린다.
 interface InstallPromptEvent extends Event { prompt: () => Promise<void> }

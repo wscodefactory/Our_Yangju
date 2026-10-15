@@ -6,10 +6,7 @@ import { DocProvider } from '@/context/DocContext';
 import { GuideProvider } from '@/context/GuideContext';
 import { ScreenRouter } from '@/screens/ScreenRouter';
 
-/**
- * 앱 뼈대: 본문 바로가기 → 앱 바 → <main> → 푸터(홈만) → 하단 고정 바 → FAB·시트 → 토스트 → PC 소개 패널
- * Provider 순서: App(언어·내비·저장) → Doc(고지서) → Guide(AI 상담, useApp 을 쓰므로 안쪽)
- */
+/** Provider 순서는 App → Doc → Guide. 공통 화면과 PC 소개 패널을 함께 구성한다. */
 export default function App() {
   return (
     <AppProvider>

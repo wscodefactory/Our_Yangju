@@ -1,5 +1,4 @@
-// 담당자가 게시한 혜택 저장소. AppContext 가 처음 로드할 때 load(), 게시할 때 add() 를 부른다.
-// localStorage 라 "이 기기에서만" 보인다. 서버가 생기면 이 두 함수만 교체하면 된다.
+// 담당자가 게시한 혜택을 이 브라우저에 저장한다. 기기 간 공유는 지원하지 않는다.
 import type { PublishedBenefit } from '@/types';
 import { STORAGE_KEYS, storage } from '@/utils/browser';
 
@@ -7,8 +6,7 @@ export const benefitsStore = {
   load(): PublishedBenefit[] {
     return storage.getJSON<PublishedBenefit[]>(STORAGE_KEYS.newBenefits, []);
   },
-  // 최신이 맨 앞. 20개 넘으면 오래된 것부터 버린다 — 용량보다는 화면이 길어지는 걸 막으려는 숫자.
-  // 추가 후 전체 목록을 돌려줘서 호출부가 다시 load() 할 필요 없게.
+  // 최근 게시한 순서로 최대 20건을 보관하고 갱신된 목록을 반환한다.
   add(b: PublishedBenefit): PublishedBenefit[] {
     const next = [b, ...this.load()].slice(0, 20);
     storage.setJSON(STORAGE_KEYS.newBenefits, next);

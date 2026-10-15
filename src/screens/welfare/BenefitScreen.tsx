@@ -1,5 +1,4 @@
-// 혜택 상세: 요약(kv) + 자격/준비물/신청 탭 + 하단 바(저장·문의 메모).
-// 퀴즈 답은 화면 안에서만 산다. 다른 혜택으로 바뀌면 ScreenRouter 가 key 로 새로 만든다.
+// 혜택의 자격 사전 확인·준비물·신청 안내. 다른 혜택으로 이동하면 응답을 초기화한다.
 import { useState } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Checklist, LvBadge, Seg, StBadge } from '@/components/ui/Bits';

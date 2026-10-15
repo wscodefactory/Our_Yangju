@@ -1,6 +1,4 @@
-// AI 호출 창구. 중계 서버(VITE_AI_PROXY, worker/)가 있으면 거기로, 없으면 Claude API 를 브라우저에서 직접 친다.
-// 화면 코드는 AiProvider 인터페이스만 보고, getAi() 가 null 이면 "데모 모드" 로 규칙/샘플 데이터만 쓴다
-// (GuideContext, ReadingScreen, MaskScreen, CounterScreen 등).
+// AI 연결 선택과 공통 요청 처리. 프록시를 우선 사용하고, 연결이 없으면 호출부에서 대체 경로를 제공한다.
 import Anthropic from '@anthropic-ai/sdk';
 import { blobToBase64, STORAGE_KEYS, storage } from '@/utils/browser';
 
@@ -22,7 +20,7 @@ export class AiError extends Error {
   }
 }
 
-/* ---------- Claude ---------- */
+/* Claude */
 
 export const DEFAULT_MODEL = 'claude-haiku-5-5';
 // json() 일 때 system 지시. scripts/*.mjs 도 같은 문장을 쓴다
@@ -42,22 +40,22 @@ export class ClaudeProvider implements AiProvider {
     this.client = new Anthropic({ apiKey, baseURL, dangerouslyAllowBrowser: true });
   }
 
-  // thinking 은 끈다 — 금액·기한 추출, 분류, 번역은 추론이 필요 없고 속도가 우선. (Claude 5 계열은 기본이 '생각 켬'이고 temperature 는 받지 않는다)
-  private async call(content: Anthropic.ContentBlockParam[], json: boolean): Promise<string> {
-    const t0 = performance.now();
+  // 추출·번역 요청에는 thinking을 비활성화한다.
+  private async call(content: Anthropic.ContentBlockParam[], expectJson: boolean): Promise<string> {
+    const startedAt = performance.now();
     try {
-      const res = await this.client.messages.create({
+      const response = await this.client.messages.create({
         model: this.model,
         max_tokens: 4096,
         thinking: { type: 'disabled' },
-        ...(json ? { system: JSON_SYSTEM } : {}),
+        ...(expectJson ? { system: JSON_SYSTEM } : {}),
         messages: [{ role: 'user', content }],
       });
-      if (import.meta.env.DEV) console.info(`[claude ${this.model}] ${Math.round(performance.now() - t0)}ms, in ${res.usage.input_tokens} / out ${res.usage.output_tokens} tokens`);
-      const out = res.content.map((b) => (b.type === 'text' ? b.text : '')).join('');
+      if (import.meta.env.DEV) console.info(`[claude ${this.model}] ${Math.round(performance.now() - startedAt)}ms, in ${response.usage.input_tokens} / out ${response.usage.output_tokens} tokens`);
+      const output = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('');
       // 안전 거부(refusal)나 빈 응답은 빈 문자열로 온다
-      if (!out) throw new AiError('Claude returned an empty response');
-      return out;
+      if (!output) throw new AiError('Claude returned an empty response');
+      return output;
     } catch (e) {
       if (e instanceof Anthropic.APIError) throw new AiError(e.message, e.status);
       throw e;
@@ -65,11 +63,11 @@ export class ClaudeProvider implements AiProvider {
   }
 
   async text(prompt: string): Promise<string> {
-    const hit = this.cache.get(prompt);
-    if (hit) return hit;
-    const out = (await this.call([{ type: 'text', text: prompt }], false)).trim();
-    this.cache.set(prompt, out);
-    return out;
+    const cached = this.cache.get(prompt);
+    if (cached) return cached;
+    const output = (await this.call([{ type: 'text', text: prompt }], false)).trim();
+    this.cache.set(prompt, output);
+    return output;
   }
 
   async json<T>(prompt: string, opts?: { image?: Blob }): Promise<T> {
@@ -92,7 +90,7 @@ export class ClaudeProvider implements AiProvider {
   }
 }
 
-/* ---------- 팩토리 ---------- */
+/* 팩토리 */
 
 // undefined = 아직 안 만들어 봄, null = 키 없음(데모 모드). 둘을 구분해야 매번 env 를 다시 읽지 않는다
 let instance: AiProvider | null | undefined;
@@ -109,6 +107,6 @@ export function getAi(): AiProvider | null {
 }
 
 /** 테스트나 런타임 교체용 */
-export function setAi(p: AiProvider | null) {
-  instance = p;
+export function setAi(nextProvider: AiProvider | null) {
+  instance = nextProvider;
 }

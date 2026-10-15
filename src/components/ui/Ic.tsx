@@ -1,6 +1,4 @@
-// 아이콘 한 곳. 데이터(content.ts)에 적힌 짧은 이름을 Lucide 컴포넌트로 연결한다.
-// 크기·선 굵기는 global.css 의 .ic / .ic.sm / .ic.lg 가 정한다.
-// 장식용이라 전부 aria-hidden. 버튼의 이름은 호출부가 aria-label 로 준다.
+// 콘텐츠의 아이콘 이름을 Lucide 컴포넌트에 연결한다. 접근성 이름은 사용하는 버튼에서 지정한다.
 import {
   AlertTriangle, AppWindow, ArrowLeft, ALargeSmall, Bookmark, BookmarkCheck, BookmarkPlus, Briefcase, Building2, Bus, Calendar, Camera, Car, Check,
   ChevronRight, CircleHelp, Copy, Cross, Download, ExternalLink, FileText, FlaskConical, Flower2, Globe, Heart, House, IdCard, Info,

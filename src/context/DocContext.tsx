@@ -1,6 +1,4 @@
-// "받은 고지서" 흐름(doc → [mask → reading] → docConfirm → docResult)이 공유하는 상태.
-// 사진 경로의 캔버스(원본·가림)와, 어느 경로로 왔든 최종으로 모이는 DocInfo 하나.
-// 캔버스처럼 무거운 값이 있어 AppContext 와 분리했다.
+// 고지서 사진, 가림 영역, 확인한 내용을 관리한다. 이미지 상태는 AppContext와 분리한다.
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 import { SAMPLE } from '@/data/content';
 import type { DocInfo } from '@/types';

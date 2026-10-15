@@ -1,19 +1,9 @@
-// 고지서 흐름의 캔버스 처리.
-//  - drawSampleNotice: 시연용 가상 자동차세 고지서를 캔버스에 그린다 (사진 대신 쓰는 샘플)
-//  - maskCanvas:       사용자가 지정한 영역을 검게 덮는다 (개인정보 가림)
-//  - canvasToBlob / fileToCanvas: 업로드 ↔ 전송 사이의 변환
-// 원본 이미지는 기기 밖으로 안 나가고, 가린 캔버스만 Blob 으로 바꿔 AI 에 보낸다는 게 이 흐름의 핵심.
-// DocContext 가 호출한다.
+// 샘플 고지서 생성, 이미지 축소와 가림 처리. 자동 위치 찾기용 사본은 MaskScreen에서 별도로 전송한다.
 
 /** 가림 영역 [x, y, w, h] (캔버스 좌표) */
 export type Rect = [number, number, number, number];
 
-/**
- * 시연용 가상 자동차세 고지서. 900x1180 캔버스에 직접 그린다.
- * 함께 돌려주는 rects 는 납세자·주소·납세번호·차량번호 값 칸의 좌표로,
- * 가리기 화면에서 "여기 가리세요" 기본 영역으로 쓰인다. row() 의 y 와 맞물려 있으니 좌표를 손대면 같이 고칠 것.
- * 글꼴은 전역 CSS 와 같은 IBM Plex Sans KR 을 미리 로드해 두는데, 안 돼도 시스템 글꼴로 그려지면 되므로 실패는 무시.
- */
+/** 가상 고지서와 기본 가림 영역. 표의 행 좌표를 바꿀 때는 반환하는 가림 좌표도 맞춘다. */
 export async function drawSampleNotice(): Promise<{ canvas: HTMLCanvasElement; rects: Rect[] }> {
   try { await document.fonts.load('24px "IBM Plex Sans KR"'); } catch { /* 글꼴 못 받아도 그냥 그림 */ }
 
@@ -72,7 +62,7 @@ export function maskCanvas(src: HTMLCanvasElement, rects: Rect[]): HTMLCanvasEle
   return canvas;
 }
 
-/** 긴 변 max 픽셀로 줄인 복사본. 가릴 곳 찾기(AI)에 보내는 저해상도 썸네일용 — 글자를 읽기엔 흐리고 위치만 잡힌다 */
+/** 긴 변을 max 이하로 줄인 사본. 축소만 하므로 개인정보를 가리는 처리는 아니다. */
 export function downscale(src: HTMLCanvasElement, max: number): HTMLCanvasElement {
   const scale = Math.min(1, max / Math.max(src.width, src.height));
   const c = document.createElement('canvas');
@@ -85,11 +75,7 @@ export function downscale(src: HTMLCanvasElement, max: number): HTMLCanvasElemen
 export const canvasToBlob = (canvas: HTMLCanvasElement, quality = 0.8) =>
   new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('toBlob failed'))), 'image/jpeg', quality));
 
-/**
- * 업로드한 사진을 캔버스로. 긴 변이 1200px 넘으면 비율 유지하며 줄인다.
- * 휴대폰 사진은 4000px 이 넘어서 그대로 보내면 느리고, 고지서 글자 읽기엔 1200 이면 충분했다 (전송량이 체감 시간의 큰 몫).
- * 작은 사진은 키우지 않음(Math.min(1, ...)).
- */
+/** 사진을 비율대로 최대 1200px로 줄인다. 작은 이미지는 확대하지 않는다. */
 export async function fileToCanvas(file: File): Promise<HTMLCanvasElement> {
   const bmp = await createImageBitmap(file);
   const scale = Math.min(1, 1200 / Math.max(bmp.width, bmp.height));

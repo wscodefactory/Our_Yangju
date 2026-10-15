@@ -1,4 +1,4 @@
-// 여러 화면이 같이 쓰는 작은 조각들. 모양은 전부 global.css 클래스(.seg .check .row .bdg .callout)가 정한다.
+// 탭, 체크리스트, 배지 등 공통 UI. 스타일은 global.css에서 관리한다.
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { useApp } from '@/context/AppContext';
 import { LV, ST } from '@/data/content';

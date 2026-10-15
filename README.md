@@ -1,133 +1,265 @@
 # 한눈에 양주 | Our Yangju
 
+**한국어** | [English](README.en.md)
+
 헤매는 시간 없이, 모두가 함께하는 양주.
-외국인 주민이 받은 안내를 모국어로 이해하고 바로 할 일까지 잇는 AI 생활·행정 길잡이 — 2026 양주시 미래인재 AI 공모전 12팀 프로토타입.
 
-이 저장소는 단일 `index.html` 시안을 **Vite + React 18 + TypeScript** 프로젝트로 옮긴 것이다.
-원본 단일 파일은 `legacy/index.html`에 그대로 두었다.
+외국인 주민이 행정 안내와 고지서를 자신의 언어로 이해하고, 준비물 확인·납부 안내·상담까지 이어갈 수 있도록 만든 **2026 양주시 미래인재 AI 공모전 12팀 프로토타입**입니다.
 
-## 실행
+단일 HTML 시안을 **React 18 + TypeScript + Vite**로 옮겼으며, Claude 연동과 Cloudflare Worker 중계 서버를 포함합니다. 원본은 `legacy/index.html`, 개편 전 React 화면은 `legacy/v1/`에 보관되어 있습니다.
 
-```bash
-npm install
-cp .env.example .env     # 선택: VITE_CLAUDE_API_KEY 입력. 비우면 데모 모드
-npm run dev              # http://localhost:3000  (같은 Wi-Fi 휴대폰은 Network 주소로)
-npm run build            # dist/ 정적 파일
-npm run preview          # 빌드 결과 미리보기 (4173)
+## 주요 기능
+
+| 화면 | 현재 구현 |
+| --- | --- |
+| 언어·접근성 | 한국어·영어·중국어·베트남어·네팔어, 큰 글씨, 쉬운 한국어, 지원 기기의 음성 읽기 |
+| 시청·주민센터 업무 | 업무별 장소·기한·준비물, 상황별 체크리스트, 공식 사이트, 1345 연결, 직원에게 보여주는 한국어 전체 화면 |
+| 받은 고지서 읽기 | 사진 선택 → 개인정보 가리기 → 내용 읽기 → 금액·기한 등 확인·수정 → 납부·질문·상담 안내. 샘플과 직접 입력도 지원 |
+| 고지서 결과 | 가상계좌 이체 순서, 계좌·금액 복사, 위택스 연결, 납기 경과 표시, 달력 파일 다운로드, 선택한 납부 기록 저장 |
+| 지원 혜택 찾기 | 대상·단계별 목록, 검색, 자격 사전 확인, 준비물·신청 방법, 혜택 저장, 문의 메모 |
+| 생활·지역 정보 | 긴급 전화, 쓰레기·의료·교통·일터 안내, 행사·명소·음식·양주 소개 |
+| AI 상담 | 다국어 키워드로 화면 추천. 규칙에 없는 질문은 내장 근거 문서를 Claude에 제공하고 근거가 있는 답변만 표시 |
+| 내 정보 | 비자·읍면동·이사일·거주 형태·가족·건강보험 납부 방식·차·은행 앱 저장, 업무 안내에 반영, 데이터 초기화 |
+| 담당자 화면 | `#admin`으로 진입. 공고 규칙 초안·원문 대조·기기 내 게시, 사각지대 예시, 번역 검수 상태, 창구 통역 |
+
+시민 화면의 기본 문구는 5개 언어로 내장되어 별도 AI 호출 없이 바뀝니다. 담당자 전용 문구는 주로 한국어·영어이며, 번역되지 않은 수집 행사는 다른 언어에서도 한국어로 표시될 수 있습니다.
+
+## 로컬 실행
+
+Node.js **22.12 이상**과 npm을 권장합니다. GitHub Actions는 Node.js 22를 사용합니다.
+
+Windows PowerShell 기준:
+
+```powershell
+Set-Location 'E:\Yangju\HtmltoReactClaude'
+npm ci
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+npm run dev
 ```
 
-- Claude API 키가 있으면(기본 모델 claude-haiku-5-5) 고지서 사진 읽기 · 공고문 규칙 추출 · 질문 분류 · zh/vi/ne 번역이 AI로 동작한다.
-- 키가 없으면 **데모 모드**로 동작한다. 샘플 고지서, 예시 공고, 키워드 규칙으로 같은 흐름을 끝까지 볼 수 있다.
-- `.env`는 git에 올라가지 않는다. 키는 브라우저 번들에 들어가므로 시연용으로만 쓰고, 운영 시에는 서버 프록시를 두어야 한다.
-- **배포본**은 키 없이 중계 서버(`VITE_AI_PROXY`, 아래 worker/)를 거친다. 배포본에서 사진 읽기가 안 되면 Worker 쪽을 본다: 허용 출처·하루 상한(429)·Worker 비밀값. 로컬 빌드에 `VITE_AI_PROXY` 가 비어 있으면 담당자 화면(`#admin`)의 **AI 키 넣기**로 시연 기기에 키를 넣을 수 있다(그 기기 localStorage에만 저장).
+- 개발 서버: `http://localhost:3000/`. 포트가 사용 중이면 다른 포트로 옮기지 않고 종료합니다.
+- 같은 네트워크의 휴대폰에서는 터미널에 표시되는 Network 주소로 기본 화면을 확인할 수 있습니다. 기본 Worker 허용 출처에는 로컬 IP 주소가 없으므로 AI 호출에는 별도 출처 설정이 필요합니다.
+- `.env` 수정 후 개발 서버를 다시 시작하세요. 빌드본에는 다시 빌드해야 반영됩니다.
 
-## 앱처럼 쓰기 (PWA)
+| 명령 | 동작 |
+| --- | --- |
+| `npm run dev` | 개발 서버 실행 |
+| `npm run typecheck` | TypeScript 타입 검사 |
+| `npm run build` | 타입 검사 후 `dist/`에 정적 파일 생성 |
+| `npm run preview` | 빌드 결과 확인, 기본 포트 4173 |
+| `npm run e2e` | 기존 `dist/`를 대상으로 브라우저 점검 실행 |
+| `npm run events` | 시청 행사 수집, 키가 있으면 새 항목 번역 |
+| `npm run eval:notices` | 실제 Claude API로 고지서 테스트셋 평가 |
 
-홈 화면 설치형 웹앱이다. `vite-plugin-pwa` 가 manifest 와 service worker 를 만들어 화면·글꼴을 기기에 캐시하고, 새 버전을 올리면 다음 실행 때 자동 갱신된다. 사진 읽기·AI 상담만 네트워크가 필요하다.
+### AI 연결과 데모 모드
 
-- 홈 화면 아래에 떠 있는 "홈 화면에 앱으로 추가" 배너 → [설치]. 안드로이드 크롬은 휴대폰 설치창이 바로 뜨고, 아이폰·그 밖의 브라우저는 기기별 2~3단계 안내 시트가 열린다
-- 배너를 닫으면 14일 동안 안 보이고, 홈 푸터의 "앱으로 설치" 링크로 언제든 다시 연다. 설치를 마치면 다시 나오지 않는다
-- 설치 후 홈 화면 아이콘으로 열면 주소창 없이 전체 화면으로 실행된다
-- 아이콘은 `public/icon-*.png` (양주시 CI 심벌), 설정은 `vite.config.ts` 의 `VitePWA(...)`
+`src/services/ai.ts`는 다음 순서로 연결을 선택합니다.
 
-## AI 중계 서버 (worker/)
+1. `VITE_AI_PROXY`가 있으면 Worker를 사용합니다.
+2. 없으면 `VITE_CLAUDE_API_KEY`로 직접 호출합니다.
+3. 환경 변수 키도 없으면 담당자 화면에서 해당 브라우저에 저장한 키를 사용합니다.
+4. 모두 없으면 AI 없이 샘플·직접 입력·키워드 규칙을 사용합니다.
 
-배포본은 Claude 를 직접 부르지 않고 Cloudflare Worker `https://our-yangju.mikael8047.workers.dev` 를 거친다. 진짜 API 키는 Worker 비밀값에만 있고 브라우저에는 없다.
+**`.env.example`에는 중계 서버 주소가 기본으로 들어 있습니다. API 키만 비워서는 데모 모드가 되지 않습니다.** 중계 서버 사용 시에도 서버 쪽 API 비용과 호출 한도가 적용됩니다.
 
-- 코드 `worker/src/index.ts`, 설정 `worker/wrangler.toml`. 경로는 앱의 Anthropic SDK 가 쓰는 `POST /v1/messages` 하나
-- 막는 것: 허용 출처(배포 주소·localhost) 밖의 요청, 허용 모델 밖, 2.5MB 넘는 요청, 하루 상한(기기 150건·전체 3,000건, KV 카운터)
-- Anthropic 으로는 Cloudflare AI Gateway(`our-yangju`)를 거쳐 가고, Worker 는 미국 쪽 센터에서 돌린다(placement hint). 홍콩 센터에서 직접 보내면 Anthropic 이 지역 차단(403)을 한다
-- 배포: `cd worker && npx wrangler login && npx wrangler deploy`. 키 등록: `npx wrangler secret put ANTHROPIC_API_KEY`
-- 앱 쪽 스위치는 `VITE_AI_PROXY`. 비우면 예전처럼 키로 직접 호출(로컬 개발·시연 기기용)
+AI 호출 없이 시연하려면 `.env`를 아래처럼 설정하고, 이전에 담당자 화면에서 키를 넣었다면 내 정보의 앱 데이터 초기화로 저장한 키도 지워 주세요. 초기화하면 언어를 제외한 다른 앱 저장값도 삭제됩니다.
 
-## 바로가기 주소 (QR·안내문·문자용)
+```dotenv
+VITE_AI_PROXY=
+VITE_CLAUDE_API_KEY=
+VITE_CLAUDE_MODEL=claude-haiku-5-5
+```
 
-서비스 주소 뒤에 붙인다. 언어를 이미 고른 사람은 그 화면이 바로 열리고, 처음 쓰는 사람은 언어를 고른 뒤 이어서 열린다. 방문 기록은 "홈 → 목적지"로 쌓여 뒤로 가기가 홈으로 간다. 읽은 뒤 주소창의 `?go=` 는 지운다.
+| 설정 | 용도 |
+| --- | --- |
+| `VITE_AI_PROXY` | Worker 기본 주소. 예제 값은 `https://our-yangju.mikael8047.workers.dev` |
+| `VITE_CLAUDE_API_KEY` | 브라우저 직접 호출 또는 로컬 수집·평가 스크립트에서 사용하는 키 |
+| `VITE_CLAUDE_MODEL` | 저장소의 기본 설정값은 `claude-haiku-5-5`. Worker 사용 시 허용 모델 목록과 일치해야 함 |
 
-| 주소 | 열리는 화면 |
-|---|---|
-| `?go=doc&from=qr` | 받은 고지서 읽기 ("고지서의 QR로 바로 들어왔어요" 표시) |
-| `?go=visit&id=reg` | 시청·주민센터 업무 하나 (move, reg, nhis, kid, drive) |
+모델 이름은 코드의 설정값을 설명한 것이며, 실제 사용 가능 여부는 연결한 API 환경에서 확인해야 합니다. AI가 없거나 고지서 읽기가 실패하면 직접 입력으로, 상담 근거를 찾지 못하면 추가 설명·1345 안내로 이어집니다. 창구의 실시간 번역에는 AI 연결이 필요합니다.
+
+직접 호출용 `VITE_` 키는 브라우저 번들에 포함됩니다. 담당자 화면의 키도 해당 브라우저 `localStorage`에 저장됩니다. 공개 배포에는 키를 넣지 말고 Worker 방식을 사용하세요. `.env`는 Git 제외 대상입니다.
+
+## 사진·질문 전송과 저장 범위
+
+**고지서 읽기와 ‘AI 가릴 곳 찾기’는 전송하는 이미지가 다릅니다.**
+
+- **직접 가리기 → 읽기:** 기기에서 검은 상자를 이미지 픽셀에 적용한 뒤, 가린 이미지를 Claude에 전송합니다.
+- **AI 가릴 곳 찾기:** `MaskScreen.tsx`가 가리기 전 캔버스의 긴 변 640px JPEG 사본을 전송해 위치를 받습니다. 이미 그려 놓은 가림 상자도 이 요청에는 적용되지 않습니다. 현재 코드는 축소·JPEG 변환만 하며 별도 흐림 처리를 하지 않으므로, 저해상도라도 개인정보가 포함될 수 있습니다.
+- **상담·공고·통역:** 규칙으로 처리하지 못한 상담 질문, 담당자가 입력한 공고문, 통역할 발화 텍스트가 AI 요청에 포함됩니다. 고지서 결과의 FAQ 질문은 기기 내 키워드로 처리합니다.
+
+Worker는 요청을 AI Gateway의 Anthropic 경로로 전달합니다. 앱과 Worker 코드에는 사진·대화 원문을 영구 저장하는 처리가 없지만, 이것만으로 외부 API·Gateway의 로그·보관 설정까지 보장하지는 않습니다.
+
+| 데이터 | 앱의 저장 방식 |
+| --- | --- |
+| 고지서 이미지·추출 결과·상담 대화 | 실행 중 메모리 상태. 앱 자체의 영구 저장소에는 기록하지 않음 |
+| 내 정보·언어·큰 글씨·쉬운 한국어 | 브라우저 `localStorage` |
+| 저장한 혜택·번역 검수 상태 | 브라우저 `localStorage` |
+| 담당자가 게시한 혜택 | 같은 브라우저에 최대 20건. 다른 기기와 공유되지 않음 |
+| 사용자가 저장을 선택한 납부 기록 | 세목·금액·납기·저장 시각만 최대 50건. 사진·이름·계좌번호 제외 |
+| 시연용 직접 호출 키 | 입력한 브라우저의 `localStorage`. 중계 서버 설정 시 키 입력 버튼 숨김 |
+
+납부 기록은 사용자가 누른 ‘납부 완료’의 기록이며, 은행·위택스와 연동한 실제 납부 확인 결과는 아닙니다. 내 정보에서 개인 정보만 지우거나, 언어를 제외한 `hy-` 접두어의 앱 저장값을 초기화할 수 있습니다.
+
+## 화면 동작과 PWA
+
+모바일 화면은 최대 480px 한 열이며 밝은 테마를 사용합니다. 960px 이상에서는 왼쪽에 서비스 소개·QR 두 개, 오른쪽에 앱을 표시합니다. 큰 창에서는 너비와 높이에 맞춰 최대 2배로 확대합니다. 관련 코드는 `src/components/layout/DeskPanel.tsx`와 `src/styles/global.css`입니다.
+
+하위 화면의 홈 버튼은 열린 시트를 닫고 홈으로 이동합니다. 화면 전환 시 스크롤과 제목 포커스를 조정하며, 하단 버튼·시트·토스트는 앱 영역에 맞춰 표시합니다.
+
+`vite-plugin-pwa`가 manifest와 service worker를 생성합니다.
+
+- 홈의 설치 배너 또는 푸터 ‘앱으로 설치’에서 설치를 진행합니다. 지원 브라우저는 설치창, 그 외 환경은 기기별 안내를 보여 줍니다.
+- 배너를 닫으면 14일간 숨기며, 설치형 실행 중에는 배너를 표시하지 않습니다.
+- 화면 자산과 한 번 받은 외부 글꼴을 캐시하고 새 버전을 자동 갱신합니다.
+- AI, 외부 사이트·지도, 일부 음성 기능에는 네트워크나 브라우저 지원이 필요합니다. 모든 기능의 오프라인 동작을 보장하지 않습니다.
+- 설정은 `vite.config.ts`, 아이콘은 `public/icon-*.png`와 `public/apple-touch-icon.png`입니다.
+
+## 바로가기 주소
+
+서비스 기본 주소 뒤에 아래 값을 붙입니다. 언어를 처음 선택하는 사람은 선택 후 목적지로 이동합니다. 목적지를 읽으면 쿼리 문자열을 지우며, 방문 기록은 홈에서 목적지로 이어집니다.
+
+| 주소 | 화면 |
+| --- | --- |
+| `?go=doc&from=qr` | 고지서 읽기, QR 진입 안내 표시 |
+| `?go=visit&id=reg` | 업무 상세. ID: `move`, `reg`, `nhis`, `kid`, `drive` |
 | `?go=welfare` | 지원 혜택 찾기 |
-| `?go=life&id=trash` | 생활 정보 하나 (sos, trash, med, bus, work) |
-| `?go=explore&tab=events` | 양주 둘러보기 (events, places, food, about) |
+| `?go=life&id=trash` | 생활 정보 상세. ID: `sos`, `trash`, `med`, `bus`, `work` |
+| `?go=explore&tab=events` | 둘러보기. 탭: `events`, `places`, `food`, `about` |
+| `#admin` | 담당자 시연 화면. 로그인·권한 검사는 구현되어 있지 않음 |
 
-고지서 인쇄 권장: QR 오류 복원 M 이상, 2cm 이상, 옆에 "휴대폰 카메라로 찍으면 내 언어로 고지서를 읽어 드려요"를 5개 언어로 한 줄씩. 규칙은 `src/utils/deeplink.ts`.
+처리 규칙은 `src/utils/deeplink.ts`에 있습니다. 업무·생활 정보의 ID가 없거나 잘못되면 목록으로, 알 수 없는 `go` 값이면 홈으로 이동합니다. 인쇄용 QR은 오류 복원 M 이상·가로세로 2cm 이상을 권장하며, 안내 문구와 실제 기기 인식 여부를 함께 확인하세요.
 
-## PC 화면 (960px 이상)
+## AI 중계 서버
 
-앱은 휴대폰 폭(480px) 그대로 오른쪽에 두고, 왼쪽에 서비스 소개·핵심 기능 3개·QR 2개("휴대폰으로 열기", "고지서 QR 예시")를 보여 준다 (`components/layout/DeskPanel.tsx`). 하단 바·시트·설치 배너·AI 상담 버튼·토스트는 앱 폭 안에 맞춰 열린다. 태블릿·휴대폰에서는 앱만 보인다. 창이 1280×800 보다 크면 앱 전체를 비율대로 확대한다 (1920×1080 약 1.3배, 2560×1440 약 1.8배, 최대 2배).
+코드는 `worker/src/index.ts`, 설정은 `worker/wrangler.toml`입니다. 브라우저의 Anthropic SDK가 `POST /v1/messages`로 요청하며, Worker가 비밀값 `ANTHROPIC_API_KEY`를 붙여 전달합니다.
 
-## 화면 구성 (2026-10-08 디자인시스템 개편)
+| 항목 | 현재 설정·동작 |
+| --- | --- |
+| 허용 출처 | `https://wscodefactory.github.io`, `http://localhost:3000`, `http://localhost:4173` |
+| 허용 모델 | `claude-haiku-5-5`, `claude-sonnet-5-5` |
+| 요청 크기 | `MAX_BODY_BYTES=2500000`. Content-Length와 읽은 본문 문자열 길이 검사 |
+| 일일 상한 | IP당 150회, 전체 3,000회. UTC 날짜 기준 KV 카운터 |
+| 응답 토큰 | `max_tokens`가 없거나 4096을 넘으면 4096으로 조정 |
+| 스트리밍 | 지원하지 않음 |
+| 상위 연결 | `UPSTREAM_URL`에 설정한 Cloudflare AI Gateway의 Anthropic 경로 |
+| 배치 설정 | Smart Placement, `wnam` 힌트 |
 
-휴대폰 한 손 사용 기준의 모바일 웹앱. 앱 폭 480px 한 열, 밝은 테마 하나, 양주시 CI 헤더.
-모든 문구는 `[ko, en, zh, vi, ne]` 다섯 칸으로 내장되어 AI 키 없이 5개 언어가 즉시 바뀐다.
+같은 공용 IP의 여러 기기는 한도를 공유합니다. KV 카운터는 원자적 증가 방식이 아니므로 동시 요청의 엄격한 과금 상한으로 볼 수 없으며, 상위 API가 실패한 요청도 카운터에 반영될 수 있습니다. 출처 검사는 사용자 인증을 대신하지 않습니다.
 
-1. **언어 선택** (첫 실행) — 이후에는 헤더 지구본 아이콘 → 시트
-2. **홈** — 서비스 소개(히어로) → 할 수 있는 일 4가지(시청·주민센터 업무 / 받은 고지서 읽기 / 지원 혜택 찾기 / 생활 정보) → 양주 둘러보기(행사·명소·소개)
-3. **시청과 주민센터 업무** — 목록 → 상세(장소·기한·준비물 체크리스트) + 하단 바 [1345 전화] [창구 직원에게 보여주기(한국어 전체 화면)]
-4. **받은 고지서 읽기** — 사진 → 기기에서 가림 → 가린 이미지만 AI 전송 → 내용 확인(세목·금액·기한·전자납부번호·가상계좌) → 결과(요약 카드 + 탭: 납부 방법 / 자주 묻는 질문 / 상담) + 하단 [위택스에서 납부하기]. 샘플 고지서·직접 입력 경로도 있음
-5. **지원 혜택 찾기** — 대상 칩 → 단계 탭 → 혜택 카드(북마크) → 상세 탭(자격 확인 / 준비물 / 신청 방법) + 하단 [저장] [문의 메모]
-6. **생활 정보** — 긴급 전화(tel: 링크), 쓰레기, 아플 때, 교통, 일터
-7. **AI 상담** — 오른쪽 아래 플로팅 버튼 하나. 한 문장 → 볼 화면 추천 (Claude 있으면 AI, 없으면 5개 언어 키워드 규칙)
-8. **내 정보** — 앱 바의 사람 아이콘(홈에는 아직 안 넣었을 때 안내 카드). "체류지 신고에 쓰여요"(비자·사는 곳·이사한 날·거주 형태·가족 동거)와 "고지서 납부에 쓰여요"(건강보험 납부 방식·차·은행 앱)로 나눠 묻고 고르는 즉시 휴대폰에만 저장(`hy-profile`). 넣으면 이사 신고에 D-day 띠와 관할 행정복지센터·지도, 가족 서류가 붙고, 업무 상세의 "내 상황"이 자동으로 채워지며, 결과 화면은 내 은행 앱 이름과 건강보험·자동차세 안내를 더한다. 화면 아래 "이 정보로 바뀐 안내"가 달라진 것을 모아 보여 준다. 이름·번호·계좌는 받지 않는다. 맨 아래 작은 링크로 내 정보만 지우거나 앱 데이터 전부(언어 제외)를 지운다
-9. **담당자 화면** — 시민 화면에서 분리. `#admin` 해시로만 진입 (공고 → 규칙 초안 → 근거 대조 → 게시 / 창구 모드 / 번역 검수 / 시연 기기 AI 키 입력 — 중계 서버 빌드에서는 숨김)
+본인 계정에 처음 배포할 때는 기존 설정을 그대로 쓰지 말고 Worker 이름·Gateway 주소·허용 출처·KV ID를 맞춰 주세요. 루트에서 `npm ci`를 마친 뒤 실행합니다.
 
-하위 화면 앱 바에는 집 모양 홈 버튼이 있어 어디서든 한 번에 홈으로 간다(열린 시트까지 닫고 방문 기록도 정리). 화면을 바꿀 때는 그리기 전에 맨 위로 스크롤하고(useLayoutEffect), 스크롤바 자리를 항상 비워 PC 에서 앱이 좌우로 흔들리지 않게 한다.
+```powershell
+Set-Location worker
+npx wrangler login
+npx wrangler kv namespace create LIMITS
+# 출력된 ID로 wrangler.toml의 [[kv_namespaces]] id를 수정
+npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler deploy
+```
+
+배포된 Worker 주소를 앱의 `VITE_AI_PROXY`에 넣고 다시 빌드합니다. 기존 Worker를 갱신할 때는 이미 연결된 KV를 유지하세요. 403은 허용 출처·상위 API 설정, 413은 이미지·요청 크기, 429는 Worker 한도와 상위 API 제한을 확인합니다.
+
+## 행사 수집과 GitHub Pages
+
+`.github/workflows/pages.yml`은 `main`·`feature/**` 푸시, 수동 실행, 매일 **06:00 한국시간**에 행사 수집과 Pages 배포를 수행하도록 설정되어 있습니다.
+
+- `scripts/fetch-events.mjs`가 양주시 행사 게시판을 최대 3페이지 수집합니다. 종료 후 30일이 지난 행사는 제외합니다.
+- 새 항목은 `VITE_CLAUDE_API_KEY`가 있으면 번역합니다. 키가 없으면 새 번역 대상은 한국어로 남고 `draft`로 표시됩니다. 기존 번역은 `events-cache.json`을 재사용합니다.
+- 수집·번역 실패 시 기존 `src/data/events.json`으로 계속 빌드합니다. 파일의 목록이 비어 있으면 앱에서 `content.ts`의 고정 행사를 사용합니다.
+- CI의 별도 `secrets-check` 작업은 번역 키가 없으면 실패하지만, `deploy` 작업은 이에 의존하지 않아 배포를 계속합니다.
+- Pages 빌드는 `tsc -b` 후 `vite build --mode pages`로 `/Our_Yangju/` 경로를 사용합니다. 일반 `npm run build`는 `/` 경로입니다.
+- CI 빌드에는 직접 호출 키를 넘기지 않고 Worker 주소를 지정합니다. 로컬에서 직접 호출 키를 넣은 채 빌드한 `dist/`는 공개하지 마세요.
+
+설정된 Pages 주소: [한눈에 양주](https://wscodefactory.github.io/Our_Yangju/). 워크플로 설정과 실제 배포 성공·서비스 가동 여부는 구분해서 확인해야 합니다.
 
 ## 코드 구조
 
-전체 폴더 구조와 데이터 흐름은 [프로젝트_구조.md](프로젝트_구조.md) 에 따로 정리했다.
-
-```
+```text
 src/
-├─ main.tsx / App.tsx           진입점, Provider 조립 (App → Doc → Guide), 앱 바·하단 바·FAB·시트·토스트
-├─ styles/global.css            양주시 디자인시스템(Yangju DS) 토큰·컴포넌트 CSS. 참고용 html의 <style> 그대로
-├─ i18n.ts                      tx/t(5개 언어 문구), Intl 날짜·금액 서식, 로캘 폴백, 누락 번역 점검
-├─ data/content.ts              모든 문구와 콘텐츠 (UI 사전, VISIT, LIFE, BEN, EVENTS, PLACES, FAQ, INTENTS, SAMPLE …)
-├─ data/admin.ts                담당자 화면 시연 데이터
-├─ data/knowledge.ts            AI 상담 근거 문서 18건 (출처 링크·이동 화면 포함)
-├─ data/events.ts, events.json  행사·공고. json 은 scripts/fetch-events.mjs 가 시청 게시판에서 자동 수집·번역(없으면 content.ts 의 정적 목록)
-├─ data/easy-ko.json            쉬운 한국어 문구 (scripts/gen-easy-ko.mjs 가 생성한 AI 초안)
-├─ types/index.ts               DocInfo · Screen(내비게이션 스택 유니온) · 담당자 화면 타입
-├─ context/AppContext.tsx       언어 · 큰 글씨 · 저장 혜택 · 내비 스택(history 연동) · 시트 · 토스트
-├─ context/DocContext.tsx       고지서 흐름 상태 (캔버스·가림·DocInfo)
-├─ context/GuideContext.tsx     AI 상담 대화 (INTENTS 규칙 → knowledge.ts 근거 문서로만 답하는 Claude → 모르면 1345 안내)
-├─ components/layout/Chrome.tsx AppBar · Title · BottomBar · Fab · Footer · Sheet · Toast
-├─ components/layout/Overlays.tsx 언어 시트 · AI 상담 · 고지서 원본 · 문의 메모 · 직원용 전체 화면 · 홈 화면 추가 안내(InstallSheet)
-├─ components/layout/DeskPanel.tsx PC(960px 이상) 왼쪽 소개·QR 패널 (qrcode)
-├─ components/ui/               Ic(Lucide 아이콘 맵) · Bits(Seg·Checklist·RowBtn·배지·Callout) · LangOptions
-├─ screens/                     Home · Lang · Explore · Saved · Profile(내 정보·데이터 초기화) · visit/ · life/ · doc/ · welfare/ · admin/
-├─ services/ai.ts, prompts.ts   Claude 호출 (@anthropic-ai/sdk) (고지서 읽기 · 가릴 곳 찾기 · 근거 답변 · 통역 · 공고 규칙 추출)
-└─ utils/                       browser(저장소·음성·복사) · sampleNotice(가상 고지서·가림) · pii(주민번호 감지) · calendar(.ics) · review(번역 검수) · deeplink(?go= 바로가기) · profile(내 정보·초기화) · rule(담당자)
-scripts/                        fetch-events(행사 수집, 배포 때 매일 06:00 실행) · gen-easy-ko · eval-notices(고지서 인식 정확도, tests/notices)
-legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드에 포함되지 않음)
-요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)
+├─ main.tsx / App.tsx       진입점, App → Doc → Guide Provider 조립
+├─ screens/ScreenRouter.tsx 화면 선택, 스크롤·포커스 조정
+├─ screens/                 홈·언어·둘러보기·저장·내 정보
+│  ├─ visit/ / life/        행정 업무·생활 정보
+│  ├─ doc/                  사진·가림·읽기·확인·납부 안내
+│  ├─ welfare/              혜택 목록·자격 사전 확인·신청 안내
+│  └─ admin/                공고 등록·번역 검수·창구 통역
+├─ components/              layout·ui·doc·guide·visit·welfare 공통 화면
+├─ context/                 언어·내비게이션·고지서·상담 상태
+├─ services/ai.ts           Claude 연결 선택, 텍스트·JSON·이미지 요청
+├─ services/prompts.ts      고지서·개인정보 위치·공고·근거 답변·통역 지시
+├─ services/benefitsStore.ts 담당자 게시 혜택의 기기 내 저장
+├─ data/content.ts          5개 언어 문구와 기본 콘텐츠
+├─ data/visit-detail.ts     상황별 업무 준비물·안내
+├─ data/links.ts            공식 사이트·연락처
+├─ data/knowledge.ts        상담에 제공하는 내장 근거 문서
+├─ data/events*.json        수집 행사·번역 캐시
+├─ data/easy-ko.json        미리 생성한 쉬운 한국어 문구
+├─ i18n.ts                  번역 선택·날짜·금액·누락 점검
+├─ types/                   화면·고지서·공고 규칙 타입
+├─ utils/                   저장소·가림·개인정보 패턴·달력·프로필·검수
+└─ styles/global.css        디자인 토큰·화면·PC 레이아웃
+worker/                     Cloudflare Worker와 KV·출처·한도 설정
+scripts/                    행사 수집·쉬운 한국어 생성·고지서 평가
+tests/e2e/                  Puppeteer 브라우저 점검
+tests/notices/              고지서 이미지·기대값
+public/                     로고·PWA 아이콘
+legacy/                     원본 HTML과 개편 전 React 코드
+.github/workflows/          Pages 빌드·배포
 ```
 
-## 브라우저 점검 (tests/e2e)
+추가 구조 설명은 [프로젝트_구조.md](프로젝트_구조.md), 고지서 테스트셋 작성법은 [tests/notices/README.md](tests/notices/README.md)를 참고하세요. `요청사항/`은 Git에서 제외한 팀 내부 자료 폴더로, 새로 복제한 저장소에는 없을 수 있습니다.
 
-헤드리스 크롬으로 실제 화면을 눌러 보는 점검. `npm run e2e` 가 빌드본(dist)을 preview 로 띄우고 `tests/e2e/*.test.mjs` 를 차례로 돌린다. 먼저 `npx vite build`.
+## 검증
 
-- `smoke` — 5개 언어 × 주요 화면 113개: 페이지 오류, 가로 스크롤, 외국어 화면의 한글 누수
-- `flows` — 바로가기 주소 6종, 홈 버튼, 설치 배너·안내 시트, 업무 상황 선택, 목록 높이(ko·vi·ne), 혜택 검색, 내 정보 → 이사 신고 D-day·관할 센터·결과 화면
-- `pc` — 1024~2560px 에서 소개 패널·확대 배율·고정 요소 정렬
-- `live` — 배포본에서 실제 AI 호출(돈이 들어 따로): `E2E_URL=https://wscodefactory.github.io/Our_Yangju/ npm run e2e -- live`
+### 로컬 브라우저 점검
 
-크롬 경로가 다르면 `CHROME_PATH`, 하나만 돌리려면 `npm run e2e -- flows`. 스크린샷은 `tests/e2e/shots/`.
+설치된 Chrome을 `puppeteer-core`로 실행합니다. `npm run e2e`는 **빌드하지 않고 기존 `dist/`**를 preview로 띄우므로 먼저 빌드하세요.
 
-## 원칙
+```powershell
+npm run build
+npm run e2e
+# 하나씩 실행할 때
+npm run e2e -- flows
+npm run e2e -- smoke
+npm run e2e -- pc
+```
 
-- AI는 세액·자격을 판정하지 않는다. 인쇄된 금액·기한을 읽기만 하고, 원본 고지서 확인을 안내한다.
-- 원본 사진은 기기 밖으로 나가지 않는다. 사용자가 가린 이미지만 전송하고 문서·질문 원문은 저장하지 않는다.
-- 납부 링크는 공식 주소(위택스)만 쓴다.
-- 업무 안내는 일반 법령 기준 예시이며 양주시 창구별 접수 범위는 확인 중이다. 중국어·베트남어·네팔어 문구는 내장 번역(팀 작성)으로 원어민·1345 통번역 인력 검수 전이다.
+| 점검 | 범위 |
+| --- | --- |
+| `flows` | 바로가기·언어 선택·홈 이동·설치 안내·업무 준비물·혜택 검색·프로필 반영·샘플 결과 |
+| `smoke` | 5개 언어 주요 화면과 담당자 탭의 페이지 오류·가로 넘침·한글 노출 검사 |
+| `pc` | 1024~2560px PC 레이아웃·배율·고정 요소 정렬 |
+| `live` | `E2E_URL`이 있을 때 실제 상담·가릴 곳 찾기·사진 읽기 호출. 없으면 건너뜀 |
 
-## 다음 개발
+기본 Chrome 경로는 Windows의 `C:/Program Files/Google/Chrome/Application/chrome.exe`입니다. 다른 경로는 `$env:CHROME_PATH`로 지정하며, 스크린샷은 `tests/e2e/shots/`에 저장됩니다.
 
-- [ ] 흐림·불확실 값 재촬영 안내, 기한 경과·복수 금액 상담 전환, 확인 전 납부 연결 보류
-- [x] 고지서 인식 테스트셋 `npm run eval:notices` (2026-10-13, 샘플 1장) · [ ] 실제 고지서 3~5장 추가
-- [x] 중·베·네 문구 고정 번역 내장 (2026-10-08) · [x] 담당자 화면 "번역 검수" 탭 (2026-10-13) · [ ] 원어민 검수 반영
-- [x] AI 상담 근거 답변(2026-10-13) · [ ] 근거 문서를 시청 공고로 확장
-- [ ] 담당자 게시 혜택 공유 저장소(서버) 연결
-- [x] Claude 호출 서버 프록시화 (2026-10-14, Cloudflare Worker + AI Gateway) · [ ] 담당자 게시 혜택 서버 저장
+실제 API 점검은 비용과 서버 한도를 사용합니다. `E2E_URL`을 설정한 채 전체 테스트를 실행하면 `live`도 포함되므로, 아래처럼 대상을 명시하세요.
+
+```powershell
+$env:E2E_URL = 'https://wscodefactory.github.io/Our_Yangju/'
+try { npm run e2e -- live }
+finally { Remove-Item Env:E2E_URL }
+```
+
+### 고지서 인식 평가·문구 생성
+
+```powershell
+npm run eval:notices
+npm run eval:notices -- --json
+node scripts/gen-easy-ko.mjs
+```
+
+이 명령들은 Worker 설정과 별도로 `.env` 또는 실행 환경의 `VITE_CLAUDE_API_KEY`로 Claude에 직접 요청합니다. 쉬운 한국어 생성은 키가 없으면 건너뛰며, `--force`로 기존 문구도 다시 생성할 수 있습니다.
+
+고지서 평가기는 앱과 같은 읽기 프롬프트를 쓰지만 이미지 파일은 축소·가림 없이 그대로 전송합니다. 실제 고지서는 미리 개인정보를 가리고 추가하세요. 현재 `cases.json`에는 가상 자동차세 샘플 **1장**이 있으며, 이것만으로 실제 고지서 인식 정확도를 일반화할 수 없습니다. `--json` 결과는 Git에서 제외한 `tests/notices/last-run.json`에 기록합니다.
+
+## 현재 한계와 후속 작업
+
+- 세액·가산금·최종 지원 자격을 확정하지 않습니다. 고지서 원문과 공식 접수·납부 채널에서 확인하도록 안내합니다.
+- 상담은 실시간 검색이나 벡터 검색이 아니라, `knowledge.ts`에 내장한 문서를 한 번의 요청에 제공하는 방식입니다. 출처 ID 확인이 답변 내용 전체의 정확성을 검증하는 것은 아닙니다.
+- 낮은 인식 신뢰도 안내와 사용자 수정 화면은 있지만, 흐림 재촬영·복수 금액 판별·확인 전 연결 제한을 더 보완해야 합니다.
+- ‘가릴 곳 찾기’는 가리기 전 이미지 사본을 전송합니다. 완전히 기기 안에서 처리하는 자동 가림 기능은 아직 없습니다.
+- `#admin`은 로그인 없는 시연 화면이며 사각지대 신호는 예시 데이터입니다. 담당자 게시·번역 검수 상태의 서버 공유는 구현되어 있지 않습니다.
+- 번역 검수는 완료 여부를 기기에 기록하는 기능입니다. 검수 상태 JSON을 가져오는 것만으로 번역 문구가 수정되지는 않습니다. 원어민 검토 결과는 별도 반영이 필요합니다.
+- 실제 고지서 테스트셋, 창구별 접수 범위 확인, 근거 문서 갱신, 음성·설치 기능의 실제 기기 검증을 추가해야 합니다.

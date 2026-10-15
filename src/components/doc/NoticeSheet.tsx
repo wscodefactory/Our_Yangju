@@ -1,4 +1,4 @@
-// "원본 보기" 시트: 샘플 고지서를 가린 모양으로 보여 준다. 개인정보 칸은 검은 띠(.mask)로.
+// 샘플 고지서를 가림 처리한 모습으로 보여주는 시트.
 import { Sheet } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
 import { useApp } from '@/context/AppContext';

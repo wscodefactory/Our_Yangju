@@ -1,6 +1,4 @@
-// 받은 고지서 읽기 — 시작 화면. 사진 / 샘플 / 직접 입력 세 갈래와, 이 휴대폰에 저장한 납부 기록.
-// 사진 버튼이 항상 주 버튼. 판독(AI)이 꺼져 있으면 가리기 뒤 ReadingScreen 이 직접 입력으로 넘긴다.
-// AI 키 입력은 시민 화면에 두지 않고 담당자 화면(#admin)에 있다.
+// 사진·샘플·직접 입력 경로와 이 기기에 저장한 납부 기록.
 import { useRef, useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Callout } from '@/components/ui/Bits';

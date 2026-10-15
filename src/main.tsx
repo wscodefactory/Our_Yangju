@@ -1,4 +1,4 @@
-// 진입점. index.html 의 #root 에 App 을 올린다. 전역 CSS 는 여기서 한 번만 import.
+// #root에 앱을 연결하고 전역 스타일을 불러온다.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

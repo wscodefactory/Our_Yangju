@@ -1,7 +1,4 @@
-// AI 상담(양주무관) 대화 상태. 사용자의 한 문장을 받아 볼 화면을 추천한다.
-// 규칙(INTENTS, 5개 언어 키워드)에 걸리면 바로 그 화면으로. 안 걸리면 AI 가 공식 문서(knowledge.ts) 안에서만 답하고
-// 근거를 붙인다. AI 가 없거나 실패하면 "조금 더 알려 주세요 + 1345". 키 없이도 규칙만으로 동작해야 한다.
-// 메시지 문구는 전부 UI 사전 키(chatHello/chatFound/chatMiss)라 언어가 바뀌면 그대로 따라온다.
+// 키워드로 화면을 추천하고, 나머지 질문은 내장 근거 자료로 답한다. 대화는 메모리에만 둔다.
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { INTENTS, LANGS, LIFE, STAGES, VISIT } from '@/data/content';
 import { KNOWLEDGE, type KnowledgeDoc } from '@/data/knowledge';

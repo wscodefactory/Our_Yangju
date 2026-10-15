@@ -1,5 +1,4 @@
-// 고지서 흐름 4단계: 할 일. 요약 카드 아래에 납부 / 질문 / 상담 탭.
-// 납부 탭은 은행 앱 가상계좌 이체를 1순위로 두고(입금 정보 상자 + 7단계 + 복사), 다른 방법은 접어 둔다.
+// 확인한 고지서의 납부 방법, FAQ, 상담 안내. 가상계좌 이체를 우선 안내한다.
 import { useState, type FormEvent } from 'react';
 import { BottomBar, Title } from '@/components/layout/Chrome';
 import { Callout, Seg } from '@/components/ui/Bits';
@@ -27,42 +26,42 @@ function splitVacct(v: string) {
 
 export function DocResultScreen() {
   const { lang, t, tx, fmtDate, fmtWon, toast, goHome } = useApp();
-  const { doc: d } = useDoc();
+  const { doc: notice } = useDoc();
   const { state: review } = useReview();
   const [tab, setTab] = useState<Tab>('pay');
   // [납부 완료] 뒤 "기록을 저장할까요?"
   const [askSave, setAskSave] = useState(false);
   const [question, setQuestion] = useState('');
-  const [asked, setAsked] = useState<string | null>(null);
-  if (!d) return null;
+  const [matchedFaq, setMatchedFaq] = useState<string | null>(null);
+  if (!notice) return null;
 
-  const n = daysUntil(d.due);
-  const overdue = n < 0;
-  const dd = overdue ? <span className="bdg red">{t('over')}</span>
-    : n === 0 ? <span className="bdg red">{t('today')}</span>
-    : <span className={`bdg ${n <= 7 ? 'red' : 'orange'}`}>{t('left', { n })}</span>;
-  const taxName = tx(TAX_TYPES[d.type]);
-  const dueShort = fmtDate(d.due, { year: 'numeric', month: 'long', day: 'numeric' });
-  const amount = fmtWon(d.amount);
-  const readText = [`${t('docIs')}: ${taxName}`, `${t('amountL')}: ${amount}`, `${t('dueL')}: ${fmtDate(d.due)}`, t('lateShort')].join('. ');
+  const daysLeft = daysUntil(notice.due);
+  const overdue = daysLeft < 0;
+  const deadlineBadge = overdue ? <span className="bdg red">{t('over')}</span>
+    : daysLeft === 0 ? <span className="bdg red">{t('today')}</span>
+    : <span className={`bdg ${daysLeft <= 7 ? 'red' : 'orange'}`}>{t('left', { n: daysLeft })}</span>;
+  const taxName = tx(TAX_TYPES[notice.type]);
+  const dueShort = fmtDate(notice.due, { year: 'numeric', month: 'long', day: 'numeric' });
+  const amount = fmtWon(notice.amount);
+  const readText = [`${t('docIs')}: ${taxName}`, `${t('amountL')}: ${amount}`, `${t('dueL')}: ${fmtDate(notice.due)}`, t('lateShort')].join('. ');
   const copy = (text: string) => { void copyText(text); toast(t('copied')); };
   const foreign = lang !== 'ko';
   const profile = loadProfile();
   const myBank = profile.bank ? bankLabel(profile.bank, foreign) : '';
-  const { bank, acct } = splitVacct(d.vacct || '');
+  const { bank, acct } = splitVacct(notice.vacct || '');
   // 외국어 화면에서는 은행 앱에서 찾기 쉽게 은행명에 영문 병기
   const bankShown = foreign ? bankWithEn(bank) : bank;
-  const taxKo = TAX_TYPES[d.type][0];
-  const koNote = `제목: ${taxKo} 고지서 관련 문의\n\n안녕하세요. 양주시에 사는 외국인 주민입니다.\n${taxKo} 고지서(납부기한 ${d.due.replace(/-/g, '.')}, 금액 ${d.amount.toLocaleString('ko-KR')}원)와 관련해 문의드립니다.\n\n문의 내용: (고지서 내용 확인 요청)\n\n한국어가 서툴러 통역(1345)과 함께 연락드릴 수 있습니다. 감사합니다.`;
+  const taxKo = TAX_TYPES[notice.type][0];
+  const inquiryText = `제목: ${taxKo} 고지서 관련 문의\n\n안녕하세요. 양주시에 사는 외국인 주민입니다.\n${taxKo} 고지서(납부기한 ${notice.due.replace(/-/g, '.')}, 금액 ${notice.amount.toLocaleString('ko-KR')}원)와 관련해 문의드립니다.\n\n문의 내용: (고지서 내용 확인 요청)\n\n한국어가 서툴러 통역(1345)과 함께 연락드릴 수 있습니다. 감사합니다.`;
 
   const savePaid = (yes: boolean) => {
-    if (yes) { paidStore.add({ type: d.type, amount: d.amount, due: d.due, paidAt: Date.now() }); toast(t('paidSaved')); }
+    if (yes) { paidStore.add({ type: notice.type, amount: notice.amount, due: notice.due, paidAt: Date.now() }); toast(t('paidSaved')); }
     goHome();
   };
 
   // 위택스 첫 화면으로 보내면서 전자납부번호를 미리 복사해 둔다. 조회 화면 직접 링크는 로그인 없이 열리는지 미확인이라 보류
   const wetaxLookup = (
-    <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (d.epay) copy(d.epay); }}>
+    <a className="btn secondary sm" href="https://www.wetax.go.kr" target="_blank" rel="noopener" onClick={() => { if (notice.epay) copy(notice.epay); }}>
       {t('wetaxLookup')}<Ic n="ext" cls="sm" />
     </a>
   );
@@ -73,14 +72,14 @@ export function DocResultScreen() {
     { text: t('bs2') },
     { text: t('bs3', { bank: bankShown }) },
     { text: t('bs4') },
-    { text: t('bs5', { amount }), copyLabel: t('copyAmt'), copyValue: String(d.amount) },
+    { text: t('bs5', { amount }), copyLabel: t('copyAmt'), copyValue: String(notice.amount) },
     { text: t('bs6') },
     { text: t('bs7') },
   ];
 
   const payPanel = (
     <div className="stack">
-      {d.vacct ? (
+      {notice.vacct ? (
         <section className="panel">
           <h2><span className="grow">{t('todoNow')}</span><span className="bdg green">{t('easiest')}</span></h2>
           {/* 기한이 지났으면 가산금 때문에 낼 금액이 고지서와 다르다. 위택스에서 지금 금액 확인이 먼저 */}
@@ -100,7 +99,7 @@ export function DocResultScreen() {
               <button type="button" className="icon-btn copy-btn" onClick={() => copy(acct)} aria-label={t('copyAcct')}><Ic n="copy" cls="sm" /></button></span></dd>
             <dt>{overdue ? t('amountBefore') : t('bankAmt')}</dt>
             <dd><span className="codebox" style={{ margin: 0 }}><code>{amount}</code>
-              <button type="button" className="icon-btn copy-btn" onClick={() => copy(String(d.amount))} aria-label={t('copyAmt')}><Ic n="copy" cls="sm" /></button></span></dd>
+              <button type="button" className="icon-btn copy-btn" onClick={() => copy(String(notice.amount))} aria-label={t('copyAmt')}><Ic n="copy" cls="sm" /></button></span></dd>
           </dl>
           <ol className="steps">
             {steps.map(({ text, copyLabel, copyValue }, i) => (
@@ -127,13 +126,13 @@ export function DocResultScreen() {
 
       {/* 다른 납부 방법은 접어 두되, 가상계좌가 없으면 이게 전부라 펼친다 */}
       <section className="panel">
-        <details className="faq" open={!d.vacct}>
+        <details className="faq" open={!notice.vacct}>
           <summary><Ic n="chev" cls="sm" /><span className="q">{t('otherPayT')}</span></summary>
           <div className="stack" style={{ gap: 10, marginBottom: 12 }}>
             <p style={{ margin: 0 }}>{t('otherCard')}</p>
-            {d.epay && (
-              <div className="codebox"><span className="sr-only">{t('fEpay')}</span><code>{d.epay}</code>
-                <button type="button" className="icon-btn copy-btn" onClick={() => copy(d.epay)} aria-label={`${t('copy')}: ${t('fEpay')}`}><Ic n="copy" cls="sm" /></button>
+            {notice.epay && (
+              <div className="codebox"><span className="sr-only">{t('fEpay')}</span><code>{notice.epay}</code>
+                <button type="button" className="icon-btn copy-btn" onClick={() => copy(notice.epay)} aria-label={`${t('copy')}: ${t('fEpay')}`}><Ic n="copy" cls="sm" /></button>
               </div>
             )}
             {wetaxLookup}
@@ -145,7 +144,7 @@ export function DocResultScreen() {
 
       {/* 내 정보에서 고른 것만: 건강보험료를 직접 내는 사람, 차가 있는 사람 */}
       {profile.nhisSelf && <Callout kind="info" icon="heart" sm>{t('nhisRemind')}</Callout>}
-      {profile.car && d.type !== 'auto' && <p className="hint-line" style={{ margin: 0 }}><Ic n="car" cls="sm" /><span>{t('carNote')}</span></p>}
+      {profile.car && notice.type !== 'auto' && <p className="hint-line" style={{ margin: 0 }}><Ic n="car" cls="sm" /><span>{t('carNote')}</span></p>}
       <Callout kind="warn" icon="alert">
         <b>{t('lateT')}</b><br />{t('lateE1')} {t('lateE2')} {t('lateE3')}<br />
         <span style={{ opacity: .85, fontSize: '.75rem' }}>{t('basis')}: {t('lateSrc')}</span>
@@ -161,7 +160,7 @@ export function DocResultScreen() {
     if (!q) return;
     if (hasPii(q)) { toast(t('piiBlocked')); return; }
     const hit = FAQ.find((f) => f.k.test(q));
-    setAsked(hit ? hit.id : 'none');
+    setMatchedFaq(hit ? hit.id : 'none');
     setQuestion('');
   };
   const faqPanel = (
@@ -172,10 +171,10 @@ export function DocResultScreen() {
         <button type="submit" className="icon-btn" aria-label={t('askSend')}><Ic n="send" /></button>
       </form>
       <p className="hint-line" style={{ margin: 0 }}><Ic n="shield" cls="sm" /><span>{t('chatPrivacy')}</span></p>
-      {asked === 'none' && <Callout kind="info" icon="info" sm>{t('faqMiss')}</Callout>}
+      {matchedFaq === 'none' && <Callout kind="info" icon="info" sm>{t('faqMiss')}</Callout>}
       <section className="panel">
         {FAQ.map((f) => (
-          <details key={f.id} className="faq" open={asked === f.id}>
+          <details key={f.id} className="faq" open={matchedFaq === f.id}>
             <summary><Ic n="chev" cls="sm" /><span className="q">{tx(f.q)}</span></summary>
             <p>{tx(f.a).replace('{due}', dueShort)}</p>
           </details>
@@ -188,17 +187,17 @@ export function DocResultScreen() {
     <div className="stack">
       <section className="list">
         <a className="row" href="tel:1345"><span className="ibox tone-blue"><Ic n="phone" /></span><span className="tx"><span className="t">1345</span><span className="d">{t('interpD')}</span></span><span className="act">{t('call')}</span></a>
-        {d.phone && (
-          <a className="row" href={`tel:${d.phone.replace(/[^0-9]/g, '')}`}><span className="ibox tone-green"><Ic n="building" /></span><span className="tx"><span className="t">{d.phone}</span><span className="d">{t('officeL')}</span></span><span className="act">{t('call')}</span></a>
+        {notice.phone && (
+          <a className="row" href={`tel:${notice.phone.replace(/[^0-9]/g, '')}`}><span className="ibox tone-green"><Ic n="building" /></span><span className="tx"><span className="t">{notice.phone}</span><span className="d">{t('officeL')}</span></span><span className="act">{t('call')}</span></a>
         )}
       </section>
       {/* 담당자에게 보여 줄 메모. 받는 쪽이 담당자라 화면 언어와 무관하게 한국어 */}
       <section className="panel">
         <h2>{t('noteKoT')}</h2>
         <div className="codebox" style={{ alignItems: 'flex-start', flexDirection: 'column' }}>
-          <code lang="ko" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontWeight: 500, fontSize: '.875rem' }}>{koNote}</code>
+          <code lang="ko" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontWeight: 500, fontSize: '.875rem' }}>{inquiryText}</code>
         </div>
-        <button type="button" className="btn secondary sm" style={{ marginTop: 10 }} onClick={() => copy(koNote)}><Ic n="copy" cls="sm" />{t('copyNote')}</button>
+        <button type="button" className="btn secondary sm" style={{ marginTop: 10 }} onClick={() => copy(inquiryText)}><Ic n="copy" cls="sm" />{t('copyNote')}</button>
       </section>
       <p className="src" style={{ margin: 0 }}><Ic n="info" cls="sm" /><span>{t('verNote')}</span></p>
     </div>
@@ -206,19 +205,19 @@ export function DocResultScreen() {
 
   return (
     <>
-      <Title>{taxName + (d.sample ? ` (${t('sample')})` : '')}</Title>
-      {!d.manual && <Stepper step={3} />}
+      <Title>{taxName + (notice.sample ? ` (${t('sample')})` : '')}</Title>
+      {!notice.manual && <Stepper step={3} />}
       {/* 질문·상담 탭에서는 요약 카드를 한 줄로 줄여 탭 내용이 한 화면에 들어오게 */}
       <section className={`sum ${tab === 'pay' ? '' : 'compact'}`.trim()} aria-label={`${t('docIs')}: ${taxName}`}>
         <button type="button" className="icon-btn sum-speak" onClick={() => { if (!speak(readText, lang)) toast(t('noVoice')); }} aria-label={t('aRead')}><Ic n="volume" /></button>
         <div className="sum-grid">
           <div>
             <div className="lab">{t('amountL')}</div><div className="val">{amount}</div>
-            {d.amountQ && foreign && tab === 'pay' && <div className="orig">{t('asPrinted')} <span lang="ko">{d.amountQ}</span></div>}
+            {notice.amountQ && foreign && tab === 'pay' && <div className="orig">{t('asPrinted')} <span lang="ko">{notice.amountQ}</span></div>}
           </div>
           <div>
-            <div className="lab">{t('dueL')}</div><div className="val sm">{dueShort}</div>{tab === 'pay' && dd}
-            {d.dueQ && foreign && tab === 'pay' && <div className="orig" style={{ marginTop: 4 }}>{t('asPrinted')} <span lang="ko">{d.dueQ}</span></div>}
+            <div className="lab">{t('dueL')}</div><div className="val sm">{dueShort}</div>{tab === 'pay' && deadlineBadge}
+            {notice.dueQ && foreign && tab === 'pay' && <div className="orig" style={{ marginTop: 4 }}>{t('asPrinted')} <span lang="ko">{notice.dueQ}</span></div>}
           </div>
         </div>
         {tab === 'pay' && <div className="sum-foot"><Ic n="alert" cls="sm" /><span>{overdue ? t('overdueWarn') : t('lateShort')}</span></div>}
@@ -226,7 +225,7 @@ export function DocResultScreen() {
       {/* 기한을 휴대폰 달력에 (종일 일정 + 3일 전 알림). 지난 기한은 넣을 이유가 없다 */}
       {tab === 'pay' && !overdue && (
         <button type="button" className="btn secondary sm" style={{ marginTop: 10 }}
-          onClick={() => { downloadIcs(`yangju-tax-${d.due}.ics`, buildIcs(t('calEvent', { tax: taxName }), d.due, `${amount} · ${t('calDesc')}`)); toast(t('calAdded')); }}>
+          onClick={() => { downloadIcs(`yangju-tax-${notice.due}.ics`, buildIcs(t('calEvent', { tax: taxName }), notice.due, `${amount} · ${t('calDesc')}`)); toast(t('calAdded')); }}>
           <Ic n="calendar" cls="sm" />{t('addCal')}
         </button>
       )}

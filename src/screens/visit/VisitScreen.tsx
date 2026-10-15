@@ -1,5 +1,4 @@
-// 시청과 주민센터 업무 목록 — 아코디언 카드. 카드를 누르면 배지·어디서·언제가 펼쳐지고, 체크리스트는 상세 화면에서.
-// 업무가 6개뿐이라 검색창은 두지 않는다.
+// 업무 목록에서 장소·기한을 펼쳐 보고, 상세 화면에서 준비물을 확인한다.
 import { useState } from 'react';
 import { Title } from '@/components/layout/Chrome';
 import { Ic } from '@/components/ui/Ic';
