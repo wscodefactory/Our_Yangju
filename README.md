@@ -77,6 +77,8 @@ npm run preview          # 빌드 결과 미리보기 (4173)
 
 ## 코드 구조
 
+전체 폴더 구조와 데이터 흐름은 [프로젝트_구조.md](프로젝트_구조.md) 에 따로 정리했다.
+
 ```
 src/
 ├─ main.tsx / App.tsx           진입점, Provider 조립 (App → Doc → Guide), 앱 바·하단 바·FAB·시트·토스트
