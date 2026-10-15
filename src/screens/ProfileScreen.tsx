@@ -117,7 +117,7 @@ export function ProfileScreen() {
               <label htmlFor="pf-bank">{t('pfBank')}</label>
               <select id="pf-bank" value={p.bank ?? ''} onChange={(e) => update({ bank: e.target.value || undefined })}>
                 <option value="">{t('pfNone')}</option>
-                {BANKS.map((b) => <option key={b} value={b}>{bankLabel(b, foreign)}</option>)}
+                {BANKS.map((b) => <option key={b} value={b} lang="ko">{bankLabel(b, foreign)}</option>)}
               </select>
             </div>
           </div>

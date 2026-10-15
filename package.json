@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "eval:notices": "node scripts/eval-notices.mjs",
-    "events": "node scripts/fetch-events.mjs"
+    "events": "node scripts/fetch-events.mjs",
+    "e2e": "node tests/e2e/run.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
@@ -23,6 +24,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.1.2",
+    "puppeteer-core": "^25.14.0",
     "typescript": "^5.6.3",
     "vite": "^8.3.3",
     "vite-plugin-pwa": "^2.0.0",

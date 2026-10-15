@@ -55,7 +55,14 @@ export function VisitItemScreen({ id }: { id: string }) {
           {d && <div className="badges" style={{ marginBottom: 12 }}>{d.badges.map((b, i) => <span key={i} className={`bdg ${b.tone}`}>{tx(b.t)}</span>)}</div>}
           <dl className="kv">
             <dt><Ic n="pin" cls="sm" />{t('lblWhere')}</dt>
-            <dd>{area ? <><b>{tx(area.label)} {t('centerWord')}</b><br /><a href={mapUrl(centerKo)} target="_blank" rel="noopener"><Ic n="pin" cls="sm" /> {t('openMap')}</a><br /><span className="muted">{tx(v.where)}</span></> : tx(v.where)}</dd>
+            <dd>{area ? (
+              <>
+                <b>{tx(area.label)} {t('centerWord')}</b><br />
+                <span lang="ko">양주시 {area.addr}</span><br />
+                <span className="linkrow"><a href={mapUrl(centerKo)} target="_blank" rel="noopener"><Ic n="pin" cls="sm" /> {t('openMap')}</a><a href={`tel:${area.tel.replace(/-/g, '')}`}><Ic n="phone" cls="sm" /> {area.tel}</a></span>
+                <span className="muted">{tx(v.where)}</span>
+              </>
+            ) : tx(v.where)}</dd>
             <dt><Ic n="calendar" cls="sm" />{t('lblWhen')}</dt><dd>{tx(v.when)}</dd>
             {d?.fee && <><dt><Ic n="landmark" cls="sm" />{t('feeT')}</dt><dd>{tx(d.fee)}</dd></>}
           </dl>

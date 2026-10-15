@@ -103,6 +103,17 @@ legacy/v1/                      개편 전 화면·데이터 (참고용, 빌드�
 요청사항/                        리서치·디자인 문서 (프로토타입 문구, 디자인시스템, UI/UX 개선 방향, 참고용 html)
 ```
 
+## 브라우저 점검 (tests/e2e)
+
+헤드리스 크롬으로 실제 화면을 눌러 보는 점검. `npm run e2e` 가 빌드본(dist)을 preview 로 띄우고 `tests/e2e/*.test.mjs` 를 차례로 돌린다. 먼저 `npx vite build`.
+
+- `smoke` — 5개 언어 × 주요 화면 113개: 페이지 오류, 가로 스크롤, 외국어 화면의 한글 누수
+- `flows` — 바로가기 주소 6종, 홈 버튼, 설치 배너·안내 시트, 업무 상황 선택, 목록 높이(ko·vi·ne), 혜택 검색, 내 정보 → 이사 신고 D-day·관할 센터·결과 화면
+- `pc` — 1024~2560px 에서 소개 패널·확대 배율·고정 요소 정렬
+- `live` — 배포본에서 실제 AI 호출(돈이 들어 따로): `E2E_URL=https://wscodefactory.github.io/Our_Yangju/ npm run e2e -- live`
+
+크롬 경로가 다르면 `CHROME_PATH`, 하나만 돌리려면 `npm run e2e -- flows`. 스크린샷은 `tests/e2e/shots/`.
+
 ## 원칙
 
 - AI는 세액·자격을 판정하지 않는다. 인쇄된 금액·기한을 읽기만 하고, 원본 고지서 확인을 안내한다.

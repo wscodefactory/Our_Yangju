@@ -50,7 +50,7 @@ async function fetchText(url) {
 /** 한 번의 Claude 호출로 여러 건의 제목·장소를 4개 언어로 번역. 실패하면 null */
 async function translate(items) {
   const prompt = `Translate each Korean event title and place into English (en), Simplified Chinese (zh), Vietnamese (vi), Nepali (ne).
-Keep proper nouns romanized the way Korean government sites do (e.g. Yangju, Hoeamsa). Keep it short, no explanations.
+Keep proper nouns romanized the way Korean government sites do (e.g. Yangju, Hoeamsa); for Chinese write place names in Chinese characters (장흥면 → 长兴面). Never leave Hangul in the output. Keep it short, no explanations.
 Return ONLY a JSON array, same order as input, each item: {"nttNo":"...","title":{"en":"","zh":"","vi":"","ne":""},"place":{"en":"","zh":"","vi":"","ne":""}}.
 Input:
 ${JSON.stringify(items.map(({ nttNo, title, place }) => ({ nttNo, title, place })))}`;

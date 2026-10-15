@@ -55,7 +55,7 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
 
   reg: {
     badges: [
-      { t: ['입국 90일 이내', 'Within 90 days of entry', '入境90天内', 'Trong 90 ngày sau nhập cảnh', 'प्रवेशको 90 दिनभित्र'], tone: 'blue' },
+      { t: ['입국 90일 이내', 'Within 90 days of entry', '入境90天内', 'Trong 90 ngày', '90 दिनभित्र'], tone: 'blue' },
       { t: ['하이코리아 예약 필수', 'HiKorea reservation required', '须HiKorea预约', 'Bắt buộc đặt lịch HiKorea', 'HiKorea बुकिङ अनिवार्य'], tone: 'red' },
     ],
     fee: ['30,000원 (우편 수령 시 등기료 4,000원 추가)', '30,000 KRW (+4,000 KRW for registered-mail delivery)', '30,000韩元（邮寄领取加挂号费4,000韩元）', '30.000 won (+4.000 won nếu nhận qua bưu điện)', '30,000 वन (हुलाकबाट लिँदा +4,000 वन)'],
@@ -97,7 +97,7 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
 
   nhis: {
     badges: [
-      { t: ['보험료는 매월 25일까지 선납', 'Premium due by the 25th, in advance', '保费每月25日前预缴', 'Đóng phí trước ngày 25 hằng tháng', 'बीमा शुल्क हरेक महिना 25 भित्र अग्रिम'], tone: 'amber' },
+      { t: ['보험료는 매월 25일까지 선납', 'Premium due by the 25th', '保费每月25日前预缴', 'Đóng phí trước ngày 25', 'हरेक 25 गतेभित्र अग्रिम'], tone: 'amber' },
       { t: ['체납 시 비자 연장 제한', 'Arrears can block visa extension', '欠费会限制签证延期', 'Nợ phí có thể bị hạn chế gia hạn visa', 'बक्यौता भए भिसा नवीकरणमा रोक'], tone: 'red' },
     ],
     types: [
@@ -132,7 +132,7 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
 
   kid: {
     badges: [
-      { t: ['체류자격 상관없이 의무교육', 'Compulsory education regardless of status', '无论滞留资格均可义务教育', 'Giáo dục bắt buộc bất kể tư cách cư trú', 'आवासीय हैसियत जे भए पनि अनिवार्य शिक्षा'], tone: 'green' },
+      { t: ['체류자격 상관없이 의무교육', 'Compulsory education for all', '无论滞留资格均可义务教育', 'Giáo dục bắt buộc cho mọi trẻ', 'सबैका लागि अनिवार्य शिक्षा'], tone: 'green' },
       { t: ['학교는 직접 방문 신청', 'Schools: apply in person', '学校需亲自申请', 'Trường học: nộp trực tiếp', 'विद्यालय: आफैं गएर आवेदन'], tone: 'blue' },
     ],
     types: [
@@ -160,7 +160,7 @@ export const VISIT_DETAIL: Record<string, VisitDetail> = {
 
   drive: {
     badges: [
-      { t: ['의정부운전면허시험장', "Uijeongbu Driver's License Center", '议政府驾驶执照考场', 'Trung tâm cấp bằng lái Uijeongbu', 'उइजङबु लाइसेन्स केन्द्र'], tone: 'blue' },
+      { t: ['의정부운전면허시험장', 'Uijeongbu License Center', '议政府驾驶执照考场', 'Trung tâm Uijeongbu', 'उइजङबु केन्द्र'], tone: 'blue' },
       { t: ['시청·주민센터에서는 안 돼요', 'Not at City Hall or community centers', '市政府、居民中心不能办', 'Không làm ở tòa thị chính, trung tâm', 'सहर कार्यालय/सामुदायिक केन्द्रमा हुँदैन'], tone: 'red' },
     ],
     types: [

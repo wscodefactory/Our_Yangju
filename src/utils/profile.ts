@@ -36,21 +36,20 @@ export const VISAS = [
   { id: 'other', label: ['그 밖', 'Other', '其他', 'Khác', 'अन्य'] },
 ];
 
-// 양주시 읍·면·동. 읍·면은 건강보험 농어촌 경감(22%) 대상
+// 양주시 읍·면·동 12곳. 주소·전화는 시청 읍면동안내(yangju.go.kr/www/contents.do?key=389, 2026-10-15 확인). 읍·면은 건강보험 농어촌 경감(22%) 대상
 export const AREAS = [
-  { id: 'yangju1', rural: false, label: ['양주1동', 'Yangju 1-dong', '杨州1洞', 'Yangju 1-dong', 'याङ्जु 1-दोङ'] },
-  { id: 'yangju2', rural: false, label: ['양주2동', 'Yangju 2-dong', '杨州2洞', 'Yangju 2-dong', 'याङ्जु 2-दोङ'] },
-  { id: 'okjeong1', rural: false, label: ['옥정1동', 'Okjeong 1-dong', '玉井1洞', 'Okjeong 1-dong', 'ओक्जङ 1-दोङ'] },
-  { id: 'okjeong2', rural: false, label: ['옥정2동', 'Okjeong 2-dong', '玉井2洞', 'Okjeong 2-dong', 'ओक्जङ 2-दोङ'] },
-  { id: 'hoecheon1', rural: false, label: ['회천1동', 'Hoecheon 1-dong', '桧泉1洞', 'Hoecheon 1-dong', 'होएचन 1-दोङ'] },
-  { id: 'hoecheon2', rural: false, label: ['회천2동', 'Hoecheon 2-dong', '桧泉2洞', 'Hoecheon 2-dong', 'होएचन 2-दोङ'] },
-  { id: 'hoecheon3', rural: false, label: ['회천3동', 'Hoecheon 3-dong', '桧泉3洞', 'Hoecheon 3-dong', 'होएचन 3-दोङ'] },
-  { id: 'hoecheon4', rural: false, label: ['회천4동', 'Hoecheon 4-dong', '桧泉4洞', 'Hoecheon 4-dong', 'होएचन 4-दोङ'] },
-  { id: 'baekseok', rural: true, label: ['백석읍', 'Baekseok-eup', '白石邑', 'Baekseok-eup', 'बेकसोक-उप'] },
-  { id: 'eunhyeon', rural: true, label: ['은현면', 'Eunhyeon-myeon', '银现面', 'Eunhyeon-myeon', 'युनह्योन-म्योन'] },
-  { id: 'nam', rural: true, label: ['남면', 'Nam-myeon', '南面', 'Nam-myeon', 'नाम-म्योन'] },
-  { id: 'gwangjeok', rural: true, label: ['광적면', 'Gwangjeok-myeon', '广积面', 'Gwangjeok-myeon', 'ग्वाङजोक-म्योन'] },
-  { id: 'jangheung', rural: true, label: ['장흥면', 'Jangheung-myeon', '长兴面', 'Jangheung-myeon', 'जाङह्युङ-म्योन'] },
+  { id: 'yangju1', rural: false, label: ['양주1동', 'Yangju 1-dong', '杨州1洞', 'Yangju 1-dong', 'याङ्जु 1-दोङ'], addr: '외미로64번길 45', tel: '031-8082-4577' },
+  { id: 'yangju2', rural: false, label: ['양주2동', 'Yangju 2-dong', '杨州2洞', 'Yangju 2-dong', 'याङ्जु 2-दोङ'], addr: '고읍로 77', tel: '031-8082-4578' },
+  { id: 'okjeong1', rural: false, label: ['옥정1동', 'Okjeong 1-dong', '玉井1洞', 'Okjeong 1-dong', 'ओक्जङ 1-दोङ'], addr: '옥정로 397-7', tel: '031-8082-4582' },
+  { id: 'okjeong2', rural: false, label: ['옥정2동', 'Okjeong 2-dong', '玉井2洞', 'Okjeong 2-dong', 'ओक्जङ 2-दोङ'], addr: '옥정동로7가길 4 파스텔시티2 2층', tel: '031-8082-4583' },
+  { id: 'hoecheon1', rural: false, label: ['회천1동', 'Hoecheon 1-dong', '桧泉1洞', 'Hoecheon 1-dong', 'होएचन 1-दोङ'], addr: '화합로1327번길 39', tel: '031-8082-4579' },
+  { id: 'hoecheon2', rural: false, label: ['회천2동', 'Hoecheon 2-dong', '桧泉2洞', 'Hoecheon 2-dong', 'होएचन 2-दोङ'], addr: '평화로1475번길 39', tel: '031-8082-4580' },
+  { id: 'hoecheon3', rural: false, label: ['회천3동', 'Hoecheon 3-dong', '桧泉3洞', 'Hoecheon 3-dong', 'होएचन 3-दोङ'], addr: '회정로 143', tel: '031-8082-7826' },
+  { id: 'baekseok', rural: true, label: ['백석읍', 'Baekseok-eup', '白石邑', 'Baekseok-eup', 'बेकसोक-उप'], addr: '백석읍 중앙로223번길 46', tel: '031-8082-4572' },
+  { id: 'eunhyeon', rural: true, label: ['은현면', 'Eunhyeon-myeon', '银现面', 'Eunhyeon-myeon', 'युनह्योन-म्योन'], addr: '은현면 은현로 66', tel: '031-8082-4573' },
+  { id: 'nam', rural: true, label: ['남면', 'Nam-myeon', '南面', 'Nam-myeon', 'नाम-म्योन'], addr: '남면 개나리17길 6', tel: '031-8082-4574' },
+  { id: 'gwangjeok', rural: true, label: ['광적면', 'Gwangjeok-myeon', '广积面', 'Gwangjeok-myeon', 'ग्वाङजोक-म्योन'], addr: '광적면 가래비길 93', tel: '031-8082-4575' },
+  { id: 'jangheung', rural: true, label: ['장흥면', 'Jangheung-myeon', '长兴面', 'Jangheung-myeon', 'जाङह्युङ-म्योन'], addr: '장흥면 권율로 7', tel: '031-8082-4576' },
 ];
 
 /** 은행 앱 선택지. 외국어 화면은 영문을 같이 보여 준다 */
